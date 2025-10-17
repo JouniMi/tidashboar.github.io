@@ -15,9 +15,8 @@ class ApiService {
      * Detect the correct GUI path for GitHub Pages deployment
      */
     detectGuiPath() {
-        // Use the base path detected in the HTML
-        const basePath = window.GITHUB_PAGES_BASE_PATH || '';
-        return basePath + '/gui/';
+        // Use relative path to work regardless of deployment URL
+        return './gui/';
     }
 
     /**
