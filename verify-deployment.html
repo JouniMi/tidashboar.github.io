@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GitHub Pages Deployment Verification</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .success { color: green; }
+        .error { color: red; }
+        .info { color: blue; }
+        pre { background: #f5f5f5; padding: 10px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>GitHub Pages Deployment Verification</h1>
+    
+    <div id="results"></div>
+
+    <script>
+        const results = document.getElementById('results');
+        
+        function addResult(message, type = 'info') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = message;
+            results.appendChild(div);
+        }
+
+        function addCodeBlock(title, content) {
+            const div = document.createElement('div');
+            div.innerHTML = `<h3>${title}</h3><pre>${content}</pre>`;
+            results.appendChild(div);
+        }
+
+        // Run verification tests
+        function runVerification() {
+            addResult('Starting GitHub Pages deployment verification...', 'info');
+            
+            // 1. Check hostname
+            const hostname = window.location.hostname;
+            addResult(`Hostname: ${hostname}`, hostname.includes('github.io') ? 'success' : 'info');
+            
+            // 2. Check pathname
+            const pathname = window.location.pathname;
+            addResult(`Pathname: ${pathname}`, 'info');
+            
+            // 3. Detect base path
+            const pathParts = pathname.split('/').filter(p => p);
+            let expectedBasePath = '';
+            if (hostname.includes('github.io') && pathParts.length > 1) {
+                expectedBasePath = '/' + pathParts[0];
+            }
+            addResult(`Expected Base Path: "${expectedBasePath}"`, 'info');
+            
+            // 4. Test static file loading
+            const testFiles = [
+                'latest_summary.json',
+                'dashboard.json', 
+                'incidents.json',
+                'vulnerabilities.json',
+                'threat_actors.json',
+                'statistics.json'
+            ];
+            
+            addResult('Testing static file loading...', 'info');
+            
+            Promise.all(testFiles.map(async (file) => {
+                try {
+                    const url = expectedBasePath + '/gui/' + file;
+                    const response = await fetch(url);
+                    if (response.ok) {
+                        const data = await response.json();
+                        addResult(`✅ ${file}: Loaded successfully (${Object.keys(data).length} keys)`, 'success');
+                        return { file, success: true, keys: Object.keys(data) };
+                    } else {
+                        addResult(`❌ ${file}: HTTP ${response.status}`, 'error');
+                        return { file, success: false, error: response.status };
+                    }
+                } catch (error) {
+                    addResult(`❌ ${file}: ${error.message}`, 'error');
+                    return { file, success: false, error: error.message };
+                }
+            })).then(results => {
+                const successCount = results.filter(r => r.success).length;
+                addResult(`Static file loading: ${successCount}/${results.length} files loaded successfully`, 
+                         successCount === results.length ? 'success' : 'error');
+                
+                // 5. Test JavaScript loading
+                addResult('Testing JavaScript asset loading...', 'info');
+                const jsTests = [
+                    '/static/js/services/api.js',
+                    '/static/js/app.js'
+                ];
+                
+                Promise.all(jsTests.map(async (jsFile) => {
+                    try {
+                        const url = expectedBasePath + jsFile;
+                        const response = await fetch(url);
+                        if (response.ok) {
+                            addResult(`✅ ${jsFile}: Loaded successfully`, 'success');
+                        } else {
+                            addResult(`❌ ${jsFile}: HTTP ${response.status}`, 'error');
+                        }
+                    } catch (error) {
+                        addResult(`❌ ${jsFile}: ${error.message}`, 'error');
+                    }
+                })).then(() => {
+                    addResult('Verification complete!', 'success');
+                });
+            });
+        }
+
+        // Run verification when page loads
+        window.addEventListener('load', runVerification);
+    </script>
+</body>
+</html>

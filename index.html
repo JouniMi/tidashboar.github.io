@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cybersecurity Threat Intelligence Dashboard v2</title>
+    
+    <!-- Bootstrap 5 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <!-- Vue 3 -->
+    <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Marked.js for markdown parsing -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="/static/css/dashboard.css">
+    
+    <!-- Base Path Detection for GitHub Pages -->
+    <script>
+        // Detect base path for GitHub Pages compatibility
+        window.GITHUB_PAGES_BASE_PATH = (function() {
+            const hostname = window.location.hostname;
+            const pathname = window.location.pathname;
+            
+            // For user/organization pages (username.github.io)
+            if (hostname.includes('github.io') && !pathname.includes('/pages/')) {
+                return '';
+            }
+            // For project pages (username.github.io/repository)
+            else if (hostname.includes('github.io')) {
+                const pathParts = pathname.split('/').filter(p => p);
+                if (pathParts.length > 0) {
+                    return '/' + pathParts[0];
+                }
+            }
+            // For local development
+            return '';
+        })();
+        
+        // Update all asset paths dynamically
+        document.addEventListener('DOMContentLoaded', function() {
+            const basePath = window.GITHUB_PAGES_BASE_PATH;
+            if (basePath) {
+                // Update CSS
+                const cssLink = document.querySelector('link[href*="/static/css/"]');
+                if (cssLink) {
+                    cssLink.href = cssLink.href.replace('/static/', basePath + '/static/');
+                }
+                
+                // Update JavaScript files
+                document.querySelectorAll('script[src*="/static/"]').forEach(script => {
+                    script.src = script.src.replace('/static/', basePath + '/static/');
+                });
+            }
+        });
+    </script>
+</head>
+<body>
+    <div id="app" class="main-container">
+        <!-- Loading State -->
+        <div v-if="loading" class="loading-spinner">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+
+        <!-- Error State -->
+        <div v-else-if="error" class="alert alert-danger" role="alert">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            [[ error ]]
+        </div>
+
+    <!-- Main Content -->
+    <div v-else>
+    {% raw %}
+            <!-- Executive Summary -->
+            <executive-summary v-if="summaryData.executiveSummary" :summary="summaryData.executiveSummary"></executive-summary>
+
+
+            
+            <!-- Stats Cards -->
+            <stats-cards :summary-stats="summaryData" :live-stats="liveStats"></stats-cards>
+
+            <!-- Navigation Tabs -->
+            <ul class="nav nav-tabs mb-4" role="tablist">
+                <li class="nav-item">
+                    <button class="nav-link" :class="{active: activeTab==='overview'}" @click="activeTab='overview'">
+                        <i class="bi bi-speedometer2 me-1"></i> Overview
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" :class="{active: activeTab==='incidents'}" @click="activeTab='incidents'">
+                        <i class="bi bi-exclamation-triangle me-1"></i> Incidents
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" :class="{active: activeTab==='vulnerabilities'}" @click="activeTab='vulnerabilities'">
+                        <i class="bi bi-bug me-1"></i> Vulnerabilities
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" :class="{active: activeTab==='threat-actors'}" @click="activeTab='threat-actors'">
+                        <i class="bi bi-person-badge me-1"></i> Threat Actors
+                    </button>
+                </li>
+                <li class="nav-item">
+                    <button class="nav-link" :class="{active: activeTab==='analytics'}" @click="activeTab='analytics'">
+                        <i class="bi bi-bar-chart me-1"></i> Analytics
+                    </button>
+                </li>
+            </ul>
+
+            <!-- Tab Content -->
+            <div class="tab-content">
+                <!-- Overview Tab -->
+                <div v-show="activeTab==='overview'">
+                    <charts-container 
+                        :summary-data="summaryData" 
+                        :incidents-data="incidents" 
+                        :vulnerabilities-data="vulnerabilities"
+                        :loading="loading"
+                        :error="error"
+                        @refresh="loadAllData">
+                    </charts-container>
+                </div>
+
+                <!-- Incidents Tab -->
+                <div v-show="activeTab==='incidents'">
+                    <incidents-table :incidents="incidents" @refresh="loadIncidents"></incidents-table>
+                </div>
+
+                <!-- Vulnerabilities Tab -->
+                <div v-show="activeTab==='vulnerabilities'">
+                    <vulnerabilities-table :vulnerabilities="vulnerabilities" @refresh="loadVulnerabilities"></vulnerabilities-table>
+                </div>
+
+                <!-- Threat Actors Tab -->
+                <div v-show="activeTab==='threat-actors'">
+                    <threat-actors-table :threat-actors="threatActors" @refresh="loadThreatActors"></threat-actors-table>
+                </div>
+
+                <!-- Analytics Tab -->
+                <div v-show="activeTab==='analytics'">
+                    <!-- Executive Summary Cards -->
+                    <div class="row mb-4">
+                        <div class="col-md-3">
+                            <div class="analytics-card risk-gauge-card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Overall Risk Level</h6>
+                                    <div class="risk-gauge" id="riskGauge"></div>
+                                    <span class="risk-label">[[ statisticsData?.risk_assessment?.overall_risk || 'Medium' ]]</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="analytics-card summary-card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Total Security Events</h6>
+                                    <div class="summary-number">[[ statisticsData?.overall_metrics?.total_security_events || 0 ]]</div>
+                                    <small class="text-muted">All categories</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="analytics-card summary-card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Active Incidents</h6>
+                                    <div class="summary-number">[[ statisticsData?.incidents?.total_incidents || 0 ]]</div>
+                                    <small class="text-muted">Last 30 days</small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="analytics-card summary-card">
+                                <div class="card-body text-center">
+                                    <h6 class="card-title">Critical Vulnerabilities</h6>
+                                    <div class="summary-number">[[ getCriticalVulnCount() ]]</div>
+                                    <small class="text-muted">CVSS 9.0-10.0</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Incident Analytics -->
+                    <div class="analytics-section">
+                        <h5 class="section-title"><i class="bi bi-exclamation-triangle me-2"></i>Incident Analytics</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Incident Types Distribution</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="incidentTypesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Incident Severity Breakdown</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="incidentSeverityChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mt-3">
+                            <div class="col-12">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Incident Timeline (Recent Activity)</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="incidentTimelineChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Vulnerability Analytics -->
+                    <div class="analytics-section">
+                        <h5 class="section-title"><i class="bi bi-bug me-2"></i>Vulnerability Analytics</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>CVSS Score Distribution</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="cvssDistributionChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Top Affected Vendors</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="vendorVulnerabilitiesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Threat Actor Analytics -->
+                    <div class="analytics-section">
+                        <h5 class="section-title"><i class="bi bi-person-badge me-2"></i>Threat Actor Analytics</h5>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Actor Motivations</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="motivationsChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Geographic Distribution</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="countriesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Top Malware Families</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <canvas ref="malwareFamiliesChart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Risk Assessment -->
+                    <div class="analytics-section">
+                        <h5 class="section-title"><i class="bi bi-shield-exclamation me-2"></i>Risk Assessment</h5>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Key Risk Factors</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="risk-factors">
+                                            <div v-for="factor in statisticsData?.risk_assessment?.risk_factors" :key="factor" class="risk-factor-item">
+                                                <i class="bi bi-exclamation-triangle-fill text-warning me-2"></i>
+                                                <span>[[ formatRiskFactor(factor) ]]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6">
+                                <div class="analytics-card">
+                                    <div class="card-header">
+                                        <h6>Recommendations</h6>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="recommendations">
+                                            <div v-for="rec in statisticsData?.risk_assessment?.recommendations" :key="rec" class="recommendation-item">
+                                                <i class="bi bi-check-circle-fill text-success me-2"></i>
+                                                <span>[[ formatRecommendation(rec) ]]</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endraw %}
+    </div>
+
+    <!-- JavaScript -->
+    <script src="/static/js/services/api.js"></script>
+    <script src="/static/js/services/charts.js"></script>
+    <script src="/static/js/services/utils.js"></script>
+    <script src="/static/js/components/executive-summary.js"></script>
+    <script src="/static/js/components/stats-cards.js"></script>
+    <script src="/static/js/components/incidents-table.js"></script>
+    <script src="/static/js/components/vulnerabilities-table.js"></script>
+    <script src="/static/js/components/threat-actors-table.js"></script>
+    <script src="/static/js/components/charts-container.js"></script>
+    <script src="/static/js/components/analytics-dashboard.js"></script>
+    <script src="/static/js/app.js"></script>
+</body>
+</html>

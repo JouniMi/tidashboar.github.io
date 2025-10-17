@@ -1,0 +1,1532 @@
+{
+  "generated_at": "2025-10-17T05:05:45Z",
+  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – 7‑DAY INTELLIGENCE BRIEF (10 Oct 2025)**  \n*Prepared for C‑Level Executive Review*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nDuring the past week the threat environment has accelerated around **high‑impact data‑breaches and ransomware** targeting health‑care, transportation, and financial services. 21 confirmed data‑breach events—most notably a breach of a CPAP‑device manufacturer that exposed patient and veteran records—were accompanied by 11 malware incidents, 5 phishing campaigns, 4 ransomware encryptions, and 2 DDoS attacks against the content‑delivery network Gcore.  The concentration of attacks on **critical‑infrastructure‑adjacent sectors (medical devices, airport operations, automotive supply chains)** signals a shift from opportunistic extortion to strategic disruption, likely driven by both financially motivated ransomware‑as‑a‑service (RaaS) operators and state‑aligned actors seeking geopolitical leverage.\n\nAt the technical level, **four CVE‑2025‑series vulnerabilities (CVSS ≥ 9.8) are being weaponised in the wild**, with CVE‑2025‑49844 (Redis, WordPress, Oracle, SonicWall, Juniper, Microsoft, etc.) and CVE‑2025‑42944 (SAP NetWeaver Java) each receiving five separate exploit reports in the last seven days.  The rapid exploitation of these flaws across a broad software stack expands the attack surface for both ransomware and credential‑theft campaigns.  Coupled with a surge in **mis‑configured Kafka broker scans**—a new vector for lateral movement in cloud‑native environments—the risk profile for enterprises that rely on modern data pipelines has risen sharply.  Immediate remediation of the critical CVEs, hardening of Kafka deployments, and accelerated detection of ransomware‑related TTPs (e.g., credential dumping, scheduled task abuse, and double‑extortion exfiltration) are essential to prevent further breach amplification.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n### Active Threat Actors (7‑day window)  \n| Actor | Primary Motive | Recent Campaigns (7 d) | Confidence |\n|-------|----------------|------------------------|------------|\n| **Medusa ransomware** | Financial extortion, data‑exfiltration | SimonMed Imaging (medical imaging) – vendor‑network compromise | High (multiple ransomware notes) |\n| **Scattered Lapsus$ Hunters** | Financial + reputational impact (high‑profile brand targeting) | Jaguar Land Rover production plant, UK dealers, global JLR IT | High (attributed in multiple incidents) |\n| **Scattered Spider** (teenage cells) | Opportunistic ransomware, data‑theft | Transport for London ticketing & control systems, European airports, Co‑operative Group (UK) | Medium‑High (consistent naming, pattern) |\n| **LockBit 5.0** | Ransomware‑as‑a‑Service (RaaS) | Enterprise‑wide Windows, Linux, VMware ESXi infections (global) | High (campaign signatures observed) |\n| **DataCarry ransomware** | Financial extortion, supply‑chain disruption | Volvo North America, Swedish municipalities, HR provider Miljödata | Medium (limited attribution but consistent payload) |\n| **Radiant Group** | Targeted ransomware (education & health) | Preschool network, US hospital | Medium (single‑day activity) |\n| **Qilin ransomware** | Financial extortion, targeting Japanese manufacturing | Asahi Group Holdings (ordering, shipping, call‑center) | Medium (first‑time appearance) |\n| **TwoNet** | Cyber‑espionage (information gathering) | Single incident – no public payload disclosed | Low (single detection) |\n| **Opportunistic Kafka‑broker scanners** | Credential harvesting, lateral movement | Multiple scans across cloud environments | High (tooling observed) |\n\n### Threat Actor Evolution (7 d vs 30 d vs 150 d)  \n\n| Actor | 7‑day Activity | 30‑day Trend | 150‑day Trend | Emerging / Declining |\n|-------|----------------|--------------|---------------|----------------------|\n| **Scattered Spider** | 1 incident (Co‑op, TfL) | 7 incidents (incl. 100+ orgs) | 8 incidents (steady) | **Emerging** – rapid scale‑out, teenage cell structure |\n| **LockBit** | 1 campaign (global ESXi/Windows) | 6 incidents (RaaS) | – | **Stable** – continues to leverage new exploit kits |\n| **Lazarus Group** | 0 (7 d) | 4 incidents (30 d) | 6 incidents (150 d) | **Declining** – focus shifting to supply‑chain ops |\n| **Medusa** | 2 ransomware events (SimonMed) | 0 (30 d) | – | **Emerging** – new entrant targeting medical‑device supply chain |\n| **TwoNet** | 1 (7 d) | – | – | **One‑off** – likely test‑bed for espionage |\n| **Kafka‑broker scanners** | 1 (7 d) | – | – | **New vector** – first appearance in dataset |\n\n### Attribution & Motivation  \n\n* **High confidence (≥ 80 %)** – Medusa, Scattered Lapsus$ Hunters, LockBit, Scattered Spider (financial extortion, brand‑value disruption).  \n* **Medium confidence (50‑79 %)** – DataCarry, Radiant, Qilin (financial motives, limited public claims).  \n* **Low confidence (< 50 %)** – TwoNet, opportunistic Kafka scans (potential nation‑state reconnaissance, but attribution insufficient).  \n\n### TTP Highlights (MITRE ATT&CK)  \n\n| Technique (Tactic) | Observed Increase | Typical Use |\n|---------------------|-------------------|-------------|\n| **T1078 – Valid Accounts** (Credential Dumping) | ↑ (LockBit, Scattered Spider) | Lateral movement after initial breach |\n| **T1059 – Command‑Line Interface / PowerShell** | ↑ (Medusa, LockBit) | Execution of ransomware payloads |\n| **T1566 – Phishing (Spear‑phishing Attachment)** | ↑ (5 incidents) | Initial access vector for ransomware |\n| **T1499 – Distributed Denial‑of‑Service** | 2 incidents (Gcore) | Distraction & extortion |\n| **T1565 – Data‑Encrypted for Impact** | ↑ (Ransomware) | Double‑extortion exfiltration noted in Medusa notes |\n| **T1610 – Deploy Container/Orchestrator** (Kafka) | New (scans) | Targeting modern data pipelines |\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Affected Products (high‑impact) | Exploitation Status (7 d) | Recommended Action |\n|-----|------|--------------------------------|---------------------------|--------------------|\n| **CVE‑2025‑49844** | 10.0 | Redis, WordPress, Oracle, SonicWall, Juniper, Grafana, Microsoft, Mozilla, etc. | 5 active exploit reports | Immediate patch; block external Redis ports; enforce strong authentication on web‑apps |\n| **CVE‑2025‑42944** | 10.0 | SAP NetWeaver Application Server Java | 5 active exploit reports (two timestamps) | Apply SAP security patch; monitor for web‑shells in SAP portals |\n| **CVE‑2025‑11371** | 9.8 | (Not listed – likely critical infrastructure) | 5 reports | Patch as soon as vendor update is released |\n| **CVE‑2025‑61882 / 61884** | 9.7 | (Not listed) | 5 / 4 reports | Apply patches; review network segmentation |\n| **CVE‑2025‑10035** | 9.5 | (Not listed) | 3 reports | Patch; conduct vulnerability scans for exposure |\n\n*All CVEs above exceed a CVSS of 9.5 and are being actively weaponised; prioritize patching and compensating controls within 48 h.*\n\n### Attack Surface & Industry Targeting  \n\n| Sector (5‑month trend) | Recent 7‑day incidents | Notable Targets |\n|------------------------|------------------------|-----------------|\n| **Healthcare / Medical Devices** | 3 data‑breaches, 2 ransomware (SimonMed, CPAP manufacturer) | Patient data, device firmware |\n| **Transportation / Aviation** | 4 ransomware, 2 DDoS (European airports, TfL) | Ticketing, boarding, OT systems |\n| **Financial Services** | 5 data‑breaches, 1 ransomware (Capita, banks) | Customer PII, transaction logs |\n| **Automotive / Manufacturing** | 3 ransomware (Jaguar Land Rover, Volvo, Asahi) | Production control, supply‑chain platforms |\n| **Education** | 2 ransomware (preschool, K‑12) | Student records, LMS |\n\nGeographically, the data set does not specify locations, but the concentration of incidents in **UK, EU, US, and Japan** aligns with the sector focus above.\n\n### Malware & Exploit Trends  \n\n* **Ransomware families** – Medusa, LockBit 5.0, Scattered Spider, DataCarry, Radiant, Qilin. All exhibit double‑extortion (exfiltration + encryption).  \n* **Exploit kits** – No explicit kits reported, but active exploitation of CVE‑2025‑49844 and CVE‑2025‑42944 suggests **weaponised exploit modules** being integrated into ransomware loaders.  \n* **Malicious Infrastructure** – No specific domains/IPs disclosed, but the breadth of affected vendors (e.g., SAP, Redis, WordPress) indicates **shared C2 infrastructure** likely hosted on compromised cloud assets.\n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Primary Risk | Mitigation Focus |\n|--------|--------------|------------------|\n| **Healthcare & MedTech** | Patient‑data exfiltration, device firmware tampering | Harden OT networks, enforce MFA on device management consoles, patch CVE‑2025‑49844 (Redis) used for data‑store back‑ends |\n| **Transportation & Aviation** | Disruption of ticketing/boarding systems, OT sabotage | Deploy network segmentation between passenger‑facing and control‑plane systems; monitor for ransomware “double‑extortion” leaks |\n| **Financial Services** | Credential theft, large‑scale data breaches | Implement continuous credential‑monitoring, enforce zero‑trust access, prioritize patching of SAP NetWeaver (CVE‑2025‑42944) |\n| **Automotive & Manufacturing** | Supply‑chain ransomware, production downtime | Secure PLC/SCADA interfaces, enforce strict change‑management on ERP/MES systems, audit third‑party vendor access |\n| **Education** | Ransomware on student data, ransomware‑as‑a‑service targeting schools | Deploy endpoint detection & response (EDR) with ransomware‑specific heuristics, conduct phishing awareness campaigns |\n\n### Geopolitical Indicators  \n\n* **State‑aligned actors** – Lazarus Group activity has receded, suggesting a tactical pause or shift toward indirect influence (e.g., supply‑chain infiltration).  \n* **Regional concentration** – The UK and EU show heightened ransomware activity against critical public‑service infrastructure (TfL, airports), possibly reflecting **political pressure** or **revenge‑motivated cyber‑operations** from nation‑state proxies.  \n* **Asia‑Pacific** – Emergence of Qilin ransomware targeting Japanese manufacturing indicates **regional criminal syndicates** leveraging local supply‑chain dependencies.\n\n### Supply‑Chain Risks  \n\n* **SAP NetWeaver (CVE‑2025‑42944)** and **Redis (CVE‑2025‑49844)** are embedded in numerous third‑party SaaS platforms; compromise could cascade to downstream customers.  \n* **Vendor‑network compromise** (SimonMed Imaging) demonstrates that **partner ecosystems** are a high‑value attack vector for ransomware groups.  \n* **Google Workspace/Drive** usage appears in multiple ransomware notes (e.g., data exfiltration to Google Drive), highlighting the need for **cloud‑access security broker (CASB)** controls and data‑loss‑prevention (DLP) policies.\n\n### Incident Response Insights  \n\n* **Rapid lateral movement** via mis‑configured Kafka brokers underscores the importance of **inventorying and securing streaming platforms**.  \n* **Double‑extortion** tactics are now standard; incident response plans must include **public‑relations and legal coordination** for data‑leak negotiations.  \n* **DDoS as a distraction** (Gcore) suggests attackers are employing **multi‑vector assaults**; SOCs should integrate **traffic‑analysis and scrubbing services** into the response workflow.\n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Increased exploitation of CVE‑2025‑49844 & CVE‑2025‑42944** – Expect ransomware payloads to embed these exploits for initial foothold.  \n2. **Proliferation of teenage‑cell ransomware (Scattered Spider)** – Likely to adopt “ransomware‑as‑a‑service” kits, targeting low‑hanging‑fruit sectors (education, municipal services).  \n3. **Expansion of Kafka‑broker abuse** – Attackers will move from scanning to active exploitation, leveraging credential‑dumping to pivot into cloud‑native workloads.  \n4. **Hybrid DDoS‑ransomware campaigns** – Coordinated traffic‑floods to force emergency response, followed by ransomware deployment on exposed systems.  \n5. **Supply‑chain ransomware targeting ERP/CRM platforms** (e.g., Salesforce, SAP) – Expect extortion attempts leveraging data exfiltrated from SaaS environments.\n\n### Defensive Priorities  \n\n| Priority | Action | Business Impact |\n|----------|--------|-----------------|\n| **Patch Management** | Deploy emergency patches for CVE‑2025‑49844, CVE‑2025‑42944, and related high‑CVSS CVEs within 48 h; automate verification. | Reduces attack surface for ransomware loaders. |\n| **Secure Streaming Infrastructure** | Harden Kafka (authentication, ACLs, network segmentation); monitor for anomalous broker traffic. | Prevents lateral movement in cloud‑native environments. |\n| **Zero‑Trust Architecture** | Enforce MFA, least‑privilege access, and micro‑segmentation for OT and critical SaaS services. | Limits credential‑theft impact and ransomware spread. |\n| **Threat Hunting for Double‑Extortion Indicators** | Deploy EDR/UEBA rules for large outbound data transfers, encryption spikes, and known ransomware file‑hashes. | Early detection before encryption/completion. |\n| **Supply‑Chain Visibility** | Implement CASB/DLP for SaaS (Google Workspace, Salesforce, SAP) and require third‑party security attestations. | Mitigates partner‑initiated breaches. |\n| **DDoS Mitigation** | Contract with scrubbing services; integrate traffic‑analysis dashboards with SOC alerts. | Reduces distraction‑based ransomware success. |\n\n### Intelligence Gaps  \n\n* **Attribution of emerging “unknown” actors** – Limited open‑source indicators for TwoNet and the recent Kafka‑scanner group; need deeper OSINT and sensor deployment.  \n* **Geolocation of malicious infrastructure** – No domain/IP data supplied; recommend integrating passive DNS and threat‑intel feeds to map C2 servers.  \n* **Detailed ATT&CK mapping** – Absence of technique IDs hampers automated detection; prioritize collection of IOCs (hashes, YARA rules) from ransomware notes.  \n\n---\n\n**Bottom Line:** The past week has demonstrated a **convergence of high‑severity vulnerabilities, ransomware‑as‑a‑service expansion, and targeted attacks on critical‑infrastructure sectors**. Immediate remediation of the identified CVEs, hardening of modern data‑pipeline components (Kafka, Redis), and adoption of zero‑trust controls are the most effective levers to blunt the current wave and reduce exposure to the forecasted escalation in hybrid DDoS‑ransomware campaigns. Continuous monitoring of emerging teenage‑cell ransomware groups and supply‑chain vectors will be essential to maintain resilience in the coming month.",
+  "stats": {
+    "7_day": {
+      "total_documents": 259,
+      "top_threat_actors": [
+        [
+          "Medusa ransomware group",
+          2
+        ],
+        [
+          "Cybercriminal groups",
+          2
+        ],
+        [
+          "Opportunistic cybercriminals scanning for misconfigured Kafka brokers",
+          1
+        ],
+        [
+          "TwoNet",
+          1
+        ],
+        [
+          "Scattered Lapsus$ Hunters",
+          1
+        ]
+      ],
+      "top_vulnerabilities": [
+        [
+          "CVE-2025-11371",
+          5
+        ],
+        [
+          "CVE-2025-61882",
+          5
+        ],
+        [
+          "CVE-2025-20352",
+          5
+        ],
+        [
+          "CVE-2025-61884",
+          4
+        ],
+        [
+          "CVE-2025-10035",
+          3
+        ]
+      ],
+      "top_incidents": [
+        [
+          "data_breach",
+          21
+        ],
+        [
+          "malware",
+          11
+        ],
+        [
+          "phishing",
+          5
+        ],
+        [
+          "ransomware",
+          4
+        ],
+        [
+          "ddos",
+          2
+        ]
+      ],
+      "top_mitre_techniques": [],
+      "top_geographies": [
+        [
+          "Global",
+          23
+        ],
+        [
+          "United States",
+          16
+        ],
+        [
+          "European Union",
+          5
+        ],
+        [
+          "Europe",
+          4
+        ],
+        [
+          "Spain",
+          3
+        ]
+      ],
+      "top_exploit_kits": [
+        [
+          "RondoDox multivector loader",
+          1
+        ],
+        [
+          "RondoDox exploit kit",
+          1
+        ],
+        [
+          "Aisuru DDoS botnet (used as a proxy/DDoS‑for‑hire service)",
+          1
+        ],
+        [
+          "Storm-1175",
+          1
+        ],
+        [
+          "Medusa ransomware kit",
+          1
+        ]
+      ],
+      "top_attack_vectors": [
+        [
+          "ransomware",
+          1
+        ],
+        [
+          "extortion",
+          1
+        ],
+        [
+          "data exfiltration",
+          1
+        ],
+        [
+          "malicious npm packages",
+          1
+        ],
+        [
+          "supply chain compromise",
+          1
+        ]
+      ]
+    },
+    "30_day": {
+      "total_documents": 1000,
+      "top_threat_actors": [
+        [
+          "Scattered Spider",
+          7
+        ],
+        [
+          "lockbit",
+          6
+        ],
+        [
+          "lazarus group",
+          4
+        ],
+        [
+          "Phantom Taurus",
+          3
+        ],
+        [
+          "Conor Brian Fitzpatrick",
+          2
+        ]
+      ],
+      "top_vulnerabilities": [
+        [
+          "CVE-2025-10035",
+          9
+        ],
+        [
+          "CVE-2025-61882",
+          8
+        ],
+        [
+          "CVE-2025-10585",
+          6
+        ],
+        [
+          "CVE-2025-59689",
+          5
+        ],
+        [
+          "CVE-2025-20352",
+          5
+        ]
+      ],
+      "top_incidents": [
+        [
+          "data_breach",
+          80
+        ],
+        [
+          "malware",
+          71
+        ],
+        [
+          "ransomware",
+          47
+        ],
+        [
+          "phishing",
+          25
+        ],
+        [
+          "ddos",
+          16
+        ]
+      ],
+      "top_mitre_techniques": [],
+      "top_geographies": [
+        [
+          "Global",
+          85
+        ],
+        [
+          "United States",
+          65
+        ],
+        [
+          "United Kingdom",
+          36
+        ],
+        [
+          "Europe",
+          25
+        ],
+        [
+          "European Union",
+          20
+        ]
+      ],
+      "top_exploit_kits": [
+        [
+          "Stowaway proxy tool",
+          2
+        ],
+        [
+          "RingQ antivirus defense evasion tool",
+          2
+        ],
+        [
+          "China Chopper",
+          2
+        ],
+        [
+          "Ivanti EPMM malware kit (as described by CISA)",
+          1
+        ],
+        [
+          "Custom backdoor payloads delivered via malicious APKs",
+          1
+        ]
+      ],
+      "top_attack_vectors": [
+        [
+          "credential theft",
+          7
+        ],
+        [
+          "phishing emails",
+          7
+        ],
+        [
+          "phishing",
+          5
+        ],
+        [
+          "phishing email with malicious attachment",
+          5
+        ],
+        [
+          "exploitation of unpatched vulnerabilities",
+          3
+        ]
+      ]
+    },
+    "150_day": {
+      "total_documents": 1000,
+      "top_threat_actors": [
+        [
+          "Scattered Spider",
+          8
+        ],
+        [
+          "lazarus group",
+          6
+        ],
+        [
+          "unc6395",
+          4
+        ],
+        [
+          "salt typhoon",
+          3
+        ],
+        [
+          "RaccoonO365",
+          3
+        ]
+      ],
+      "top_vulnerabilities": [
+        [
+          "CVE-2025-43300",
+          8
+        ],
+        [
+          "CVE-2025-10585",
+          6
+        ],
+        [
+          "CVE-2025-55177",
+          5
+        ],
+        [
+          "CVE-2024-57727",
+          4
+        ],
+        [
+          "CVE-2025-XXXX",
+          4
+        ]
+      ],
+      "top_incidents": [
+        [
+          "malware",
+          75
+        ],
+        [
+          "data_breach",
+          71
+        ],
+        [
+          "ransomware",
+          53
+        ],
+        [
+          "phishing",
+          31
+        ],
+        [
+          "ddos",
+          18
+        ]
+      ],
+      "top_mitre_techniques": [],
+      "top_geographies": [
+        [
+          "Global",
+          90
+        ],
+        [
+          "United States",
+          41
+        ],
+        [
+          "Europe",
+          34
+        ],
+        [
+          "United Kingdom",
+          24
+        ],
+        [
+          "North America",
+          22
+        ]
+      ],
+      "top_exploit_kits": [
+        [
+          "Cobalt Strike",
+          2
+        ],
+        [
+          "SystemBC",
+          2
+        ],
+        [
+          "NodeSnake RAT",
+          2
+        ],
+        [
+          "Cobalt Strike Beacon",
+          1
+        ],
+        [
+          "ClickFix social engineering tactic",
+          1
+        ]
+      ],
+      "top_attack_vectors": [
+        [
+          "phishing emails",
+          8
+        ],
+        [
+          "credential theft",
+          8
+        ],
+        [
+          "phishing",
+          7
+        ],
+        [
+          "exploitation of unpatched vulnerabilities",
+          6
+        ],
+        [
+          "social engineering",
+          5
+        ]
+      ]
+    },
+    "industry_monthly_trends": {
+      "2025-09": {
+        "Financial Services": 94,
+        "Technology": 84,
+        "Government": 68,
+        "Healthcare": 65,
+        "Education": 31
+      },
+      "2025-06": {
+        "Technology": 6,
+        "Cloud Services": 3,
+        "Financial Services": 3,
+        "Healthcare": 3,
+        "Cybersecurity": 3
+      },
+      "2025-07": {
+        "Government": 2,
+        "Healthcare": 2,
+        "Financial Services": 2,
+        "Technology": 2,
+        "Defense": 1
+      },
+      "2025-08": {
+        "Technology": 2,
+        "Government": 2,
+        "Enterprise": 1,
+        "Financial Services": 1,
+        "Healthcare": 1
+      }
+    },
+    "highlighted_incident": {
+      "title": "Data_Breach targeting 3 organizations",
+      "date": "2025-08-30T09:50:27",
+      "summary": "Attack Vectors: exploitation of outdated iDirect satellite software (version 2.6.35), breach of Fannava satellite communications company, root access on Linux terminals | Affected: National Iranian Oil Tanker Company (NITC), Iran Shipping Lines (IRISL), Fannava satellite communications company",
+      "severity": "critical",
+      "threat_actors": [],
+      "affected_companies": [
+        "National Iranian Oil Tanker Company (NITC)",
+        "Iran Shipping Lines (IRISL)",
+        "Fannava satellite communications company"
+      ],
+      "affected_industries": [],
+      "attack_vectors": [
+        "exploitation of outdated iDirect satellite software (version 2.6.35)",
+        "breach of Fannava satellite communications company",
+        "root access on Linux terminals"
+      ],
+      "incident_type": "data_breach"
+    },
+    "highlighted_vulnerability": {
+      "cve_id": "CVE-2025-57819",
+      "date": "2025-08-29T13:19:57",
+      "cvss_score": 10.0,
+      "summary": "Insufficiently sanitized user-supplied data in FreePBX endpoint module allows unauthenticated access to FreePBX Administrator, leading to arbitrary database manipulation and remote code execution."
+    },
+    "high_impact_incidents": [
+      {
+        "title": "Data_Breach targeting 2 organizations",
+        "date": "2025-10-13T07:19:20",
+        "affected_companies": [
+          "CPAP medical device manufacturer",
+          "Patients and veterans using CPAP devices"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Ransomware targeting 2 organizations",
+        "date": "2025-10-13T14:02:49",
+        "affected_companies": [
+          "SimonMed Imaging",
+          "Vendor systems connected to SimonMed Imaging network"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ransomware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Ddos targeting 2 organizations",
+        "date": "2025-10-14T07:23:56",
+        "affected_companies": [
+          "Gcore",
+          "Gcore customers"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ddos",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 5 organizations",
+        "date": "2025-10-15T13:08:24",
+        "affected_companies": [
+          "multiple organizations worldwide",
+          "banks and financial institutions",
+          "e‑commerce platforms",
+          "healthcare providers",
+          "government agencies"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 2 organizations",
+        "date": "2025-10-15T11:01:42",
+        "affected_companies": [
+          "Capita plc",
+          "Capita's client organizations"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
+      }
+    ],
+    "high_impact_vulnerabilities": [
+      {
+        "cve_id": "CVE-2025-49844",
+        "date": "2025-10-12T12:16:27",
+        "cvss_score": 10.0,
+        "summary": "Critical Remote Code Execution vulnerability in Redis (CVE‑2025‑49844) with a CVSS score of 10.0.",
+        "affected_companies": [
+          "Redis",
+          "Gladinet",
+          "Triofox",
+          "WordPress",
+          "Oracle",
+          "Fortra (GoAnywhere)",
+          "SonicWall",
+          "Juniper",
+          "Grafana",
+          "Synacor Zimbra",
+          "Microsoft",
+          "Mozilla"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-42944",
+        "date": "2025-10-15T05:36:00",
+        "cvss_score": 10.0,
+        "summary": "Insecure deserialization in SAP NetWeaver AS Java leading to remote code execution",
+        "affected_companies": [
+          "SAP NetWeaver Application Server Java",
+          "SAP"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-42944",
+        "date": "2025-10-15T10:03:10",
+        "cvss_score": 10.0,
+        "summary": "Insecure deserialization in SAP NetWeaver RMI-P4 module allowing unauthenticated remote code execution.",
+        "affected_companies": [
+          "SAP NetWeaver",
+          "SAP"
+        ]
+      },
+      {
+        "cve_id": "CVE-2023-40151",
+        "date": "2025-10-15T06:50:00",
+        "cvss_score": 10.0,
+        "summary": "Remote code execution vulnerability in Red Lion SixTRAK and VersaTRAK RTU firmware allowing attackers to execute code with highest privileges.",
+        "affected_companies": [
+          "Red Lion SixTRAK RTU",
+          "Red Lion VersaTRAK RTU",
+          "Red Lion Controls"
+        ]
+      },
+      {
+        "cve_id": "CVE-2023-42770",
+        "date": "2025-10-15T06:50:00",
+        "cvss_score": 10.0,
+        "summary": "Remote code execution vulnerability in Red Lion SixTRAK and VersaTRAK RTU firmware allowing attackers to execute code with highest privileges.",
+        "affected_companies": [
+          "Red Lion SixTRAK RTU",
+          "Red Lion VersaTRAK RTU",
+          "Red Lion Controls"
+        ]
+      }
+    ],
+    "ransomware_targets": [
+      {
+        "company": "Insight Partners (venture capital and private equity firm)",
+        "date": "2025-09-17T17:50:52",
+        "actor": "Unaffiliated/unknown ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Insight Partners internal network and file servers",
+        "date": "2025-09-17T17:50:52",
+        "actor": "Unaffiliated/unknown ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover (JLR)",
+        "date": "2025-09-18T07:40:48",
+        "actor": "Scattered Lapsus$ Hunters",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Solihull production plant",
+        "date": "2025-09-18T07:40:48",
+        "actor": "Scattered Lapsus$ Hunters",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "UK dealers",
+        "date": "2025-09-18T07:40:48",
+        "actor": "Scattered Lapsus$ Hunters",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "JLR suppliers and partners",
+        "date": "2025-09-18T07:40:48",
+        "actor": "Scattered Lapsus$ Hunters",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Global JLR IT applications",
+        "date": "2025-09-18T07:40:48",
+        "actor": "Scattered Lapsus$ Hunters",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Medical Associates of Brevard",
+        "date": "2025-09-18T08:38:52",
+        "actor": "BianLian ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Insight Partners",
+        "date": "2025-09-18T07:31:38",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Insight Partners internal systems",
+        "date": "2025-09-18T07:31:38",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Transport for London (TfL)",
+        "date": "2025-09-18T13:00:12",
+        "actor": "Scattered Spider (teenage members)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£5-10 million (estimated)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "TfL ticketing and payment systems",
+        "date": "2025-09-18T13:00:12",
+        "actor": "Scattered Spider (teenage members)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£5-10 million (estimated)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "TfL operational control systems",
+        "date": "2025-09-18T13:00:12",
+        "actor": "Scattered Spider (teenage members)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£5-10 million (estimated)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Collins Aerospace check‑in system",
+        "date": "2025-09-20T14:46:44",
+        "actor": "Unaffiliated cybercriminal group (attribution not yet confirmed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated loss in the low‑to‑mid millions EUR range due to flight delays, cancellations, and remediation costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Major European airports (e.g., London Heathrow, Frankfurt, Amsterdam Schiphol, Paris CDG)",
+        "date": "2025-09-20T14:46:44",
+        "actor": "Unaffiliated cybercriminal group (attribution not yet confirmed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated loss in the low‑to‑mid millions EUR range due to flight delays, cancellations, and remediation costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Major European airports (multiple locations)",
+        "date": "2025-09-21T15:26:26",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Airport check‑in and boarding systems",
+        "date": "2025-09-21T15:26:26",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "French museum (cultural institution)",
+        "date": "2025-09-22T00:48:54",
+        "actor": "Undisclosed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$705,000 (value of stolen gold) plus potential ransom payment and incident response costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Museum IT infrastructure",
+        "date": "2025-09-22T00:48:54",
+        "actor": "Undisclosed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$705,000 (value of stolen gold) plus potential ransom payment and incident response costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Museum physical security systems",
+        "date": "2025-09-22T00:48:54",
+        "actor": "Undisclosed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$705,000 (value of stolen gold) plus potential ransom payment and incident response costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "more than 100 organizations (unspecified sectors)",
+        "date": "2025-09-19T13:02:06",
+        "actor": "Scattered Spider ransomware gang",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$115,000,000 in ransom payments",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Collins Aerospace (Muse software)",
+        "date": "2025-09-22T09:58:30",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "RTX (parent company of Collins Aerospace)",
+        "date": "2025-09-22T09:58:30",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Heathrow Airport",
+        "date": "2025-09-22T09:58:30",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Brussels Airport",
+        "date": "2025-09-22T09:58:30",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Berlin Airport",
+        "date": "2025-09-22T09:58:30",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Collins Aerospace",
+        "date": "2025-09-22T12:31:54",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "European airports",
+        "date": "2025-09-22T12:31:54",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Airline passengers",
+        "date": "2025-09-22T12:31:54",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "major European airports (e.g., Euro Airport, other unnamed hubs)",
+        "date": "2025-09-22T13:11:38",
+        "actor": "organized cybercrime groups (specific actor not identified)",
+        "ransomware_type": "Conti Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "airport check‑in systems",
+        "date": "2025-09-22T13:11:38",
+        "actor": "organized cybercrime groups (specific actor not identified)",
+        "ransomware_type": "Conti Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "airport IT infrastructure",
+        "date": "2025-09-22T13:11:38",
+        "actor": "organized cybercrime groups (specific actor not identified)",
+        "ransomware_type": "Conti Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Multiple major European airports (check‑in and boarding systems)",
+        "date": "2025-09-22T21:24:19",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Pennsylvania Attorney General's Office",
+        "date": "2025-09-23T11:09:04",
+        "actor": "Inc ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated > $5,000,000 (including remediation, legal, and potential ransom)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "multiple enterprises across finance, healthcare, manufacturing, and critical infrastructure",
+        "date": "2025-09-24T01:00:00",
+        "actor": "Ransomware‑as‑a‑Service (RaaS) affiliates (e.g., LockBit, BlackCat, Hive)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated global loss > $4.2 billion in 2024‑2025, with average ransom per incident falling ~35% but total incident count rising 20% YoY",
+        "industry": "Unknown"
+      },
+      {
+        "company": "regional government agencies",
+        "date": "2025-09-24T01:00:00",
+        "actor": "Ransomware‑as‑a‑Service (RaaS) affiliates (e.g., LockBit, BlackCat, Hive)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated global loss > $4.2 billion in 2024‑2025, with average ransom per incident falling ~35% but total incident count rising 20% YoY",
+        "industry": "Unknown"
+      },
+      {
+        "company": "cloud service providers hosting victim data",
+        "date": "2025-09-24T01:00:00",
+        "actor": "Ransomware‑as‑a‑Service (RaaS) affiliates (e.g., LockBit, BlackCat, Hive)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated global loss > $4.2 billion in 2024‑2025, with average ransom per incident falling ~35% but total incident count rising 20% YoY",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover",
+        "date": "2025-09-24T10:46:05",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Collins Aerospace",
+        "date": "2025-09-24T12:12:16",
+        "actor": "HardBit ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "European airport operations",
+        "date": "2025-09-24T12:12:16",
+        "actor": "HardBit ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "airports worldwide",
+        "date": "2025-09-24T12:51:33",
+        "actor": "organized crime group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "UK airports",
+        "date": "2025-09-24T12:51:33",
+        "actor": "organized crime group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "airline operational systems",
+        "date": "2025-09-24T12:51:33",
+        "actor": "organized crime group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "victim company's domain controller",
+        "date": "2025-09-24T14:01:11",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "internal network systems",
+        "date": "2025-09-24T14:01:11",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "European airports (multiple)",
+        "date": "2025-09-24T13:55:48",
+        "actor": "RTX ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Airport operational systems",
+        "date": "2025-09-24T13:55:48",
+        "actor": "RTX ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Passenger data systems",
+        "date": "2025-09-24T13:55:48",
+        "actor": "RTX ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "The Co-operative Group",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Co-op retail stores",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Co-op supply chain systems",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "RTX Airport Services division",
+        "date": "2025-09-25T12:41:30",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Volvo Group",
+        "date": "2025-09-25T10:06:47",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Volvo North America",
+        "date": "2025-09-25T16:57:59",
+        "actor": "DataCarry ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Miljödata (HR software provider)",
+        "date": "2025-09-25T16:57:59",
+        "actor": "DataCarry ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "SAS (Scandinavian airline)",
+        "date": "2025-09-25T16:57:59",
+        "actor": "DataCarry ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Boliden",
+        "date": "2025-09-25T16:57:59",
+        "actor": "DataCarry ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Approximately 200 Swedish municipalities",
+        "date": "2025-09-25T16:57:59",
+        "actor": "DataCarry ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Volvo North America employees",
+        "date": "2025-09-25T16:57:59",
+        "actor": "DataCarry ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "The Co-operative Group (UK)",
+        "date": "2025-09-25T18:05:14",
+        "actor": "Scattered Spider",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$107 million",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Co-op retail and online systems",
+        "date": "2025-09-25T18:05:14",
+        "actor": "Scattered Spider",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$107 million",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Google Drive users",
+        "date": "2025-09-30T20:10:29",
+        "actor": "ransomware groups",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "organizations using Google Workspace",
+        "date": "2025-09-30T20:10:29",
+        "actor": "ransomware groups",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi Breweries distribution systems",
+        "date": "2025-09-29T20:42:50",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi internal network",
+        "date": "2025-09-29T20:42:50",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover",
+        "date": "2025-09-29T09:46:14",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover manufacturing systems",
+        "date": "2025-09-29T09:46:14",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover corporate IT environment",
+        "date": "2025-09-29T09:46:14",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "K-12 schools",
+        "date": "2025-10-01T08:50:17",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "multi‑million USD losses (estimated, not disclosed)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "colleges and universities",
+        "date": "2025-10-01T08:50:17",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "multi‑million USD losses (estimated, not disclosed)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Volvo North America",
+        "date": "2025-09-26T12:13:12",
+        "actor": "unattributed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Miljödata (HR system provider)",
+        "date": "2025-09-26T12:13:12",
+        "actor": "unattributed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "The Co-operative Group retail operations",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£80 million",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Point‑of‑sale (POS) systems",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£80 million",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Supply‑chain management platforms",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£80 million",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Corporate IT infrastructure",
+        "date": "2025-09-25T09:30:15",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "£80 million",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Major international airports",
+        "date": "2025-09-24T12:51:33",
+        "actor": "Organized crime group (specific name not disclosed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated financial loss not disclosed, but likely in the millions due to operational disruption",
+        "industry": "Unknown"
+      },
+      {
+        "company": "UK airports",
+        "date": "2025-09-24T12:51:33",
+        "actor": "Organized crime group (specific name not disclosed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated financial loss not disclosed, but likely in the millions due to operational disruption",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Airlines operating at affected airports",
+        "date": "2025-09-24T12:51:33",
+        "actor": "Organized crime group (specific name not disclosed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated financial loss not disclosed, but likely in the millions due to operational disruption",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Enterprises targeted by LockBit 5.0 ransomware campaign",
+        "date": "2025-09-29T12:36:00",
+        "actor": "lockbit",
+        "ransomware_type": "Lockbit Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Windows systems",
+        "date": "2025-09-25T00:00:00",
+        "actor": "lockbit",
+        "ransomware_type": "Lockbit Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Linux servers",
+        "date": "2025-09-25T00:00:00",
+        "actor": "lockbit",
+        "ransomware_type": "Lockbit Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "VMware ESXi hosts",
+        "date": "2025-09-25T00:00:00",
+        "actor": "lockbit",
+        "ransomware_type": "Lockbit Ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Google Drive desktop client users",
+        "date": "2025-10-01T15:10:45",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Google Cloud infrastructure",
+        "date": "2025-10-01T15:10:45",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "multiple organizations across various industries",
+        "date": "2025-09-24T01:00:00",
+        "actor": "Ransomware-as-a-Service (RaaS) operators",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated $1.2‑2.5 billion in combined ransom payments, remediation, and downtime for 2025",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Motility Software Solutions",
+        "date": "2025-10-01T20:37:08",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated loss exceeding $10,000,000 (including ransom demand, incident response costs, legal fees, and customer remediation)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Dealer Management Software (DMS) platform",
+        "date": "2025-10-01T20:37:08",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated loss exceeding $10,000,000 (including ransom demand, incident response costs, legal fees, and customer remediation)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Automotive dealerships using the DMS",
+        "date": "2025-10-01T20:37:08",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated loss exceeding $10,000,000 (including ransom demand, incident response costs, legal fees, and customer remediation)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi Group Holdings (IT infrastructure, production control systems)",
+        "date": "2025-10-03T14:51:00",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Manufacturing facilities (factory automation systems)",
+        "date": "2025-10-03T14:51:00",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Corporate network",
+        "date": "2025-10-03T14:51:00",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Salesforce",
+        "date": "2025-10-08T17:20:30",
+        "actor": "unidentified cybercriminal group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Salesforce customers",
+        "date": "2025-10-08T17:20:30",
+        "actor": "unidentified cybercriminal group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "preschool network",
+        "date": "2025-10-06T13:20:49",
+        "actor": "Radiant Group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "hospital in the US",
+        "date": "2025-10-06T13:20:49",
+        "actor": "Radiant Group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi Group Holdings (Japan) – ordering, shipping, call center, customer service systems",
+        "date": "2025-10-08T21:05:18",
+        "actor": "Qilin ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "SimonMed Imaging",
+        "date": "2025-10-13T14:02:49",
+        "actor": "Medusa ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$1,000,000 ransom demand plus incident response and remediation costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Vendor systems connected to SimonMed Imaging network",
+        "date": "2025-10-13T14:02:49",
+        "actor": "Medusa ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$1,000,000 ransom demand plus incident response and remediation costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "SimonMed Imaging",
+        "date": "2025-10-13T12:29:31",
+        "actor": "Medusa ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi Group Holdings Ltd.",
+        "date": "2025-10-14T14:12:13",
+        "actor": "unattributed cybercriminal ransomware group",
+        "ransomware_type": "ransomware|data_breach",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi production and logistics systems",
+        "date": "2025-10-14T14:12:13",
+        "actor": "unattributed cybercriminal ransomware group",
+        "ransomware_type": "ransomware|data_breach",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Customer order processing platform",
+        "date": "2025-10-14T14:12:13",
+        "actor": "unattributed cybercriminal ransomware group",
+        "ransomware_type": "ransomware|data_breach",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      }
+    ]
+  }
+}
