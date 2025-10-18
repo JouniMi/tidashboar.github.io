@@ -96,9 +96,7 @@ class Utils {
         if (!text) return '';
         if (typeof marked !== 'undefined') {
             let html = marked.parse(text);
-            // Wrap tables in responsive containers for mobile
-            html = html.replace(/<table([^>]*)>/gi, '<div class="table-responsive"><table$1>');
-            html = html.replace(/<\/table>/gi, '</table></div>');
+            // Only wrap tables in responsive containers, let CSS handle responsiveness
             return html;
         }
         // Fallback: basic HTML formatting
