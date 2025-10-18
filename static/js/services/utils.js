@@ -95,7 +95,11 @@ class Utils {
     static formatMarkdown(text) {
         if (!text) return '';
         if (typeof marked !== 'undefined') {
-            return marked.parse(text);
+            let html = marked.parse(text);
+            // Wrap tables in responsive containers for mobile
+            html = html.replace(/<table([^>]*)>/gi, '<div class="table-responsive"><table$1>');
+            html = html.replace(/<\/table>/gi, '</table></div>');
+            return html;
         }
         // Fallback: basic HTML formatting
         return text
