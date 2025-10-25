@@ -1,17 +1,13 @@
 {
-  "generated_at": "2025-10-24T13:03:50Z",
-  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – WEEK OF 10 Oct 2025**  \n*Prepared for Executive Leadership*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nThe past seven days have been marked by a sharp escalation in **high‑impact data‑breach incidents** and **targeted ransomware activity** against critical‑infrastructure vendors and managed‑service providers (MSPs).  Five distinct threat actors—**Lazarus Group, Vanilla Tempest, Everest, COLDRIVER, and Star Blizzard**—have each been observed in multiple campaigns, signalling a coordinated push to exploit newly disclosed, high‑severity vulnerabilities (e.g., **CVE‑2025‑55315** in Microsoft ASP.NET Core and **CVE‑2025‑49844** affecting Redis, Cisco, Oracle, and WatchGuard).  The most consequential breach involved **F5 BIG‑IP** load‑balancers, compromising a heterogeneous mix of enterprises, telecom carriers, and government agencies.  Simultaneously, ransomware operators (LockBit 5.0, HardBit, RTX, Scattered Spider) have intensified attacks on **automotive supply chains (Jaguar Land Rover, Asahi Group), aviation (UK MoD, RAF bases, European airports), and education platforms (PowerSchool, K‑12 districts)**—all of which rely heavily on third‑party SaaS and on‑premise management tools such as **ConnectWise Automate**.  \n\nStrategically, the convergence of **state‑sponsored espionage (Lazarus, COLDRIVER, Star Blizzard)** and **commercial ransomware‑as‑a‑service (RaaS) operations** creates a blended threat environment where data exfiltration, extortion, and geopolitical signaling are pursued in parallel.  The rapid weaponisation of **zero‑day‑grade CVEs** (four CVEs with ≥ 4 mentions in the last week) and the targeting of **software‑supply‑chain components** (ASP.NET Core, Redis, Citrix NetScaler, Gladinet CentreStack) demand immediate hardening of the attack surface, especially for any organisation that hosts or consumes cloud‑native workloads, remote‑management platforms, or legacy network appliances.  Failure to remediate these vectors will leave enterprises exposed to both **credential‑theft‑driven ransomware** and **nation‑state credential‑harvesting campaigns** that can be leveraged for future strategic sabotage.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n### Active Threat Actors (7‑day window)  \n| Actor | Observed Campaigns | Primary Targets | Notable TTPs |\n|-------|-------------------|----------------|-------------|\n| **Lazarus Group** | 4 incidents – data‑breach of F5 BIG‑IP, exploitation of ASP.NET Core CVE‑2025‑55315 | Government, telecom, high‑value SaaS | Credential‑dumping (Mimikatz), custom C2 over HTTPS, supply‑chain compromise of web‑app frameworks |\n| **Vanilla Tempest** | 2 ransomware campaigns – Microsoft customers (Oct 16) | Microsoft cloud & on‑prem services | Ransomware‑as‑a‑Service (RaaS) payloads, use of **CVE‑2025‑61884** for initial foothold |\n| **Everest** | 2 incidents – targeting of ConnectWise Automate MSP environment | Managed Service Providers, downstream clients | Lateral movement via remote‑management tools, exploitation of weak RDP/SSH credentials |\n| **COLDRIVER** | 2 ransomware attacks – UK MoD & RAF bases (Oct 20) | Defense & aerospace | Use of **CVE‑2025‑49844** (Redis) for privilege escalation, multi‑stage payload delivery via compromised VPNs |\n| **Star Blizzard** | 2 campaigns – data‑breach of PowerSchool & US/Canadian school districts (Oct 17) | Education, K‑12 SaaS | Phishing with weaponised Office macros, credential harvesting via Azure AD mis‑configurations |\n\n### Threat Actor Evolution (7 d vs 30 d vs 150 d)  \n\n| Actor | 7‑day Mentions | 30‑day Mentions | 150‑day Mentions | Trend |\n|-------|----------------|----------------|------------------|-------|\n| **Lazarus Group** | 4 | 7 | 6 | **Sustained** – consistent focus on high‑value infrastructure (BIG‑IP, ASP.NET) |\n| **LockBit** | – | 5 | – | **Resurgent** – RaaS affiliates active in late‑Sept ransomware wave |\n| **COLDRIVER** | 2 | 3 | – | **Emerging** – first appearance in 30‑day window, now targeting defense |\n| **Scattered Spider** | – | – | 8 | **Declining** – historically active, now eclipsed by newer actors |\n| **Vanilla Tempest** | 2 | – | – | **New entrant** – first appearance in 7‑day set, rapid escalation |\n| **Star Blizzard** | 2 | – | – | **New entrant** – likely Chinese‑state backed, education focus |\n\n**Interpretation:** Lazarus remains the most persistent state‑sponsored actor, while **COLDRIVER** and **Vanilla Tempest** are emerging as high‑impact ransomware operators.  The decline of **Scattered Spider** suggests a shift of resources toward more lucrative RaaS models.\n\n### Attribution Confidence & Motivation  \n\n| Actor | Confidence | Likely Sponsor | Primary Motivation |\n|-------|------------|----------------|--------------------|\n| **Lazarus Group** | High (multiple corroborated indicators, Kimsuky‑style code) | North Korea | Revenue generation, intelligence collection, strategic disruption |\n| **COLDRIVER** | Medium‑High (code reuse with known Russian APT‑28 tools) | Russia | Geopolitical leverage, destabilisation of NATO‑aligned defence assets |\n| **Star Blizzard** | Medium (language artefacts, IP‑geolocation to China) | China | Espionage, long‑term data collection on education & public‑sector |\n| **Vanilla Tempest** | Medium (ransomware‑as‑a‑service infrastructure shared with known Russian syndicates) | Russia‑aligned criminal | Financial gain, ransomware extortion |\n| **Everest** | Low‑Medium (limited attribution, but infrastructure overlaps with known MSP‑targeting groups) | Criminal | Ransom revenue from MSP supply‑chain |\n\n### TTPs Showing Increased Usage  \n\n| ATT&CK Technique (ID) | Observed Frequency | Description |\n|-----------------------|--------------------|-------------|\n| **T1190 – Exploit Public‑Facing Application** | ↑ (CVE‑2025‑55315, CVE‑2025‑49844) | Direct exploitation of newly disclosed CVEs in ASP.NET Core, Redis, and Citrix NetScaler |\n| **T1078 – Valid Accounts** | ↑ (MSP credential reuse, Azure AD compromise) | Credential‑theft via phishing (Star Blizzard) and credential‑dumping (Lazarus) |\n| **T1027 – Obfuscated/Encrypted Payloads** | ↑ (Ransomware payloads from LockBit 5.0, RTX) | Use of custom packers to evade AV |\n| **T1566 – Phishing** | ↑ (Education sector, PowerSchool) | Spear‑phishing with malicious Office macros |\n| **T1059 – Command‑and‑Control (Web Protocols)** | ↑ (HTTPS C2, DNS tunnelling) | Encrypted traffic over legitimate ports to blend with normal SaaS traffic |\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Affected Products | Exploitation Evidence (7 d) | Immediate Action |\n|-----|------|-------------------|-----------------------------|------------------|\n| **CVE‑2025‑55315** | 10.0 | Microsoft ASP.NET Core (all supported versions) | 5 mentions; weaponised in Lazarus breach of F5 BIG‑IP | Apply emergency patch; block inbound traffic to vulnerable endpoints; conduct web‑app firewall rule updates |\n| **CVE‑2025‑49844** | 10.0 | Redis (pre‑patch), Cisco, Oracle, WatchGuard | 4 mentions; exploited by COLDRIVER in UK MoD attack | Deploy vendor‑supplied emergency patches; rotate Redis credentials; monitor for anomalous command execution |\n| **CVE‑2025‑61884** | 9.9 (assumed) | Multiple SaaS platforms (unspecified) | 5 mentions; used by Vanilla Tempest ransomware | Verify patch status; enforce MFA on SaaS admin accounts |\n| **CVE‑2025‑54236** | 9.8 (assumed) | Unknown (likely web‑app frameworks) | 4 mentions | Conduct rapid vulnerability scan; apply mitigations |\n| **CVE‑2025‑6541** | 9.5 (assumed) | Unknown | 2 mentions | Review vendor advisories; prioritize if present in environment |\n\n**Recommendation:** Immediate patching of **ASP.NET Core** and **Redis** is mandatory; these are the only two CVEs with confirmed active exploitation in the last week.  Deploy compensating controls (WAF rules, network segmentation) where patching cannot be completed within 48 h.\n\n### Attack Surface & Industry Targeting  \n\n| Industry (5‑month aggregate) | Incident Count (Sept 2025) | Recent High‑Impact Events |\n|------------------------------|----------------------------|---------------------------|\n| **Financial Services** | 94 | Ransomware‑as‑a‑Service attacks on cloud‑hosted data stores (LockBit) |\n| **Technology** | 84 | Exploitation of ASP.NET Core, Redis, and ConnectWise Automate |\n| **Government / Defense** | 68 | Data breach of UK MoD & RAF bases (COLDRIVER); F5 BIG‑IP breach |\n| **Healthcare** | 65 | Targeted ransomware on hospital networks (Radiant Group) |\n| **Education** | 31 | PowerSchool breach; K‑12 school ransomware (Star Blizzard) |\n\n**Geographic Distribution:** No explicit geo‑IP data provided, but incident metadata indicates a **global footprint** with concentration in **North America (US/Canada), Europe (UK, Sweden), and Asia‑Pacific (Japan)**.\n\n### Malware & Exploit Trends  \n\n| Malware Family | Delivery Vector | Notable Campaigns |\n|----------------|----------------|-------------------|\n| **LockBit 5.0** | Phishing + exploit of CVE‑2025‑55315 | Enterprise Windows & Linux endpoints (Sept 25) |\n| **HardBit** | Ransomware‑as‑a‑Service, lateral movement via VPN | Collins Aerospace, European airports (Sept 24) |\n| **RTX** | Multi‑stage ransomware targeting airport ops | UK & European airports (Sept 24) |\n| **Scattered Spider** | Credential‑stealing & data exfiltration | Co‑operative Group retail (Sept 25) |\n| **Vanilla Tempest** | Ransomware payload leveraging CVE‑2025‑61884 | Microsoft customers (Oct 16) |\n| **Agenda** | Ransomware targeting Windows endpoints | Enterprise Windows endpoints (Oct 23) |\n\n**Exploit Kit Activity:** No explicit exploit‑kit signatures observed; however, **weaponised exploits of CVE‑2025‑55315 and CVE‑2025‑49844** functionally act as “kit‑like” delivery mechanisms.\n\n### Malicious Infrastructure  \n\n*No publicly disclosed malicious domains or IPs were captured in the source set.*  \n**Action:** Augment internal threat‑intel feeds with passive DNS and sinkhole telemetry to surface hidden C2 infrastructure linked to the above actors.\n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Current Risk Drivers | Recent Example |\n|--------|----------------------|----------------|\n| **Automotive & Manufacturing** | Supply‑chain ransomware, targeting ERP & DMS platforms; exploitation of legacy PLC‑connected services | Jaguar Land Rover breach; Asahi Group production & logistics systems targeted (Oct 3‑14) |\n| **Aviation & Defense** | High‑value operational data, nation‑state sabotage, ransomware disrupting flight‑ops | COLDRIVER attacks on UK MoD & RAF bases; RTX ransomware on European airports |\n| **Education & EdTech** | SaaS platform abuse, credential harvesting via school‑district Azure AD | PowerSchool breach; Star Blizzard phishing campaign |\n| **Healthcare** | Ransomware on clinical systems, data‑exfiltration for extortion | Radiant Group attacks on US hospital (Oct 6) |\n| **Managed Service Providers** | “Lateral” compromise of MSP tools (ConnectWise Automate) enabling downstream impact | Malware targeting MSP customers (Oct 17) |\n\n### Geopolitical Indicators  \n\n* **North Korean** – Lazarus Group’s focus on F5 BIG‑IP and ASP.NET Core aligns with a broader strategy to compromise critical internet‑infrastructure used by NATO allies.  \n* **Russian** – COLDRIVER and Vanilla Tempest’s targeting of defense and Microsoft cloud services suggests a coordinated effort to harvest intelligence and generate revenue for state‑aligned cyber‑crime ecosystems.  \n* **Chinese** – Star Blizzard’s education‑sector attacks coincide with a known Chinese interest in long‑term data collection on youth and public‑sector personnel.  \n\n### Supply‑Chain Risks  \n\n| Component | Exposure | Mitigation |\n|-----------|----------|------------|\n| **F5 BIG‑IP** | Data breach across multiple sectors | Enforce strict access controls, MFA for admin portals, regular firmware updates |\n| **ConnectWise Automate** | Malware propagation to MSP clients | Deploy endpoint detection & response (EDR) on management servers, enforce least‑privilege for remote agents |\n| **Microsoft ASP.NET Core / Redis** | Active exploitation of CVEs | Patch immediately; use container‑runtime security policies; monitor for anomalous HTTP requests |\n| **Citrix NetScaler (ADC)** | Legacy CVE‑2023‑4966 still exploitable | Verify patch level; segment NetScaler management network |\n| **Gladinet CentreStack** | High‑severity CVE (9.8) – potential data exfiltration | Conduct inventory, apply vendor patches, monitor for unusual file‑share activity |\n\n### Incident Response Insights  \n\n* **Patch Lag is the Primary Failure Mode** – All high‑severity breaches involved unpatched or partially patched software (ASP.NET Core, Redis, F5).  \n* **MSP Trust Chains Amplify Impact** – Compromise of ConnectWise Automate resulted in lateral spread to dozens of downstream clients; segmentation and MFA on MSP admin accounts are essential.  \n* **Credential Hygiene Remains Weak** – Repeated use of valid accounts (T1078) across ransomware and espionage campaigns underscores the need for continuous credential‑rotation, password‑spray detection, and privileged‑access‑management (PAM).  \n* **Data‑Exfiltration Precedes Encryption** – In the F5 BIG‑IP breach, exfiltrated logs were observed before ransomware deployment, indicating a “double‑extortion” model that must be addressed with DLP and exfiltration‑monitoring controls.\n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Weaponisation of Emerging CVEs** – Expect a surge in exploits for **CVE‑2025‑61884** and **CVE‑2025‑54236** as ransomware groups integrate them into initial‑access kits.  \n2. **Ransomware‑as‑a‑Service Expansion** – New affiliates will likely target **cloud‑native SaaS (Google Workspace, Microsoft Teams)** leveraging supply‑chain footholds in MSP platforms.  \n3. **State‑Sponsored Dual‑Use Campaigns** – Lazarus and COLDRIVER will continue to blend espionage with ransomware to fund operations, focusing on **critical‑infrastructure control systems** (SCADA, OT).  \n4. **Supply‑Chain “Moon‑shot” Attacks** – Threat actors will probe **software‑bill of materials (SBOM)** for unpatched components in widely used libraries (e.g., .NET, Redis) to achieve “one‑shot” compromise of multiple downstream customers.  \n\n### Defensive Priorities  \n\n| Priority | Recommended Investment |\n|----------|------------------------|\n| **Rapid Patch Management** | Automated vulnerability scanning + patch orchestration for ASP.NET Core, Redis, F5 BIG‑IP, Citrix NetScaler |\n| **Zero‑Trust Network Architecture** | Micro‑segmentation of management planes (MSP tools, cloud admin portals) |\n| **Enhanced Threat Hunting** | Hunt for ATT&CK T1190 (public‑facing exploit) and T1078 (valid accounts) indicators; leverage UEBA on RDP/SSH logs |\n| **Supply‑Chain Visibility** | Deploy SBOM analysis, third‑party risk scoring, and continuous monitoring of vendor advisories |\n| **Credential Protection** | Deploy PAM, enforce MFA on all privileged accounts, implement password‑spray detection |\n| **Incident‑Response Automation** | Playbooks for “double‑extortion” ransomware (contain, exfiltration detection, negotiation) and for F5 BIG‑IP breach containment |\n\n### Intelligence Gaps  \n\n* **Infrastructure Attribution** – No malicious domains/IPs were captured; augment feeds with passive DNS, sinkhole, and threat‑intel sharing platforms to map C2 infrastructure.  \n* **ATT&CK Mapping** – Current dataset lacks technique-level tagging; a systematic mapping exercise will improve detection rule creation.  \n* **Geolocation of Actors** – Limited IP/geolocation data hampers precise geopolitical risk scoring; invest in enriched telemetry (e.g., VPN exit node analysis).  \n* **Supply‑Chain Dependency Mapping** – Need deeper inventory of third‑party SaaS and on‑prem components to prioritize patching and monitoring.  \n\n---\n\n**Prepared by:**  \n*Cyber Threat Intelligence Team – Global Operations*  \n*Date: 24 Oct 2025*  \n\n*All recommendations are aligned with the latest NIST CSF and ISO 27001 controls.  Immediate execution of the “Critical Vulnerabilities” action list is advised to reduce the highest‑impact risk exposure.*",
+  "generated_at": "2025-10-25T04:03:52Z",
+  "summary": "[LLM error] HTTPConnectionPool(host='192.168.1.58', port=8000): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x7ff444cefa10>: Failed to establish a new connection: [Errno 111] Connection refused'))",
   "stats": {
     "7_day": {
-      "total_documents": 240,
+      "total_documents": 227,
       "top_threat_actors": [
         [
           "lazarus group",
           4
-        ],
-        [
-          "Vanilla Tempest",
-          2
         ],
         [
           "Everest",
@@ -24,6 +20,10 @@
         [
           "Star Blizzard",
           2
+        ],
+        [
+          "SIMCARTEL criminal network",
+          1
         ]
       ],
       "top_vulnerabilities": [
@@ -32,12 +32,12 @@
           5
         ],
         [
-          "CVE-2025-9242",
+          "CVE-2025-54236",
           4
         ],
         [
-          "CVE-2025-54236",
-          4
+          "CVE-2025-9242",
+          2
         ],
         [
           "CVE-2025-6541",
@@ -55,7 +55,7 @@
         ],
         [
           "data_breach",
-          14
+          8
         ],
         [
           "ransomware",
@@ -63,11 +63,11 @@
         ],
         [
           "phishing",
-          3
+          4
         ],
         [
           "insider_threat",
-          1
+          2
         ]
       ],
       "top_mitre_techniques": [],
@@ -78,26 +78,22 @@
         ],
         [
           "Europe",
-          11
-        ],
-        [
-          "United States",
-          8
+          12
         ],
         [
           "North America",
-          8
+          9
         ],
         [
-          "European Union",
-          4
+          "United States",
+          7
+        ],
+        [
+          "Asia-Pacific",
+          6
         ]
       ],
       "top_exploit_kits": [
-        [
-          "AdaptixC2",
-          1
-        ],
         [
           "Cobalt Strike",
           1
@@ -113,37 +109,41 @@
         [
           "KrustyLoader",
           1
+        ],
+        [
+          "ShadowPad",
+          1
         ]
       ],
       "top_attack_vectors": [
         [
-          "Unauthorized data exfiltration",
+          "Phishing email with malicious ZIP attachment",
           1
         ],
         [
-          "Potential insider or compromised credentials (unspecified)",
+          "Execution of .NET CAPI Backdoor payload",
           1
         ],
         [
-          "Exploitation of unpatched BIG-IP vulnerability (e.g., CVE‑2023‑XXXXX)",
+          "Social engineering",
           1
         ],
         [
-          "Exposure of management interfaces to the Internet",
+          "Multi‑stage intrusion using 42 NSA‑attributed cyber tools",
           1
         ],
         [
-          "Use of default or weak administrative credentials",
+          "Potential use of zero‑day exploits, credential theft, and custom malware",
           1
         ]
       ]
     },
     "30_day": {
-      "total_documents": 1000,
+      "total_documents": 962,
       "top_threat_actors": [
         [
           "lazarus group",
-          7
+          8
         ],
         [
           "lockbit",
@@ -180,60 +180,56 @@
           6
         ],
         [
-          "CVE-2025-59689",
+          "CVE-2025-11371",
           5
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          75
+          72
         ],
         [
           "malware",
-          59
+          55
         ],
         [
           "ransomware",
-          41
+          33
         ],
         [
           "phishing",
-          22
+          20
         ],
         [
           "ddos",
-          11
+          7
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          88
+          85
         ],
         [
           "United States",
-          66
+          59
         ],
         [
           "United Kingdom",
-          31
+          30
         ],
         [
           "Europe",
-          27
+          28
         ],
         [
           "European Union",
-          24
+          23
         ]
       ],
       "top_exploit_kits": [
-        [
-          "China Chopper",
-          2
-        ],
         [
           "Cobalt Strike",
           2
@@ -243,11 +239,15 @@
           2
         ],
         [
-          "Star Chat",
+          "BrickStorm",
           1
         ],
         [
-          "0ktapus",
+          "SparkRAT",
+          1
+        ],
+        [
+          "Pantegana",
           1
         ]
       ],
@@ -261,15 +261,15 @@
           4
         ],
         [
-          "exploitation of unpatched vulnerabilities",
-          3
-        ],
-        [
-          "phishing email",
-          3
-        ],
-        [
           "credential theft",
+          3
+        ],
+        [
+          "malicious email attachments",
+          3
+        ],
+        [
+          "credential stuffing",
           3
         ]
       ]
@@ -279,7 +279,7 @@
       "top_threat_actors": [
         [
           "Scattered Spider",
-          8
+          9
         ],
         [
           "lazarus group",
@@ -312,11 +312,11 @@
           5
         ],
         [
-          "CVE-2025-XXXX",
-          4
+          "CVE-2025-10035",
+          5
         ],
         [
-          "CVE-2025-38352",
+          "CVE-2025-XXXX",
           4
         ]
       ],
@@ -327,7 +327,7 @@
         ],
         [
           "data_breach",
-          72
+          71
         ],
         [
           "ransomware",
@@ -335,7 +335,7 @@
         ],
         [
           "phishing",
-          32
+          31
         ],
         [
           "ddos",
@@ -346,11 +346,11 @@
       "top_geographies": [
         [
           "Global",
-          91
+          90
         ],
         [
           "United States",
-          42
+          41
         ],
         [
           "Europe",
@@ -358,7 +358,7 @@
         ],
         [
           "United Kingdom",
-          24
+          25
         ],
         [
           "North America",
@@ -375,15 +375,15 @@
           1
         ],
         [
-          "WhatsApp Zero-Click Exploit Kit",
-          1
-        ],
-        [
           "FreePBX Exploit Kit",
           1
         ],
         [
           "Salt Typhoon",
+          1
+        ],
+        [
+          "WhatsApp Zero-Click Exploit Kit",
           1
         ]
       ],
@@ -412,10 +412,10 @@
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Financial Services": 94,
-        "Technology": 84,
+        "Financial Services": 95,
+        "Technology": 85,
         "Government": 68,
-        "Healthcare": 65,
+        "Healthcare": 66,
         "Education": 31
       },
       "2025-06": {
@@ -467,47 +467,6 @@
     },
     "high_impact_incidents": [
       {
-        "title": "Data_Breach targeting F5 BIG-IP devices deployed across multiple enterprises, service providers, and government agencies",
-        "date": "2025-10-17T12:16:23",
-        "affected_companies": [
-          "F5 BIG-IP devices deployed across multiple enterprises, service providers, and government agencies"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Data_Breach targeting 4 organizations",
-        "date": "2025-10-17T08:59:12",
-        "affected_companies": [
-          "PowerSchool",
-          "Unnamed second company",
-          "US school districts",
-          "Canadian school districts"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Malware targeting 3 organizations",
-        "date": "2025-10-17T19:29:22",
-        "affected_companies": [
-          "ConnectWise Automate customers",
-          "Managed Service Providers (MSPs) using Automate",
-          "End‑user organizations managed through Automate"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "malware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
         "title": "Data_Breach targeting 7 organizations",
         "date": "2025-10-20T21:37:29",
         "affected_companies": [
@@ -518,6 +477,20 @@
           "RAF Predannack",
           "RNAS Culdrose",
           "UK Ministry of Defence staff and contractors"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 3 organizations",
+        "date": "2025-10-22T11:43:00",
+        "affected_companies": [
+          "Developers using the Nethereum .NET library",
+          "Organizations building Ethereum-enabled .NET applications",
+          "End‑users of compromised cryptocurrency wallets"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -537,19 +510,38 @@
         "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
+      },
+      {
+        "title": "Malware targeting 5 organizations",
+        "date": "2025-10-23T07:25:36",
+        "affected_companies": [
+          "Jaguar Land Rover (JLR) corporate IT systems",
+          "JLR Solihull production plant",
+          "JLR UK dealerships",
+          "Tier‑1 and Tier‑2 automotive suppliers",
+          "Approximately 5,000 UK organisations linked through the supply chain"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "malware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Insider_Threat targeting 2 organizations",
+        "date": "2025-10-24T12:42:43",
+        "affected_companies": [
+          "Unspecified U.S. technology firm",
+          "Russian intelligence services"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "insider_threat",
+        "impact_assessment": "",
+        "affected_industries": []
       }
     ],
     "high_impact_vulnerabilities": [
-      {
-        "cve_id": "CVE-2025-55315",
-        "date": "2025-10-17T10:46:36",
-        "cvss_score": 10.0,
-        "summary": "HTTP request smuggling vulnerability in ASP.NET Core allowing information disclosure, file content tampering, and denial of service.",
-        "affected_companies": [
-          "Microsoft ASP.NET Core",
-          "Microsoft"
-        ]
-      },
       {
         "cve_id": "CVE-2025-49844",
         "date": "2025-10-19T13:37:42",
@@ -565,27 +557,6 @@
         ]
       },
       {
-        "cve_id": "",
-        "date": "2025-10-17T07:51:15",
-        "cvss_score": 9.8,
-        "summary": "Unauthenticated Local File Inclusion (LFI) in Gladinet CentreStack that enables retrieval of the machine key and remote code execution via ViewState deserialization.",
-        "affected_companies": [
-          "Gladinet CentreStack",
-          "Gladinet"
-        ]
-      },
-      {
-        "cve_id": "",
-        "date": "2025-10-17T15:35:49",
-        "cvss_score": 9.8,
-        "summary": "Remote code execution vulnerability in ASP.NET Core runtime allowing attackers to execute arbitrary code on vulnerable servers.",
-        "affected_companies": [
-          "Microsoft ASP.NET Core Runtime",
-          "Microsoft ASP.NET Core MVC",
-          "Microsoft"
-        ]
-      },
-      {
         "cve_id": "CVE-2023-4966",
         "date": "2025-10-21T11:27:05",
         "cvss_score": 9.8,
@@ -594,135 +565,42 @@
           "Citrix NetScaler Gateway (ADC) versions prior to the December 2023 security patch",
           "Citrix"
         ]
+      },
+      {
+        "cve_id": "CVE-2025-34567",
+        "date": "2025-10-22T12:56:00",
+        "cvss_score": 9.8,
+        "summary": "ToolShell remote code execution vulnerability in Microsoft SharePoint",
+        "affected_companies": [
+          "Microsoft SharePoint Server 2019",
+          "Microsoft SharePoint Server 2016",
+          "Microsoft SharePoint Online",
+          "Microsoft"
+        ]
+      },
+      {
+        "cve_id": "",
+        "date": "2025-10-22T17:21:24",
+        "cvss_score": 9.8,
+        "summary": "Remote code execution vulnerability in the async-tar Rust library (TARmageddon) allowing attackers to execute arbitrary code via crafted tar archives.",
+        "affected_companies": [
+          "Any software that statically or dynamically links against the async-tar Rust library or its unmaintained forks",
+          "Various open‑source Rust projects that depend on async-tar"
+        ]
+      },
+      {
+        "cve_id": "CVE-2023-40477",
+        "date": "2025-10-22T18:38:33",
+        "cvss_score": 9.8,
+        "summary": "Remote code execution vulnerability in WinRAR when processing specially crafted ACE archives",
+        "affected_companies": [
+          "WinRAR",
+          "Rarlab",
+          "Microsoft"
+        ]
       }
     ],
     "ransomware_targets": [
-      {
-        "company": "multiple enterprises across finance, healthcare, manufacturing, and critical infrastructure",
-        "date": "2025-09-24T01:00:00",
-        "actor": "Ransomware‑as‑a‑Service (RaaS) affiliates (e.g., LockBit, BlackCat, Hive)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated global loss > $4.2 billion in 2024‑2025, with average ransom per incident falling ~35% but total incident count rising 20% YoY",
-        "industry": "Unknown"
-      },
-      {
-        "company": "regional government agencies",
-        "date": "2025-09-24T01:00:00",
-        "actor": "Ransomware‑as‑a‑Service (RaaS) affiliates (e.g., LockBit, BlackCat, Hive)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated global loss > $4.2 billion in 2024‑2025, with average ransom per incident falling ~35% but total incident count rising 20% YoY",
-        "industry": "Unknown"
-      },
-      {
-        "company": "cloud service providers hosting victim data",
-        "date": "2025-09-24T01:00:00",
-        "actor": "Ransomware‑as‑a‑Service (RaaS) affiliates (e.g., LockBit, BlackCat, Hive)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated global loss > $4.2 billion in 2024‑2025, with average ransom per incident falling ~35% but total incident count rising 20% YoY",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Jaguar Land Rover",
-        "date": "2025-09-24T10:46:05",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Collins Aerospace",
-        "date": "2025-09-24T12:12:16",
-        "actor": "HardBit ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "European airport operations",
-        "date": "2025-09-24T12:12:16",
-        "actor": "HardBit ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "airports worldwide",
-        "date": "2025-09-24T12:51:33",
-        "actor": "organized crime group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "UK airports",
-        "date": "2025-09-24T12:51:33",
-        "actor": "organized crime group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "airline operational systems",
-        "date": "2025-09-24T12:51:33",
-        "actor": "organized crime group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "victim company's domain controller",
-        "date": "2025-09-24T14:01:11",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "internal network systems",
-        "date": "2025-09-24T14:01:11",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "European airports (multiple)",
-        "date": "2025-09-24T13:55:48",
-        "actor": "RTX ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Airport operational systems",
-        "date": "2025-09-24T13:55:48",
-        "actor": "RTX ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Passenger data systems",
-        "date": "2025-09-24T13:55:48",
-        "actor": "RTX ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
       {
         "company": "The Co-operative Group",
         "date": "2025-09-25T09:30:15",
@@ -841,6 +719,69 @@
         "industry": "Unknown"
       },
       {
+        "company": "Google Drive users",
+        "date": "2025-09-30T20:10:29",
+        "actor": "ransomware groups",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "organizations using Google Workspace",
+        "date": "2025-09-30T20:10:29",
+        "actor": "ransomware groups",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi Breweries distribution systems",
+        "date": "2025-09-29T20:42:50",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Asahi internal network",
+        "date": "2025-09-29T20:42:50",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover",
+        "date": "2025-09-29T09:46:14",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover manufacturing systems",
+        "date": "2025-09-29T09:46:14",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover corporate IT environment",
+        "date": "2025-09-29T09:46:14",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
         "company": "K-12 schools",
         "date": "2025-10-01T08:50:17",
         "actor": "Unknown",
@@ -913,33 +854,6 @@
         "industry": "Unknown"
       },
       {
-        "company": "Major international airports",
-        "date": "2025-09-24T12:51:33",
-        "actor": "Organized crime group (specific name not disclosed)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Estimated financial loss not disclosed, but likely in the millions due to operational disruption",
-        "industry": "Unknown"
-      },
-      {
-        "company": "UK airports",
-        "date": "2025-09-24T12:51:33",
-        "actor": "Organized crime group (specific name not disclosed)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Estimated financial loss not disclosed, but likely in the millions due to operational disruption",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Airlines operating at affected airports",
-        "date": "2025-09-24T12:51:33",
-        "actor": "Organized crime group (specific name not disclosed)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Estimated financial loss not disclosed, but likely in the millions due to operational disruption",
-        "industry": "Unknown"
-      },
-      {
         "company": "Enterprises targeted by LockBit 5.0 ransomware campaign",
         "date": "2025-09-29T12:36:00",
         "actor": "lockbit",
@@ -949,26 +863,8 @@
         "industry": "Unknown"
       },
       {
-        "company": "Google Drive users",
-        "date": "2025-09-30T20:10:29",
-        "actor": "ransomware groups",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "organizations using Google Workspace",
-        "date": "2025-09-30T20:10:29",
-        "actor": "ransomware groups",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Asahi Breweries distribution systems",
-        "date": "2025-09-29T20:42:50",
+        "company": "Google Drive desktop client users",
+        "date": "2025-10-01T15:10:45",
         "actor": "Unknown",
         "ransomware_type": "ransomware",
         "impact": "",
@@ -976,48 +872,12 @@
         "industry": "Unknown"
       },
       {
-        "company": "Asahi internal network",
-        "date": "2025-09-29T20:42:50",
+        "company": "Google Cloud infrastructure",
+        "date": "2025-10-01T15:10:45",
         "actor": "Unknown",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Jaguar Land Rover",
-        "date": "2025-09-29T09:46:14",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Jaguar Land Rover manufacturing systems",
-        "date": "2025-09-29T09:46:14",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Jaguar Land Rover corporate IT environment",
-        "date": "2025-09-29T09:46:14",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "multiple organizations across various industries",
-        "date": "2025-09-24T01:00:00",
-        "actor": "Ransomware-as-a-Service (RaaS) operators",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated $1.2‑2.5 billion in combined ransom payments, remediation, and downtime for 2025",
         "industry": "Unknown"
       },
       {
@@ -1045,24 +905,6 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "estimated loss exceeding $10,000,000 (including ransom demand, incident response costs, legal fees, and customer remediation)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Google Drive desktop client users",
-        "date": "2025-10-01T15:10:45",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Google Cloud infrastructure",
-        "date": "2025-10-01T15:10:45",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
         "industry": "Unknown"
       },
       {
