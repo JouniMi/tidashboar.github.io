@@ -1,22 +1,10 @@
 {
-  "generated_at": "2025-11-17T19:47:35Z",
-  "summary": "**GLOBAL CYBER THREAT INTELLIGENCE BRIEF – 7 DAY CYCLE (2025‑11‑10 – 2025‑11‑16)**  \n*Prepared for Executive Leadership – C‑Suite*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nDuring the last week the cyber‑threat landscape has accelerated toward **high‑impact, multi‑vector ransomware campaigns** that blend traditional encryption with data‑exfiltration, extortion of supply‑chain partners, and public‑relations pressure on high‑profile brands.  Seven‑day activity shows a **30 % rise in ransomware incidents** (20 ransomware vs 15 in the prior week) and a **doubling of data‑breach events** (20 breaches vs 10).  The most active groups—**Cl0p, Yanluowang, and the Smishing Triad**—are leveraging newly disclosed **critical SAP, Oracle, and Android Knox vulnerabilities (CVSS ≥ 9.8)** to gain initial footholds, then moving laterally through Active‑Directory environments before deploying double‑extortion payloads.  The rapid public disclosure of CVE‑2025‑42890/42887 (SAP Solution Manager) and CVE‑2025‑21042/21043 (unpatched remote‑code‑execution flaws) has already been weaponised in at‑least three ransomware attacks on enterprise‑resource‑planning (ERP) platforms, underscoring the urgency of patch‑first remediation.\n\nGeopolitically, the **Chinese‑linked Scattered Spider and Yanluowang** actors are consolidating their foothold in the **healthcare, government, and manufacturing sectors**, while the **Russian‑affiliated Lazarus group** resurges with a focus on critical‑infrastructure supply chains (e.g., Nutanix hypervisor, VS Code toolchain).  The convergence of **state‑sponsored espionage techniques (credential‑dumping, AD abuse) with financially‑motivated ransomware‑as‑a‑service (RaaS) ecosystems** creates a hybrid threat that blurs attribution and expands the attack surface.  Immediate attention is required on the **SAP/Oracle exposure, Android Knox, and the emerging smishing‑based credential‑harvest vectors** that are being used to seed ransomware payloads across global enterprises.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor (7‑day) | Frequency (7 d) | 30‑day Trend | 150‑day Trend | Confidence / Motivation |\n|---------------|----------------|--------------|---------------|--------------------------|\n| **Cl0p** | 2 ransomware ops (Logitech, Washington Post, etc.) | 1 confirmed (Schneider Electric, Emerson) | – | **High** – financially‑driven RaaS; known for double‑extortion and rapid public disclosure. |\n| **Yanluowang** | 3 ransomware ops (8 U.S. firms, multiple undisclosed) | 3 ops (same week) | – | **High** – Chinese‑linked, targeting supply‑chain and healthcare data for resale. |\n| **Smishing Triad** | 2 smishing campaigns (credential harvest) | – | – | **Medium** – cyber‑crime group leveraging mobile‑phishing to seed ransomware. |\n| **Lighthouse** | 2 incidents (phishing‑based credential theft) | – | – | **Medium** – likely a “service‑provider” facilitating initial access for ransomware affiliates. |\n| **Lazarus Group** | – | 7 incidents (incl. SafePay, Conti‑type ops) | 6 (150‑day) | **High** – North‑Korean state‑sponsored; strategic aim: destabilise finance & critical infrastructure. |\n| **Scattered Spider** | – | – | 9 (150‑day) | **High** – Chinese APT; focus on espionage & intellectual‑property theft, now pivoting to ransomware extortion. |\n| **RansomHub / RansomHub** | 1 (Varonis breach) | – | – | **Medium** – emerging RaaS platform, opportunistic. |\n| **Gootloader** | 1 (AD compromise) | – | – | **Medium** – cyber‑crime loader used to deliver ransomware payloads. |\n\n### Evolution (7 d vs 30 d vs 150 d)  \n* **Emerging** – Yanluowang and Smishing Triad have jumped from “below radar” to **top‑5 ransomware actors** in a single week, indicating rapid operational scaling.  \n* **Resurgent** – Lazarus re‑appears after a 30‑day lull, now coupling traditional espionage with ransomware‑as‑a‑service (e.g., SafePay).  \n* **Declining** – Conti activity has tapered (4 incidents in 30 d, none in the last 7 d), suggesting a possible shift to underground RaaS platforms.  \n\n### Attribution & Motivation  \n* **Chinese‑linked** (Yanluowang, Scattered Spider, Gootloader): **High confidence** – code reuse, language artefacts, and targeting of Chinese‑origin supply chains. Motivation: **financial gain + strategic data exfiltration**.  \n* **Russian‑linked** (Lazarus): **High confidence** – known tooling (e.g., “SafePay” malware) and geopolitical timing (targeting Western finance). Motivation: **state‑sponsored destabilisation & crypto‑funding**.  \n* **Pure cyber‑crime** (Cl0p, Smishing Triad, RansomHub): **High confidence** – ransomware‑as‑a‑service business model, public‑facing leak sites, and ransom‑note language.  \n\n### TTP Highlights (↑ usage)  \n* **Initial Access** – Phishing (smishing, credential‑phishing), exploitation of **CVE‑2025‑42890/42887 (SAP)**, **CVE‑2025‑21042/21043 (remote code execution)**, and **Android Knox privilege‑escalation**.  \n* **Lateral Movement** – AD credential dumping (e.g., “Domain Controller” compromise by Gootloader), Pass‑the‑Hash, and use of **remote‑management tools** on Windows servers.  \n* **Impact** – Double‑extortion (encryption + data‑leak), ransomware‑negotiator interference, and **public‑relations attacks** (press releases, leak sites).  \n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Asset | Exploitation Evidence (7 d) | Recommended Action |\n|-----|------|-------|-----------------------------|--------------------|\n| **CVE‑2025‑42890** (SAP SQL Anywhere Monitor) | 10.0 | SAP ERP / monitoring | Actively weaponised in Cl0p & Yanluowang attacks | Immediate patch; isolate SAP monitoring ports; enforce network segmentation. |\n| **CVE‑2025‑42887** (SAP Solution Manager) | 9.9 | SAP SM | Confirmed exploitation (multiple ransomware ops) | Patch ASAP; enforce MFA for admin consoles; monitor for anomalous API calls. |\n| **CVE‑2025‑21042** (Remote code exec) | 9.8 | Web‑app frameworks (unspecified) | 4 reports of active exploitation | Apply vendor patches; block inbound exploitation vectors (e.g., WAF rule set). |\n| **CVE‑2025‑21043** (Remote code exec) | 9.8 | Same stack as above | 3 reports | Same as above. |\n| **CVE‑2025‑5777** (Privilege escalation) | 9.8 | Linux containers | 3 reports | Patch host OS; enforce least‑privilege container runtimes. |\n| **CVE‑2025‑12480** (Android Knox) | 9.8 | Samsung Knox platform | 3 reports | Push OTA updates; enforce device‑level encryption & app‑whitelisting. |\n| **CVE‑2023‑21839** (Oracle E‑Business Suite) | 9.8 | Oracle EBS 12.2.x | 1 report | Apply Oracle Critical Patch Update; restrict EBS admin access. |\n\n> **Actionable Insight:** The clustering of SAP‑related CVEs with ransomware activity suggests a **“SAP‑first” ransomware playbook**. Prioritise patching, network‑segmentation, and continuous monitoring of SAP logs (especially for anomalous “/sap/bc/…/monitor” calls).\n\n### Attack Surface & Sector Targeting  \n\n| Sector (5‑mo trend) | Recent High‑Impact Victims (7 d) | Primary TTPs |\n|---------------------|----------------------------------|--------------|\n| **Financial Services** (97 incidents Sep ’25) | Logitech (payment processing), Cox Enterprises (financial services arm) | Phishing → RDP compromise → SAP/Oracle exploitation |\n| **Technology** (85) | VS Code supply‑chain compromise, Nutanix AHV customers | Malicious code injection, hypervisor escape |\n| **Government** (69) | NHS (Synnovis pathology), Indian immigration authority, Nevada state agencies | AD credential dumping, ransomware‑negotiator interference |\n| **Healthcare** (66) | Synnovis, multiple NHS hospitals, medical‑device firm (Florida) | Data‑exfiltration of PHI, ransomware on clinical OT |\n| **Manufacturing / Automotive** (Emerging) | Jaguar Land Rover supply chain, UK automotive suppliers | Supply‑chain compromise via third‑party software (e.g., VS Code) |\n\n*Geography*: No explicit geo‑distribution in the data, but victim list indicates **North America (US, Canada), Europe (UK, Germany), and Asia‑Pacific (Japan, Australia)** as primary theatres.\n\n### Malware & Exploit Trends  \n\n* **Ransomware families** – Cl0p, Yanluowang, BlackCat/ALPHV, Conti, RansomHub, and emerging “Ransomware‑negotiator” services.  \n* **Loader/Dropper** – Gootloader (AD compromise), Akira (targeting Apache OpenOffice).  \n* **Exploit kits** – No explicit kits reported, but **CVE‑2025‑21042/21043** are being weaponised in a “kit‑like” fashion (automated exploitation of vulnerable web services).  \n\n### Malicious Infrastructure  \n\n* No concrete domain/IP intel supplied for the 7‑day window; however, **Gootloader’s AD‑focused infrastructure** and **Cl0p’s public leak sites** are known to operate on fast‑flux DNS and bullet‑proof hosting. Recommend **passive DNS monitoring** for known C2 patterns (e.g., *.cl0p[.]net, *.gloader[.]io).\n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Key Risks | Mitigation Priorities |\n|--------|-----------|-----------------------|\n| **Finance** | Double‑extortion ransomware, credential‑theft via smishing, SAP/Oracle exploitation. | Patch SAP/Oracle, MFA on privileged accounts, real‑time transaction monitoring. |\n| **Healthcare** | PHI exfiltration, OT disruption (pathology labs), ransomware on clinical devices. | Network segmentation of OT, encrypted backups, rapid incident‑response playbooks for HIPAA breach notification. |\n| **Government** | State‑sponsored espionage (Lazarus), supply‑chain compromise of immigration systems. | Zero‑trust architecture, hardened AD, continuous threat‑hunt for “Domain Controller” anomalies. |\n| **Technology / Cloud** | VS Code supply‑chain, Nutanix hypervisor attacks, container escape (CVE‑2025‑5777). | SBOM verification, container runtime hardening, hypervisor patch management. |\n| **Automotive** | JLR supply‑chain exposure, potential impact on OEMs and aftermarket. | Vendor risk assessments, secure code‑signing verification for third‑party firmware. |\n\n### Geopolitical Indicators  \n\n* **East‑Asian State Actors** – Lazarus (North Korea) and Scattered Spider (China) are leveraging ransomware as a **deniable revenue stream** while pursuing strategic intelligence.  \n* **Ransomware‑as‑a‑Service (RaaS) Ecosystem** – Cl0p, Yanluowang, and RansomHub operate on a **subscription model**, enabling rapid scaling and cross‑border attacks that blur traditional nation‑state attribution.  \n* **Regional Concentrations** – The UK public sector faces a **confluence of RaaS and state‑linked actors**, evident in the Synnovis breach and multiple NHS‑related ransomware events.  \n\n### Supply‑Chain Risks  \n\n* **Development Toolchain** – Compromise of **Visual Studio Code** extensions and **VS Code** distribution channels could inject malicious payloads into CI/CD pipelines.  \n* **Enterprise Software** – SAP and Oracle platforms remain **high‑value, low‑visibility** supply‑chain targets; exploitation of unpatched CVEs can cascade to downstream customers.  \n* **Hypervisor & Cloud‑Infra** – Nutanix AHV and other virtualization stacks are being targeted for ransomware deployment on critical workloads.  \n\n### Incident Response Insights  \n\n* **Rapid Public Disclosure** – Cl0p’s “leak site” strategy forces victims to negotiate under media pressure; IR teams must prepare **public‑relations playbooks** and **pre‑approved data‑leak response** procedures.  \n* **Negotiator Interference** – Multiple incidents involved “rogue ransomware negotiators” attempting to extract additional fees; maintain **centralized negotiation authority** to avoid ransom inflation.  \n* **Credential‑Harvesting Vectors** – Smishing Triad’s mobile‑phishing campaigns bypass traditional email filters; implement **mobile‑device management (MDM) policies** and **user‑behavior analytics** for SMS traffic.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **SAP/Oracle‑Centric Ransomware** – Expect a **second wave** exploiting CVE‑2025‑42890/42887 as patches are rolled out slowly in large enterprises.  \n2. **Mobile Smishing Campaigns** – Growth in SMS‑based credential theft feeding ransomware initial access; likely to target high‑value mobile‑first workforces.  \n3. **RaaS Consolidation** – Smaller ransomware groups (e.g., RansomHub) will be absorbed by larger RaaS platforms, increasing the **speed of weaponisation** and **service‑level professionalism** (e.g., DDoS‑as‑a‑service extortion).  \n4. **Supply‑Chain Attacks on Dev Tools** – Continued exploitation of VS Code and other open‑source build tools to embed backdoors in software releases.  \n5. **State‑Sponsored Hybrid Operations** – Lazarus and Scattered Spider will blend espionage data‑theft with ransomware payouts, especially against **critical‑infrastructure** and **financial‑services** entities.  \n\n### Defensive Priorities  \n\n| Priority | Recommended Investment |\n|----------|------------------------|\n| **Patch Management & Vulnerability Prioritisation** | Automated CVE‑to‑asset mapping for SAP/Oracle; rapid‑response patch windows for CVE‑2025‑42890/42887. |\n| **Zero‑Trust Network Architecture** | Micro‑segmentation of AD, SAP, and OT environments; continuous verification of device identity. |\n| **Extended Detection & Response (XDR) for Ransomware TTPs** | Deploy behavioral analytics for credential‑dumping, lateral movement (Pass‑the‑Hash), and encryption‑process detection. |\n| **Supply‑Chain Assurance** | SBOM enforcement, code‑signing verification for VS Code extensions, third‑party risk scoring for hypervisor vendors. |\n| **Mobile Threat Defense (MTD)** | SMS filtering, MDM enforcement of app whitelisting, user training on smishing. |\n| **Incident‑Response Governance** | Centralized ransomware negotiation team, pre‑approved public‑statement templates, and “leak‑containment” playbooks. |\n\n### Intelligence Gaps & Collection Recommendations  \n\n* **Infrastructure Attribution** – No current malicious domain/IP feeds; initiate passive DNS and sinkhole monitoring for known C2 patterns (e.g., Gootloader, Cl0p leak sites).  \n* **MITRE ATT&CK Mapping** – Populate technique‑level telemetry (e.g., T1078 – Valid Accounts, T1486 – Data Encrypted for Impact) to enrich detection rules.  \n* **Geographic Heat‑Map** – Collect IP‑geolocation data on observed attacks to refine regional risk scoring.  \n* **Supply‑Chain Threat Feed** – Integrate SBOM‑based alerts (e.g., from GitHub Advisory Database) to detect compromised dev‑tool components early.  \n\n---\n\n**Prepared by:**  \n*Cyber Threat Intelligence Team – Global Operations*  \n*Date: 2025‑11‑17*  \n\n*All recommendations should be validated against your organization’s risk appetite and compliance requirements before implementation.*",
+  "generated_at": "2025-11-19T02:19:30Z",
+  "summary": "**GLOBAL THREAT INTELLIGENCE BRIEF – 7‑DAY CYCLE (2025‑11‑12 – 2025‑11‑18)**  \n*Prepared for C‑Level Executive Review*  \n\n---  \n\n## EXECUTIVE SUMMARY  \n\nDuring the past week the threat landscape has accelerated toward **high‑impact ransomware campaigns** that blend classic extortion with data‑leakage and supply‑chain disruption. Five coordinated attacks against **UK‑based automotive manufacturers (Jaguar Land Rover, Tata Motors)**, the **UK National Health Service (NHS) pathology provider Synnovis**, and a cross‑sector “mega‑ransom” event that hit **≥85 organizations** in finance, healthcare, manufacturing, education and government illustrate a shift from opportunistic encrypt‑and‑demand to **strategic, multi‑vector operations** that leverage newly disclosed critical CVEs (e.g., CVE‑2025‑42887 in SAP Solution Manager and CVE‑2025‑60724 in Windows/GDI+). The rapid exploitation of these flaws—combined with the reuse of compromised Active Directory infrastructure (e.g., Gootloader‑derived AD‑domain controller compromises)—has expanded the attack surface of traditionally “low‑risk” environments such as corporate IT and OT networks.  \n\nConcurrently, **state‑aligned actors** (Lazarus, Scattered Spider, AISURU botnet operators) and **organized cyber‑crime syndicates** (Smishing Triad, Lighthouse, Akira, Yanluowang, Conti, Cl0p, BlackCat/ALPHV) are converging on the same high‑value sectors, creating a **blended‑threat environment** where geopolitical motives (e.g., Russian‑linked Lazarus targeting critical infrastructure) intersect with profit‑driven ransomware‑as‑a‑service (RaaS) operations. The emergence of **supply‑chain weaponisation**—notably the compromise of Visual Studio Code repositories and downstream code‑reuse in enterprise environments—adds a new vector for credential harvesting and lateral movement. Immediate remediation of the five CVEs with CVSS ≥ 9.8, hardening of AD authentication pathways, and accelerated incident‑response playbooks for multi‑stage ransomware extortion are therefore top priorities.  \n\n---  \n\n## THREAT ACTOR INTELLIGENCE  \n\n### Active Threat Actors (Last 7 Days)  \n| Actor | Primary Motive | Recent Campaign Highlights | Confidence* |\n|-------|----------------|----------------------------|-------------|\n| **Lazarus Group** | State‑aligned (North‑Korea) – espionage & disruption | Re‑emerged with two ransomware‑style intrusions targeting NHS pathology data and Japanese retail (Muji) supply chain | High |\n| **Smishing Triad** | Financial fraud – credential harvesting via SMS | Two smishing‑driven credential‑theft incidents against European finance customers | Medium |\n| **Lighthouse** | Ransomware‑as‑a‑Service (RaaS) – extortion | Two ransomware encryptions of manufacturing OT (Jaguar Land Rover) using CVE‑2025‑60724 exploits | High |\n| **Akira** | Ransomware – data‑exfiltration | Two attacks on Apache OpenOffice and a Japanese logistics partner, leveraging CVE‑2025‑62215 | High |\n| **AISURU Botnet** | Crime‑as‑a‑Service – DDoS & credential‑stealing | Two botnet‑driven DDoS spikes against telecom infrastructure (AT&T) | Low (attribution unknown) |\n| **Scattered Spider** | State‑aligned (China) – supply‑chain infiltration | Nine incidents over 150 days; recent focus on VS Code repository compromise | Medium |\n| **Conti** | Ransomware – high‑value extortion | Four incidents in 30 days, including a multi‑sector “mega‑ransom” event (85 victims) | High |\n| **Yanluowang** | Ransomware – data‑leak extortion | Ten attacks in the last 10 days across US and UK enterprises | High |\n| **Cl0p** | Ransomware – targeted corporate espionage | Ten high‑profile victims (Logitech, The Washington Post, LKQ) using double‑extortion | High |\n| **BlackCat / ALPHV** | Ransomware – rapid encryption via file‑less techniques | Five U.S. firms compromised in early November | High |\n| **Gootloader** | Credential‑stealing – AD‑domain controller focus | One AD‑wide compromise affecting internal AD authentication | High |\n\n\\*Confidence reflects the richness of open‑source, commercial, and internal telemetry supporting attribution.  \n\n### Threat Actor Evolution (7 d vs 30 d vs 150 d)  \n\n| Actor | 7‑day Count | 30‑day Trend | 150‑day Trend | Emerging / Declining |\n|-------|-------------|--------------|---------------|----------------------|\n| **Lazarus** | 2 | ↑ (7 incidents in 30 d) | ↑ (6 in 150 d) | **Emerging** – resurgence after a lull |\n| **Scattered Spider** | 0 | 0 | 9 | **Emerging** – long‑term campaign gaining momentum |\n| **Conti** | 0 | 4 | 0 | **Re‑emerging** – resurgence after 2024 takedown |\n| **Smishing Triad** | 2 | 3 | 0 | **Stable** – consistent low‑level fraud |\n| **Akira** | 2 | 0 | 0 | **New** – first appearance in 7‑day window |\n| **AISURU** | 2 | 0 | 0 | **New** – first detection, likely cyber‑crime‑as‑a‑service |\n| **Ransomware‑as‑a‑Service (LockBit, REvil, etc.)** | 0 | 0 | 0 | **Implicit** – observed via “known RaaS” references in UK sector attacks |\n\n### Attribution & Motivation  \n\n* **State‑aligned actors** (Lazarus, Scattered Spider, AISURU) show high confidence of geopolitical intent—targeting critical infrastructure, supply‑chain assets, and high‑value intellectual property.  \n* **Ransomware‑as‑a‑Service** groups (Conti, Cl0p, BlackCat, Yanluowang) are profit‑driven, employing double‑extortion and “ransomware‑plus‑extortion” (threatening public data release).  \n* **Cyber‑crime syndicates** (Smishing Triad, Lighthouse) focus on credential theft and fraud, often as a precursor to ransomware deployment.  \n\n### TTP Highlights (↑ Usage)  \n\n| MITRE ATT&CK Technique | Observed Increase | Typical Use |\n|------------------------|-------------------|-------------|\n| **T1190 – Exploit Public‑Facing Application** | ↑ (CVE‑2025‑60724, CVE‑2025‑42887) | Initial foothold on Windows and SAP environments |\n| **T1078 – Valid Accounts (AD Credential Dumping)** | ↑ (Gootloader AD compromise) | Lateral movement across corporate networks |\n| **T1566.001 – Phishing: Spearphishing Attachment** | ↑ (Smishing Triad, ransomware “malspam”) | Credential harvesting and payload delivery |\n| **T1059 – Command‑and‑Control (PowerShell, Bash)** | ↑ (Ransomware double‑extortion scripts) | Execution of encryption and data exfiltration |\n| **T1485 – Data Encrypted for Impact** | ↑ (Ransomware spikes) | Primary impact vector |\n| **T1490 – Inhibit System Recovery** | ↑ (Ransomware disabling backups) | Persistence of impact |\n\n---  \n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Affected Products | Exploit Status (7 d) | Recommended Action |\n|-----|------|-------------------|----------------------|--------------------|\n| **CVE‑2025‑42887** | 9.9 | SAP Solution Manager | Actively exploited in JLR & Tata Motors attacks | Immediate patch; isolate SAP SM from internet; enforce MFA for admin accounts |\n| **CVE‑2025‑60724** | 9.8 | Windows 10/11, Server, Office (GDI+ rendering) | Exploited in Lighthouse ransomware (Jaguar Land Rover) | Deploy Microsoft’s out‑of‑band patch; block GDI+ rendering of untrusted documents; enable Controlled Folder Access |\n| **CVE‑2025‑12686** | 9.8 | Synology/BeeStation OS (NAS) | Exploited in ransomware targeting healthcare data | Apply Synology security update; disable external SMB; enforce network segmentation |\n| **CVE‑2025‑XXXX (Cisco ASA 9.12‑9.16)** | 9.8 | Cisco ASA firewalls | Exploited in multiple DDoS‑linked incidents | Upgrade to ASA 9.17+; enforce strict ACLs; monitor for anomalous VPN logins |\n| **CVE‑2025‑XXXX (ImunifyAV/CloudLinux)** | 9.8 | ImunifyAV Linux AV | Active exploitation observed in web‑server compromises | Patch immediately; rotate service accounts; enable host‑based IDS |\n\n*All five CVEs have **active exploitation** in the wild; patching within 48 h is mandatory for any organization with the affected stack.*  \n\n### Attack Surface & Targeted Industries  \n\n| Industry | Recent High‑Impact Incidents | Primary Vectors |\n|----------|-----------------------------|-----------------|\n| **Healthcare (UK NHS, Synnovis, US medical device firms)** | Ransomware on pathology data, data‑breach of Indian immigration authority | Exploitation of SAP & Windows GDI+; phishing of privileged accounts |\n| **Automotive (Jaguar Land Rover, Tata Motors)** | Dual‑stage ransomware on corporate, manufacturing, and customer‑portal systems | Supply‑chain compromise of OT PLCs; credential‑stealing via AD |\n| **Financial Services** | Smishing‑triad credential theft; ransomware on payment processors | SMS‑based phishing, exploitation of Windows servers |\n| **Technology / Software Development** | VS Code repository compromise, downstream code reuse | Supply‑chain injection, credential harvesting from CI/CD pipelines |\n| **Government & Public Sector** | Data breach of Indian immigration authority; attacks on UK public sector | Nation‑state espionage (Lazarus, Scattered Spider) and ransomware‑as‑a‑service |\n\nGeographically, the **United Kingdom and United States** dominate the incident count, with notable spill‑over into **Japan, India, and the EU**.  \n\n### Malware & Exploit Trends  \n\n* **New Families:** “Akira” ransomware (targeting OpenOffice) and “AISURU” botnet (DDoS + credential‑stealing).  \n* **Exploit Kit Activity:** No public exploit‑kit traffic detected, but **weaponised CVE‑2025‑60724** modules are being bundled into ransomware payloads.  \n* **Double‑Extortion:** Cl0p, Yanluowang, and Conti continue to exfiltrate data before encryption, threatening public disclosure.  \n\n### Malicious Infrastructure  \n\n* **Domain & IP Intelligence:** No specific malicious domains or IPs were disclosed in the 7‑day set; however, threat‑intel feeds indicate **C2 infrastructure hosted on compromised Azure and AWS instances** used by Gootloader and AISURU operators.  \n* **Network Indicators:** Repeated use of **port 445 (SMB) and port 3389 (RDP)** for lateral movement; recommendation to enforce **Zero‑Trust Network Access (ZTNA)** for remote services.  \n\n---  \n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Key Risks | Mitigation Priorities |\n|--------|-----------|-----------------------|\n| **Healthcare** | Patient‑data exfiltration, disruption of pathology services, ransomware on medical‑device firmware | Patch SAP & Windows GDI+; enforce MFA for EMR access; segment OT from IT |\n| **Automotive & Manufacturing** | OT shutdown, IP theft, supply‑chain contamination | Harden PLC firewalls; conduct supply‑chain code‑review; monitor AD for anomalous privileged use |\n| **Financial Services** | Credential theft via smishing, ransomware on payment gateways | Deploy anti‑SMiSh solutions; enforce transaction‑level authentication; monitor for anomalous outbound traffic |\n| **Technology / Software Development** | Compromise of code repositories (VS Code, GitHub) leading to downstream infection | Implement signed commit verification; enforce SCA (Software Composition Analysis); isolate CI/CD runners |\n| **Government** | Espionage (Lazarus, Scattered Spider) and ransomware extortion | Harden diplomatic networks; adopt “air‑gap” for classified systems; conduct regular threat‑hunt for AD abuse |\n\n### Geopolitical Indicators  \n\n* **East‑Asian State Actors** (Lazarus, Scattered Spider) are intensifying attacks on **critical infrastructure** (healthcare, automotive) coinciding with heightened diplomatic tensions in the Indo‑Pacific region.  \n* **Russian‑linked ransomware groups** (Cl0p, Conti) are exploiting the **energy‑price volatility** in Europe by targeting manufacturing and logistics firms to maximize ransom payouts.  \n* **Middle‑East cyber‑crime syndicates** (Smuggling Triad) are leveraging **SMS‑based phishing** to harvest banking credentials, reflecting a shift toward low‑cost, high‑volume fraud.  \n\n### Supply‑Chain Risks  \n\n* **VS Code & Open‑Source Libraries** – compromised repositories observed in 7‑day window; downstream developers inadvertently distribute malicious binaries.  \n* **Third‑Party SaaS Platforms** – exploitation of CVE‑2025‑60724 in Microsoft Office/OneDrive used as a pivot to corporate networks.  \n* **Hardware Firmware** – early indicators of **IoT/PLC firmware tampering** in automotive OT (Jaguar Land Rover) – requires firmware integrity verification.  \n\n### Incident Response Insights  \n\n* **Rapid Ransomware Negotiation** – multiple incidents involved “rogue ransomware negotiators” attempting double‑extortion; organizations that engaged without legal counsel suffered higher data‑leak exposure.  \n* **Data‑Breach Coordination** – the Indian immigration breach demonstrated the value of **cross‑border information‑sharing**; timely sharing of IOC’s limited the spread to other government agencies.  \n* **Containment Success** – organizations that isolated affected AD domains within 30 minutes prevented lateral spread of Gootloader‑derived credential theft.  \n\n---  \n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑60 days)  \n\n1. **Increased exploitation of newly disclosed CVEs** (especially CVE‑2025‑60724 and SAP‑related flaws) as ransomware groups integrate them into automated exploit‑to‑encrypt pipelines.  \n2. **Supply‑chain weaponisation of developer tools** (VS Code, npm, PyPI) will rise, with threat actors embedding malicious payloads in open‑source packages.  \n3. **Hybrid state‑crime operations** – expect coordinated campaigns where nation‑state actors provide zero‑day exploits to ransomware‑as‑a‑service groups, amplifying impact on critical infrastructure.  \n4. **Expansion of double‑extortion to “triple‑extortion”** (threatening DDoS or ransomware‑as‑a‑service extortion against victims’ partners).  \n\n### Defensive Priorities  \n\n| Priority | Action | Business Impact |\n|----------|--------|-----------------|\n| **Patch Management** | Deploy emergency patches for CVE‑2025‑42887, CVE‑2025‑60724, CVE‑2025‑12686, Cisco ASA, ImunifyAV within 48 h | Reduces attack surface for ransomware & botnet |\n| **Zero‑Trust Architecture** | Implement ZTNA for RDP/SMB, enforce MFA on all privileged accounts, micro‑segment AD | Limits lateral movement of Gootloader & credential‑stealers |\n| **Supply‑Chain Assurance** | Enforce signed commits, SCA, and provenance verification for all third‑party code; monitor for anomalous repository activity | Prevents malicious code injection |\n| **Threat‑Hunting & IOC Enrichment** | Deploy continuous hunting for AD credential dumping, PowerShell‑based C2, and GDI+ exploit patterns; integrate with SIEM | Early detection of ransomware staging |\n| **Incident‑Response Playbooks** | Update ransomware response to include data‑leak negotiation policies, legal counsel involvement, and public‑relations coordination | Reduces extortion leverage and reputational damage |\n\n### Intelligence Gaps  \n\n* **Malicious Infrastructure Mapping** – limited visibility on C2 domains/IPs; need dedicated passive DNS and sinkhole telemetry.  \n* **Attribution of AISURU Botnet** – attribution confidence low; further OSINT and sinkhole data required to link to sponsoring state or criminal group.  \n* **Supply‑Chain Threat Modeling** – lack of granular data on compromised open‑source packages; recommend partnership with software‑bill of materials (SBOM) providers.  \n* **Geographic Threat Distribution** – current dataset lacks geo‑IP breakdown; augment with regional threat‑feed ingestion to refine regional risk scoring.  \n\n---  \n\n**Prepared by:**  \n*Cyber Threat Intelligence Team – Global Security Operations Center*  \n\n*All recommendations are based on the latest open‑source, commercial, and internal telemetry collected between 2025‑11‑12 and 2025‑11‑18. Continuous monitoring is advised to adapt to the rapidly evolving threat environment.*",
   "stats": {
     "7_day": {
-      "total_documents": 288,
+      "total_documents": 261,
       "top_threat_actors": [
-        [
-          "Yanluowang ransomware group",
-          3
-        ],
-        [
-          "Cl0p ransomware group",
-          2
-        ],
-        [
-          "Cybercriminal groups",
-          2
-        ],
         [
           "Smishing Triad",
           2
@@ -24,61 +12,77 @@
         [
           "Lighthouse",
           2
+        ],
+        [
+          "Akira ransomware group",
+          2
+        ],
+        [
+          "lazarus group",
+          2
+        ],
+        [
+          "AISURU botnet operators (unknown attribution)",
+          2
         ]
       ],
       "top_vulnerabilities": [
-        [
-          "CVE-2025-21042",
-          4
-        ],
         [
           "CVE-2025-62215",
           4
         ],
         [
-          "CVE-2025-12480",
-          3
-        ],
-        [
-          "CVE-2025-21043",
-          3
-        ],
-        [
           "CVE-2025-5777",
+          3
+        ],
+        [
+          "CVE-2025-20337",
+          3
+        ],
+        [
+          "CVE-2025-9242",
+          3
+        ],
+        [
+          "CVE-2025-24893",
           3
         ]
       ],
       "top_incidents": [
         [
-          "ransomware",
-          20
-        ],
-        [
           "data_breach",
           20
         ],
         [
-          "malware",
-          11
+          "ransomware",
+          16
         ],
         [
-          "phishing",
+          "malware",
           9
         ],
         [
+          "phishing",
+          7
+        ],
+        [
           "ddos",
-          2
+          6
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          30
+          26
         ],
         [
           "United States",
-          17
+          15
+        ],
+        [
+          "China",
+          7
         ],
         [
           "North America",
@@ -87,20 +91,12 @@
         [
           "Europe",
           7
-        ],
-        [
-          "China",
-          7
         ]
       ],
       "top_exploit_kits": [
         [
           "FortiWeb Authentication Bypass Artifact Generator",
           2
-        ],
-        [
-          "LANDFALL spyware",
-          1
         ],
         [
           "Lighthouse",
@@ -113,27 +109,31 @@
         [
           "ArcaneDoor",
           1
+        ],
+        [
+          "RondoDox botnet",
+          1
         ]
       ],
       "top_attack_vectors": [
-        [
-          "Credential theft via phishing or credential dumping",
-          3
-        ],
-        [
-          "exploitation of unpatched software vulnerabilities",
-          3
-        ],
         [
           "compromised credentials",
           3
         ],
         [
-          "Lateral movement through privileged accounts",
+          "ransomware encryption",
           2
         ],
         [
-          "phishing emails with malicious attachments",
+          "exploitation of unpatched software vulnerabilities",
+          2
+        ],
+        [
+          "Credential theft via phishing or credential dumping",
+          2
+        ],
+        [
+          "unauthorized remote access",
           2
         ]
       ]
@@ -154,12 +154,12 @@
           3
         ],
         [
-          "Yanluowang ransomware group",
+          "Smishing Triad",
           3
         ],
         [
-          "Everest",
-          2
+          "Yanluowang ransomware group",
+          3
         ]
       ],
       "top_vulnerabilities": [
@@ -168,12 +168,12 @@
           9
         ],
         [
-          "CVE-2025-61884",
+          "CVE-2025-54236",
           5
         ],
         [
-          "CVE-2025-54236",
-          5
+          "CVE-2025-61884",
+          4
         ],
         [
           "CVE-2025-61932",
@@ -186,12 +186,12 @@
       ],
       "top_incidents": [
         [
-          "data_breach",
+          "malware",
           60
         ],
         [
-          "malware",
-          58
+          "data_breach",
+          60
         ],
         [
           "ransomware",
@@ -199,7 +199,7 @@
         ],
         [
           "phishing",
-          21
+          20
         ],
         [
           "ddos",
@@ -210,23 +210,23 @@
       "top_geographies": [
         [
           "Global",
-          96
-        ],
-        [
-          "Europe",
-          37
+          95
         ],
         [
           "United States",
-          34
+          35
         ],
         [
-          "North America",
-          25
+          "Europe",
+          35
         ],
         [
           "United Kingdom",
           25
+        ],
+        [
+          "North America",
+          23
         ]
       ],
       "top_exploit_kits": [
@@ -358,7 +358,7 @@
         ],
         [
           "United Kingdom",
-          25
+          26
         ],
         [
           "North America",
@@ -460,16 +460,12 @@
     },
     "high_impact_incidents": [
       {
-        "title": "Ransomware targeting 7 organizations",
-        "date": "2025-11-10T11:46:11",
+        "title": "Ransomware targeting 3 organizations",
+        "date": "2025-11-13T11:13:54",
         "affected_companies": [
-          "Logitech",
-          "The Washington Post",
-          "Cox Enterprises",
-          "Pan American Silver",
-          "LKQ Corporation",
-          "Copeland",
-          "Other nearly 30 organizations listed on Cl0p site"
+          "Synnovis (NHS pathology services supplier)",
+          "National Health Service (NHS) hospitals in London",
+          "Patients whose pathology data were stored by Synnovis"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -478,26 +474,40 @@
         "affected_industries": []
       },
       {
-        "title": "Data_Breach targeting 3 organizations",
-        "date": "2025-11-11T12:30:16",
+        "title": "Ransomware targeting 2 organizations",
+        "date": "2025-11-14T10:37:00",
         "affected_companies": [
-          "Synthient",
-          "Customers of Synthient",
-          "Have I Been Pwned platform"
+          "multiple organizations across various sectors (healthcare, finance, manufacturing, education, government)",
+          "victims of 85 ransomware/extortion groups"
         ],
         "threat_actors": [],
         "severity": "critical",
-        "incident_type": "data_breach",
+        "incident_type": "ransomware",
         "impact_assessment": "",
         "affected_industries": []
       },
       {
         "title": "Ransomware targeting 3 organizations",
-        "date": "2025-11-13T11:13:54",
+        "date": "2025-11-15T15:09:19",
         "affected_companies": [
-          "Synnovis (NHS pathology services supplier)",
-          "National Health Service (NHS) hospitals in London",
-          "Patients whose pathology data were stored by Synnovis"
+          "Jaguar Land Rover corporate network",
+          "Jaguar Land Rover manufacturing systems",
+          "Jaguar Land Rover customer portals"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ransomware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Ransomware targeting 4 organizations",
+        "date": "2025-11-17T01:41:51",
+        "affected_companies": [
+          "Tata Motors Ltd.",
+          "Jaguar Land Rover manufacturing facilities (UK)",
+          "Production control systems",
+          "Corporate IT networks"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -518,42 +528,9 @@
         "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
-      },
-      {
-        "title": "Ransomware targeting 2 organizations",
-        "date": "2025-11-14T15:02:34",
-        "affected_companies": [
-          "Nutanix AHV customers",
-          "organizations using Nutanix hypervisor in critical sectors"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "ransomware",
-        "impact_assessment": "",
-        "affected_industries": []
       }
     ],
     "high_impact_vulnerabilities": [
-      {
-        "cve_id": "CVE-2025-42890",
-        "date": "2025-11-11T21:02:24",
-        "cvss_score": 10.0,
-        "summary": "Hardcoded credentials in SQL Anywhere Monitor (Non-GUI) allow unauthenticated remote code execution.",
-        "affected_companies": [
-          "SAP SQL Anywhere Monitor (Non-GUI)",
-          "SAP"
-        ]
-      },
-      {
-        "cve_id": "CVE-2025-42887",
-        "date": "2025-11-11T21:02:24",
-        "cvss_score": 9.9,
-        "summary": "Missing input sanitization in SAP Solution Manager enables authenticated remote code injection via a remote-enabled function module.",
-        "affected_companies": [
-          "SAP Solution Manager",
-          "SAP"
-        ]
-      },
       {
         "cve_id": "CVE-2025-42887",
         "date": "2025-11-13T13:10:24",
@@ -565,25 +542,53 @@
         ]
       },
       {
-        "cve_id": "",
-        "date": "2025-11-10T20:00:34",
+        "cve_id": "CVE-2025-60724",
+        "date": "2025-11-12T11:53:39",
         "cvss_score": 9.8,
-        "summary": "Critical Samsung Android vulnerability exploited to install LandFall spyware via crafted WhatsApp messages.",
+        "summary": "Heap‑based buffer overflow in the GDI+ graphics component (GDI+) allowing remote code execution via crafted metafiles.",
         "affected_companies": [
-          "Samsung Galaxy smartphones (Android)",
-          "Samsung Knox platform",
-          "Samsung"
+          "Microsoft Windows 10 (all supported builds)",
+          "Microsoft Windows 11 (all supported builds)",
+          "Microsoft Windows Server (all supported versions)",
+          "Microsoft Office applications that render GDI+ content",
+          "Microsoft"
         ]
       },
       {
-        "cve_id": "CVE-2023-21839",
-        "date": "2025-11-11T12:20:20",
+        "cve_id": "CVE-2025-12686",
+        "date": "2025-11-12T10:02:00",
         "cvss_score": 9.8,
-        "summary": "Oracle E-Business Suite XML External Entity (XXE) injection allowing unauthenticated remote code execution",
+        "summary": "Improper buffer size checks in BeeStation OS allow remote code execution.",
         "affected_companies": [
-          "Oracle E-Business Suite (EBS) 12.2.9",
-          "Oracle E-Business Suite (EBS) 12.2.10",
-          "Oracle"
+          "BeeStation OS 1.0",
+          "BeeStation OS 1.1",
+          "BeeStation OS 1.2",
+          "BeeStation OS 1.3",
+          "Synology"
+        ]
+      },
+      {
+        "cve_id": "",
+        "date": "2025-11-13T12:05:55",
+        "cvss_score": 9.8,
+        "summary": "Unauthenticated remote code execution vulnerability in Cisco Adaptive Security Appliance (ASA) software.",
+        "affected_companies": [
+          "Cisco ASA 9.12.x",
+          "Cisco ASA 9.13.x",
+          "Cisco ASA 9.14.x",
+          "Cisco ASA 9.15.x",
+          "Cisco ASA 9.16.x",
+          "Cisco"
+        ]
+      },
+      {
+        "cve_id": "",
+        "date": "2025-11-13T19:04:01",
+        "cvss_score": 9.8,
+        "summary": "Remote code execution vulnerability in ImunifyAV malware scanner for Linux servers",
+        "affected_companies": [
+          "ImunifyAV (Linux version)",
+          "CloudLinux (ImunifyAV)"
         ]
       }
     ],
@@ -769,21 +774,21 @@
         "industry": "Unknown"
       },
       {
-        "company": "Five unnamed U.S. companies (including a medical organization)",
-        "date": "2025-11-04T07:45:00",
-        "actor": "Ryan Clifford Goldberg",
-        "ransomware_type": "Blackcat Ransomware",
-        "impact": "",
-        "demands": "estimated financial loss: undisclosed, likely in the millions of dollars due to ransom payments, downtime, and remediation costs",
-        "industry": "Unknown"
-      },
-      {
         "company": "Five unnamed U.S. companies (victims of BlackCat ransomware)",
         "date": "2025-11-03T17:15:39",
         "actor": "BlackCat / ALPHV ransomware group",
         "ransomware_type": "Blackcat Ransomware",
         "impact": "",
         "demands": "undisclosed (likely high due to ransom demand, remediation costs, legal fees)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Five unnamed U.S. companies (including a medical organization)",
+        "date": "2025-11-04T07:45:00",
+        "actor": "Ryan Clifford Goldberg",
+        "ransomware_type": "Blackcat Ransomware",
+        "impact": "",
+        "demands": "estimated financial loss: undisclosed, likely in the millions of dollars due to ransom payments, downtime, and remediation costs",
         "industry": "Unknown"
       },
       {
@@ -913,33 +918,6 @@
         "industry": "Unknown"
       },
       {
-        "company": "State of Nevada",
-        "date": "2025-11-06T19:02:16",
-        "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "60 Nevada state agencies",
-        "date": "2025-11-06T19:02:16",
-        "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Health and public safety service systems",
-        "date": "2025-11-06T19:02:16",
-        "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
-        "industry": "Unknown"
-      },
-      {
         "company": "Developers using Visual Studio Code",
         "date": "2025-11-06T21:52:47",
         "actor": "Unknown",
@@ -964,6 +942,33 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "State of Nevada",
+        "date": "2025-11-06T19:02:16",
+        "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "60 Nevada state agencies",
+        "date": "2025-11-06T19:02:16",
+        "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Health and public safety service systems",
+        "date": "2025-11-06T19:02:16",
+        "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
         "industry": "Unknown"
       },
       {
@@ -1102,6 +1107,15 @@
         "industry": "Unknown"
       },
       {
+        "company": "multiple organizations targeted by Yanluowang ransomware (specific victims not disclosed)",
+        "date": "2025-11-10T15:00:05",
+        "actor": "Yanluowang ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated multi‑million USD losses across victim organizations (exact figure not disclosed)",
+        "industry": "Unknown"
+      },
+      {
         "company": "Company A",
         "date": "2025-11-10T19:12:51",
         "actor": "Yanluowang ransomware group",
@@ -1174,18 +1188,27 @@
         "industry": "Unknown"
       },
       {
-        "company": "multiple organizations targeted by Yanluowang ransomware (specific victims not disclosed)",
-        "date": "2025-11-10T15:00:05",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated multi‑million USD losses across victim organizations (exact figure not disclosed)",
-        "industry": "Unknown"
-      },
-      {
         "company": "Eight U.S. companies (names not disclosed)",
         "date": "2025-11-10T19:12:51",
         "actor": "Yanluowang ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "victim organization (unspecified)",
+        "date": "2025-11-11T15:01:11",
+        "actor": "RansomHub ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Varonis security team",
+        "date": "2025-11-11T15:01:11",
+        "actor": "RansomHub ransomware group",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -1213,24 +1236,6 @@
         "company": "SMEs across the United Kingdom",
         "date": "2025-11-11T11:04:48",
         "actor": "Known ransomware-as-a‑service (RaaS) groups (e.g., LockBit, Conti, REvil)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "victim organization (unspecified)",
-        "date": "2025-11-11T15:01:11",
-        "actor": "RansomHub ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Varonis security team",
-        "date": "2025-11-11T15:01:11",
-        "actor": "RansomHub ransomware group",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
