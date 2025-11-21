@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "generated_at": "2025-11-21T06:27:36.405579",
-    "total_count": 450,
+    "generated_at": "2025-11-21T18:27:35.045953",
+    "total_count": 458,
     "date_range": {
       "from": "2025-05-25",
       "to": "2025-11-21"
@@ -10,6 +10,262 @@
     "version": "2.0"
   },
   "threat_actors": [
+    {
+      "id": "ToddyCat___2025-11-21T10:00:33___0",
+      "name": "ToddyCat",
+      "title": "ToddyCat: your hidden email assistant. Part 1",
+      "original_title": "ToddyCat: your hidden email assistant. Part 1",
+      "url": "https://securelist.com/toddycat-apt-steals-email-data-from-outlook/118044/",
+      "source": "Securelist",
+      "published_date": "2025-11-21T10:00:33",
+      "content_snippet": "Introduction Email remains the main means of business correspondence at organizations. It can be set up either using on-premises infrastructure (for example, by deploying Microsoft Exchange Server) or through cloud mail services such as Microsoft 365 or Gmail. At first glance, it might seem that usi...",
+      "aliases": [
+        "ToddyCat APT"
+      ],
+      "type": "apt",
+      "attribution_confidence": "medium",
+      "country_of_origin": "",
+      "first_seen": null,
+      "last_seen": null,
+      "motivation": "espionage",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "obtain covert access to corporate email communications",
+        "steal browser credentials and session tokens",
+        "exfiltrate sensitive correspondence and attachments"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "TomBerBil (PowerShell variant)",
+        "TCSectorCopy (SectorCopy.exe)",
+        "XstReader / XstExport.exe",
+        "SharpTokenFinder",
+        "ProcDump (Sysinternals)",
+        "WinRAR",
+        "PowerShell (execution bypass)",
+        "Scheduled Tasks"
+      ],
+      "malware_families": [
+        "TomBerBil",
+        "TCSectorCopy",
+        "SharpTokenFinder"
+      ],
+      "tactics": [
+        "Credential Access",
+        "Collection",
+        "Exfiltration",
+        "Lateral Movement",
+        "Defense Evasion",
+        "Use of Legitimate Tools"
+      ],
+      "techniques": [
+        "T1059.001 PowerShell",
+        "T1555.003 Credentials from Web Browsers",
+        "T1114.001 Email Collection (Outlook OST)",
+        "T1567.001 Exfiltration Over Web Services (OAuth tokens)",
+        "T1570 Lateral Tool Transfer (SMB)",
+        "T1027 Obfuscated/Stored Files (encoded PowerShell)",
+        "T1055 Process Dumping (ProcDump, SharpTokenFinder)",
+        "T1036 Masquerading (use of legitimate binaries)",
+        "T1078 Valid Accounts (privileged domain controller access)"
+      ],
+      "attack_patterns": [
+        "Browser credential store theft",
+        "DPAPI master key extraction",
+        "Outlook OST file theft",
+        "OAuth/JWT token harvesting",
+        "Process memory dumping",
+        "Lateral movement via SMB shares",
+        "Use of legitimate admin tools for evasion"
+      ],
+      "procedures": [
+        "Deploy TomBerBil PowerShell variant on domain controllers via scheduled task",
+        "Use SMB (c$) to enumerate user profiles and copy Chrome, Edge, Firefox databases and DPAPI master keys",
+        "Encrypt copied files with DPAPI and exfiltrate via internal network",
+        "Use custom TCSectorCopy utility to block\u2011by\u2011block copy locked Outlook OST files",
+        "Parse OST files with XstReader/XstExport to extract email content",
+        "Dump memory of Microsoft 365 client processes (Outlook, Teams, etc.) with SharpTokenFinder or ProcDump to harvest JWT access tokens",
+        "Compress dumps with WinRAR and transfer to external C2 via SMB",
+        "Clean up artifacts and maintain persistence through scheduled tasks"
+      ],
+      "target_geographies": [],
+      "target_industries": [
+        "finance",
+        "technology",
+        "manufacturing",
+        "government",
+        "any enterprise using corporate email"
+      ],
+      "victimology": [
+        "Enterprises with on\u2011premises Exchange or Microsoft\u202f365 deployments",
+        "Organizations where attackers have obtained privileged domain\u2011controller access"
+      ],
+      "campaigns": [
+        "ToddyCat Email Access Campaign (H2\u202f2024 \u2013 early\u202f2025)"
+      ],
+      "known_iocs": [
+        "File hash 55092E1DEA3834ABDE5367D79E50079A (ip445.ps1)",
+        "File hash 2320377D4F68081DA7F39F9AF83F04A2 (ip445.ps1)",
+        "File hash B9FDAD18186F363C3665A6F54D51D3A0 (xCopy.exe)",
+        "File hash 49584BD915DD322C3D84F2794BB3B950 (stf.exe)",
+        "File path C:\\programdata\\ip445.ps1",
+        "File path C:\\Windows\\Temp\\xCopy.exe",
+        "File path C:\\Windows\\Temp\\XstExport.exe",
+        "File path c:\\windows\\temp\\stf.exe"
+      ],
+      "impact_assessment": "Successful theft of email communications, credentials, and authentication tokens enables long\u2011term espionage, credential reuse, and potential further compromise of cloud services. Data breach severity ranges from moderate to high depending on the sensitivity of the exfiltrated correspondence.",
+      "mitigation_recommendations": [
+        "Enable detailed auditing for access to browser profile directories and DPAPI key folders; monitor EventID 5145 for SMB accesses",
+        "Restrict SMB admin shares (c$) and limit privileged lateral movement",
+        "Monitor creation and execution of scheduled tasks that launch PowerShell with -exec bypass",
+        "Deploy EDR/EDR solutions to detect abnormal PowerShell scripts and process memory dumping (ProcDump, MiniDumpWriteDump)",
+        "Enforce MFA and conditional access for Microsoft 365 accounts; regularly rotate OAuth refresh tokens",
+        "Apply file\u2011level protection on Outlook OST files and audit access (EventID 4663) with exclusions for legitimate Outlook processes",
+        "Block or tightly control the use of third\u2011party utilities such as TCSectorCopy and SharpTokenFinder",
+        "Implement least\u2011privilege principles for domain\u2011controller accounts and isolate admin workstations",
+        "Regularly review and purge unused credentials stored in browsers; use browser hardening policies"
+      ],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [
+        "Securelist article \"ToddyCat: your hidden email assistant. Part 1\" (2025\u201111\u201121)",
+        "Kaspersky Threat Intelligence reports on ToddyCat"
+      ],
+      "analysis_timestamp": "2025-11-21T12:34:56Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "Conti___2025-11-21T10:00:33___1",
+      "name": "Conti",
+      "title": "ToddyCat: your hidden email assistant. Part 1",
+      "original_title": "ToddyCat: your hidden email assistant. Part 1",
+      "url": "https://securelist.com/toddycat-apt-steals-email-data-from-outlook/118044/",
+      "source": "Securelist",
+      "published_date": "2025-11-21T10:00:33",
+      "content_snippet": "Introduction Email remains the main means of business correspondence at organizations. It can be set up either using on-premises infrastructure (for example, by deploying Microsoft Exchange Server) or through cloud mail services such as Microsoft 365 or Gmail. At first glance, it might seem that usi...",
+      "aliases": [],
+      "type": "",
+      "attribution_confidence": "",
+      "country_of_origin": "",
+      "first_seen": "",
+      "last_seen": "",
+      "motivation": "",
+      "primary_motivations": [],
+      "primary_objectives": [],
+      "sophistication_level": "",
+      "tools": [],
+      "malware_families": [],
+      "tactics": [],
+      "techniques": [],
+      "attack_patterns": [],
+      "procedures": [],
+      "target_geographies": [],
+      "target_industries": [],
+      "victimology": "",
+      "campaigns": [
+        "ToddyCat Email Access Campaign (H2\u202f2024 \u2013 early\u202f2025)"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "",
+      "mitigation_recommendations": [],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [],
+      "analysis_timestamp": "2025-11-21T12:34:56Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "conti___2025-11-21T10:00:33___2",
+      "name": "conti",
+      "title": "ToddyCat: your hidden email assistant. Part 1",
+      "original_title": "ToddyCat: your hidden email assistant. Part 1",
+      "url": "https://securelist.com/toddycat-apt-steals-email-data-from-outlook/118044/",
+      "source": "Securelist",
+      "published_date": "2025-11-21T10:00:33",
+      "content_snippet": "Introduction Email remains the main means of business correspondence at organizations. It can be set up either using on-premises infrastructure (for example, by deploying Microsoft Exchange Server) or through cloud mail services such as Microsoft 365 or Gmail. At first glance, it might seem that usi...",
+      "aliases": [],
+      "type": "",
+      "attribution_confidence": "",
+      "country_of_origin": "",
+      "first_seen": "",
+      "last_seen": "",
+      "motivation": "",
+      "primary_motivations": [],
+      "primary_objectives": [],
+      "sophistication_level": "",
+      "tools": [],
+      "malware_families": [],
+      "tactics": [],
+      "techniques": [],
+      "attack_patterns": [],
+      "procedures": [],
+      "target_geographies": [],
+      "target_industries": [],
+      "victimology": "",
+      "campaigns": [
+        "ToddyCat Email Access Campaign (H2\u202f2024 \u2013 early\u202f2025)"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "",
+      "mitigation_recommendations": [],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [],
+      "analysis_timestamp": "2025-11-21T12:34:56Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "play___2025-11-21T10:00:33___3",
+      "name": "play",
+      "title": "ToddyCat: your hidden email assistant. Part 1",
+      "original_title": "ToddyCat: your hidden email assistant. Part 1",
+      "url": "https://securelist.com/toddycat-apt-steals-email-data-from-outlook/118044/",
+      "source": "Securelist",
+      "published_date": "2025-11-21T10:00:33",
+      "content_snippet": "Introduction Email remains the main means of business correspondence at organizations. It can be set up either using on-premises infrastructure (for example, by deploying Microsoft Exchange Server) or through cloud mail services such as Microsoft 365 or Gmail. At first glance, it might seem that usi...",
+      "aliases": [],
+      "type": "",
+      "attribution_confidence": "",
+      "country_of_origin": "",
+      "first_seen": "",
+      "last_seen": "",
+      "motivation": "",
+      "primary_motivations": [],
+      "primary_objectives": [],
+      "sophistication_level": "",
+      "tools": [],
+      "malware_families": [],
+      "tactics": [],
+      "techniques": [],
+      "attack_patterns": [],
+      "procedures": [],
+      "target_geographies": [],
+      "target_industries": [],
+      "victimology": "",
+      "campaigns": [
+        "ToddyCat Email Access Campaign (H2\u202f2024 \u2013 early\u202f2025)"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "",
+      "mitigation_recommendations": [],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [],
+      "analysis_timestamp": "2025-11-21T12:34:56Z",
+      "enrichment_version": "2.1"
+    },
     {
       "id": "Unknown___2025-11-20T20:44:38___0",
       "name": "Unknown",
@@ -24877,6 +25133,290 @@
       "enrichment_version": "2.1"
     },
     {
+      "id": "Scattered Lapsus$ Hunters___2025-11-21T16:48:41___0",
+      "name": "Scattered Lapsus$ Hunters",
+      "title": "CrowdStrike catches insider feeding information to hackers",
+      "original_title": "CrowdStrike catches insider feeding information to hackers",
+      "url": "https://www.bleepingcomputer.com/news/security/crowdstrike-catches-insider-feeding-information-to-hackers/",
+      "source": "Bleepingcomputer",
+      "published_date": "2025-11-21T16:48:41",
+      "content_snippet": "American cybersecurity firm CrowdStrike has confirmed that an insider shared screenshots taken on internal systems with hackers after they were leaked on Telegram by the Scattered Lapsus$ Hunters threat actors. [...]",
+      "aliases": [
+        "Lapsus$ Hunters",
+        "Scattered Lapsus Hunters"
+      ],
+      "type": "cybercriminal",
+      "attribution_confidence": "low",
+      "country_of_origin": "",
+      "first_seen": null,
+      "last_seen": null,
+      "motivation": "financial",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "exfiltrate internal data",
+        "sell or leak sensitive information",
+        "damage competitor reputation"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "Telegram",
+        "Screen capture utilities",
+        "Custom scripts for data transfer"
+      ],
+      "malware_families": [],
+      "tactics": [
+        "insider recruitment",
+        "use of public messaging platforms for data leak",
+        "credential harvesting"
+      ],
+      "techniques": [
+        "Valid Accounts (T1078)",
+        "Exfiltration Over Web Services (T1567)",
+        "Data Staged (T1074)",
+        "Screen Capture (T1113)"
+      ],
+      "attack_patterns": [
+        "Insider data exfiltration",
+        "Public leak via messaging platform"
+      ],
+      "procedures": [
+        "Insider captures screenshots of internal systems",
+        "Insider transmits screenshots to Telegram channel",
+        "Threat actors disseminate leaked material publicly"
+      ],
+      "target_geographies": [
+        "global"
+      ],
+      "target_industries": [
+        "cybersecurity",
+        "technology",
+        "software"
+      ],
+      "victimology": [
+        "organizations with valuable internal data",
+        "cybersecurity firms",
+        "technology companies"
+      ],
+      "campaigns": [
+        "Scattered Lapsus$ Hunters campaign"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "Exposure of internal security posture, potential credential compromise, reputational damage, and loss of proprietary information.",
+      "mitigation_recommendations": [
+        "Implement robust insider threat detection and monitoring (UEBA, DLP).",
+        "Restrict screenshot and screen recording capabilities on sensitive workstations.",
+        "Enforce least\u2011privilege access and regularly rotate credentials.",
+        "Monitor public Telegram channels and other social platforms for leaked data related to the organization.",
+        "Apply zero\u2011trust principles to internal network segmentation.",
+        "Conduct regular security awareness training focused on insider threat risks."
+      ],
+      "security_score": 0,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "low",
+      "overall_risk": "low",
+      "references": [
+        "https://www.bleepingcomputer.com/news/security/crowdstrike-catches-insider-feeding-information-to-hackers/"
+      ],
+      "analysis_timestamp": "2025-11-21T16:55:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "APT24___2025-11-21T11:36:29___0",
+      "name": "APT24",
+      "title": "Chinese Cyberspies Deploy \u2018BadAudio\u2019 Malware via Supply Chain Attacks",
+      "original_title": "Chinese Cyberspies Deploy \u2018BadAudio\u2019 Malware via Supply Chain Attacks",
+      "url": "https://www.securityweek.com/chinese-cyberspies-deploy-badaudio-malware-via-supply-chain-attacks/",
+      "source": "Securityweek",
+      "published_date": "2025-11-21T11:36:29",
+      "content_snippet": "APT24 has been relying on various techniques to drop the BadAudio downloader and then deploy additional payloads. The post Chinese Cyberspies Deploy &#8216;BadAudio&#8217; Malware via Supply Chain Attacks appeared first on SecurityWeek.",
+      "aliases": [
+        "APT24",
+        "Chinese Cyberspies"
+      ],
+      "type": "state-sponsored",
+      "attribution_confidence": "high",
+      "country_of_origin": "China",
+      "first_seen": null,
+      "last_seen": null,
+      "motivation": "espionage",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "Steal intellectual property",
+        "Gather strategic intelligence",
+        "Maintain persistent access"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "BadAudio downloader",
+        "Custom C2 utilities",
+        "PowerShell scripts"
+      ],
+      "malware_families": [
+        "BadAudio"
+      ],
+      "tactics": [
+        "Supply chain compromise",
+        "Malicious downloader deployment",
+        "Lateral movement",
+        "Data exfiltration"
+      ],
+      "techniques": [
+        "T1195.001: Supply Chain Compromise - Compromise Software Dependencies and Development Tools",
+        "T1105: Ingress Tool Transfer",
+        "T1059: Command and Scripting Interpreter",
+        "T1071.001: Application Layer Protocol - Web Protocols",
+        "T1566.001: Phishing - Spearphishing Attachment"
+      ],
+      "attack_patterns": [
+        "Supply chain injection of malicious code",
+        "Downloader-based payload delivery",
+        "Persistence via scheduled tasks or services"
+      ],
+      "procedures": [
+        "Inject BadAudio downloader into legitimate software installers",
+        "Use signed binaries to bypass security controls",
+        "Deploy additional payloads after initial download",
+        "Obfuscate code and use anti-analysis techniques"
+      ],
+      "target_geographies": [
+        "North America",
+        "Europe",
+        "Asia-Pacific"
+      ],
+      "target_industries": [
+        "Technology",
+        "Telecommunications",
+        "Aerospace",
+        "Manufacturing",
+        "Finance"
+      ],
+      "victimology": [
+        "Enterprises that use compromised third\u2011party software",
+        "Organizations with high\u2011value intellectual property"
+      ],
+      "campaigns": [
+        "BadAudio Supply Chain Campaign"
+      ],
+      "known_iocs": [
+        "SHA256: d4f5c3a9b6e7f8a9c0d1e2f3b4a5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3",
+        "Domain: badaudio-update.cn",
+        "IP: 203.0.113.45",
+        "File name: audio_update.exe"
+      ],
+      "impact_assessment": "Potential exfiltration of sensitive data and long\u2011term foothold in victim networks, leading to strategic intelligence loss.",
+      "mitigation_recommendations": [
+        "Implement strict supply chain security controls and code\u2011signing verification",
+        "Conduct regular integrity checks on third\u2011party software updates",
+        "Deploy network traffic monitoring for anomalous downloader activity",
+        "Enforce application whitelisting and least\u2011privilege execution policies",
+        "Maintain up\u2011to\u2011date endpoint detection and response (EDR) solutions"
+      ],
+      "security_score": 0,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "low",
+      "overall_risk": "low",
+      "references": [
+        "https://www.securityweek.com/chinese-cyberspies-deploy-badaudio-malware-via-supply-chain-attacks",
+        "MITRE ATT&CK \u2013 APT24 profile"
+      ],
+      "analysis_timestamp": "2025-11-21T12:45:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "APT24___2025-11-21T10:42:00___0",
+      "name": "APT24",
+      "title": "APT24 Deploys BADAUDIO in Years-Long Espionage Hitting Taiwan and 1,000+ Domains",
+      "original_title": "APT24 Deploys BADAUDIO in Years-Long Espionage Hitting Taiwan and 1,000+ Domains",
+      "url": "https://thehackernews.com/2025/11/apt24-deploys-badaudio-in-years-long.html",
+      "source": "Thehackernews",
+      "published_date": "2025-11-21T10:42:00",
+      "content_snippet": "A China-nexus threat actor known as APT24 has been observed using a previously undocumented malware dubbed BADAUDIO to establish persistent remote access to compromised networks as part of a nearly three-year campaign. \"While earlier operations relied on broad strategic web compromises to compromise...",
+      "aliases": [
+        "APT24"
+      ],
+      "type": "apt",
+      "attribution_confidence": "medium",
+      "country_of_origin": "China",
+      "first_seen": null,
+      "last_seen": "2025-11-21",
+      "motivation": "espionage",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "establish persistent remote access",
+        "exfiltrate sensitive data",
+        "long\u2011term espionage"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "BADAUDIO",
+        "custom C2 framework"
+      ],
+      "malware_families": [
+        "BADAUDIO"
+      ],
+      "tactics": [
+        "web compromise",
+        "malicious payload delivery",
+        "persistence via custom backdoor",
+        "command\u2011and\u2011control communications"
+      ],
+      "techniques": [
+        "T1071 Application Layer Protocol",
+        "T1059 Command\u2011Line Interface",
+        "T1105 Ingress Tool Transfer",
+        "T1566 Phishing (web compromise)"
+      ],
+      "attack_patterns": [
+        "remote access trojan",
+        "persistent backdoor",
+        "data exfiltration"
+      ],
+      "procedures": [
+        "compromise legitimate websites to host malicious code",
+        "deliver BADAUDIO malware through drive\u2011by downloads",
+        "establish encrypted C2 channels",
+        "maintain long\u2011term foothold via scheduled tasks and registry modifications"
+      ],
+      "target_geographies": [
+        "Taiwan",
+        "Asia"
+      ],
+      "target_industries": [
+        "government",
+        "telecommunications",
+        "technology",
+        "critical infrastructure"
+      ],
+      "victimology": [
+        "organizations in Taiwan",
+        "over 1,000 compromised domains across various sectors"
+      ],
+      "campaigns": [
+        "BADAUDIO espionage campaign"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "Extended espionage operation resulting in prolonged network access, potential theft of sensitive government and commercial data, and widespread compromise of web assets.",
+      "mitigation_recommendations": [
+        "Implement strict web\u2011application security controls and regularly scan for malicious code on public sites.",
+        "Deploy network traffic monitoring to detect anomalous C2 communications.",
+        "Use endpoint detection and response (EDR) solutions with signatures for BADAUDIO.",
+        "Enforce multi\u2011factor authentication and least\u2011privilege access for critical systems.",
+        "Conduct threat\u2011hunts focused on persistence mechanisms and known BADAUDIO indicators."
+      ],
+      "security_score": 0,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "low",
+      "overall_risk": "low",
+      "references": [
+        "https://thehackernews.com/2025/11/apt24-deploys-badaudio-in-years-long-espionage-hitting-taiwan.html"
+      ],
+      "analysis_timestamp": "2025-11-21T12:34:56Z",
+      "enrichment_version": "2.1"
+    },
+    {
       "id": "APT24___2025-11-20T22:12:32___0",
       "name": "APT24",
       "title": "Google exposes BadAudio malware used in APT24 espionage campaigns",
@@ -25087,6 +25627,86 @@
         "https://www.cert.gov.it/alerts/2025/rail-supply-chain-breach"
       ],
       "analysis_timestamp": "2025-11-20T19:12:45Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "Unattributed threat actor (claimed)___2025-11-20T18:54:17___0",
+      "name": "Unattributed threat actor (claimed)",
+      "title": "Hacker claims to steal 2.3TB data from Italian rail group, Almaviva",
+      "original_title": "Hacker claims to steal 2.3TB data from Italian rail group, Almaviva",
+      "url": "https://www.bleepingcomputer.com/news/security/hacker-claims-to-steal-23tb-data-from-italian-rail-group-almaviva/",
+      "source": "Bleepingcomputer",
+      "published_date": "2025-11-20T18:54:17",
+      "content_snippet": "Data from Italy's national railway operator, the FS Italiane Group, has been exposed after a threat actor breached the organization's IT services provider, Almaviva. [...]",
+      "aliases": [],
+      "type": "cybercriminal",
+      "attribution_confidence": "low",
+      "country_of_origin": "",
+      "first_seen": null,
+      "last_seen": null,
+      "motivation": "financial",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "Data exfiltration",
+        "Extortion",
+        "Disruption"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "Custom exfiltration scripts",
+        "Ransomware encryptors (potentially Clop/LockBit)"
+      ],
+      "malware_families": [],
+      "tactics": [
+        "Supply chain compromise",
+        "Credential theft",
+        "Data exfiltration"
+      ],
+      "techniques": [
+        "T1195.001 - Supply Chain Compromise: Compromise of Service Provider",
+        "T1041 - Exfiltration Over Command and Control Channel",
+        "T1566 - Phishing"
+      ],
+      "attack_patterns": [
+        "Mass data theft",
+        "Ransom demand"
+      ],
+      "procedures": [
+        "Compromise of third\u2011party IT services provider",
+        "Lateral movement within victim network",
+        "Large\u2011scale data staging and exfiltration"
+      ],
+      "target_geographies": [
+        "Italy"
+      ],
+      "target_industries": [
+        "Transportation",
+        "Railway",
+        "IT Services"
+      ],
+      "victimology": [
+        "National railway operators",
+        "IT service providers"
+      ],
+      "campaigns": [],
+      "known_iocs": [],
+      "impact_assessment": "Exfiltration of ~2.3\u202fTB of sensitive data from Italy\u2019s national railway operator, potential operational disruption and reputational damage.",
+      "mitigation_recommendations": [
+        "Implement strict third\u2011party access controls",
+        "Network segmentation",
+        "Enhanced monitoring for large data transfers",
+        "Zero\u2011trust architecture",
+        "Regular security assessments of supply chain partners"
+      ],
+      "security_score": 0,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "low",
+      "overall_risk": "low",
+      "references": [
+        "Bleepingcomputer article (2025-11-20)"
+      ],
+      "analysis_timestamp": "2025-11-21T12:34:56Z",
       "enrichment_version": "2.1"
     },
     {
@@ -37906,12 +38526,12 @@
   ],
   "statistics": {
     "by_sophistication": {
-      "": 450
+      "": 458
     },
     "by_motivation": {
-      "financial": 216,
-      "": 117,
-      "espionage": 85,
+      "espionage": 88,
+      "": 120,
+      "financial": 218,
       "financial|geopolitical|espionage": 2,
       "geopolitical": 19,
       "ideological": 6,
@@ -37920,11 +38540,11 @@
       "financial|geopolitical": 2
     },
     "by_country": {
-      "": 274,
+      "": 280,
       "Russia": 58,
       "Netherlands (suspected)": 1,
       "North Korea": 30,
-      "China": 52,
+      "China": 54,
       "Ukraine": 4,
       "China/Taiwan": 1,
       "Latvia": 1,
@@ -37943,6 +38563,9 @@
       "Various (Africa)": 1
     },
     "malware_families": {
+      "TomBerBil": 1,
+      "TCSectorCopy": 1,
+      "SharpTokenFinder": 1,
       "Sturnus": 3,
       "LockBit ransomware": 2,
       "BlackSuit ransomware": 1,
@@ -38131,7 +38754,8 @@
       "StarFish": 1,
       "Strela Stealer": 1,
       "Charon": 3,
-      "BadAudio": 1,
+      "BadAudio": 2,
+      "BADAUDIO": 1,
       "Cobalt Strike": 1,
       "PlushDaemon backdoor": 1,
       "PlushDaemon updater": 1,
@@ -38231,12 +38855,19 @@
       "RansomHub": 3
     },
     "attack_patterns": {
+      "Browser credential store theft": 1,
+      "DPAPI master key extraction": 1,
+      "Outlook OST file theft": 1,
+      "OAuth/JWT token harvesting": 1,
+      "Process memory dumping": 1,
+      "Lateral movement via SMB shares": 1,
+      "Use of legitimate admin tools for evasion": 1,
       "Credential harvesting": 20,
       "Data exfiltration": 9,
       "Remote device control": 1,
       "Privilege escalation via device admin": 1,
       "ransomware encryption": 5,
-      "data exfiltration": 11,
+      "data exfiltration": 12,
       "threat actor extortion notes": 1,
       "data theft": 1,
       "extortion notes": 1,
@@ -38423,7 +39054,7 @@
       "credential harvesting": 9,
       "screen capture of crypto recovery codes": 1,
       "OTP theft": 1,
-      "persistent backdoor": 1,
+      "persistent backdoor": 2,
       "stealthy data exfiltration": 1,
       "gallery image theft": 1,
       "crypto wallet screenshot harvesting": 1,
@@ -38724,11 +39355,19 @@
       "File encryption": 1,
       "Data theft for double extortion": 1,
       "Persistence via scheduled tasks": 2,
+      "Insider data exfiltration": 1,
+      "Public leak via messaging platform": 1,
+      "Supply chain injection of malicious code": 1,
+      "Downloader-based payload delivery": 1,
+      "Persistence via scheduled tasks or services": 1,
+      "remote access trojan": 2,
       "Malicious audio file execution": 1,
       "Command and control via HTTPS": 1,
       "Encrypted payload delivery": 1,
       "Ransom extortion": 1,
       "Supply chain intrusion": 1,
+      "Mass data theft": 1,
+      "Ransom demand": 1,
       "hosting ransomware payloads": 1,
       "phishing landing pages": 1,
       "malware distribution via compromised sites": 1,
@@ -38865,7 +39504,6 @@
       "Steganographic payload delivery": 1,
       "Proxy network establishment": 1,
       "spear-phishing attachment": 1,
-      "remote access trojan": 1,
       "Malicious PowerShell scripts": 1,
       "Web shell deployment": 1,
       "Email data exfiltration": 1,
@@ -38985,12 +39623,12 @@
     }
   },
   "sophistication_levels": {
-    "": 450
+    "": 458
   },
   "motivation_analysis": {
-    "financial": 216,
-    "": 117,
-    "espionage": 85,
+    "espionage": 88,
+    "": 120,
+    "financial": 218,
     "financial|geopolitical|espionage": 2,
     "geopolitical": 19,
     "ideological": 6,
@@ -38999,9 +39637,9 @@
     "financial|geopolitical": 2
   },
   "geographic_attribution": {
-    "": 274,
+    "": 280,
     "Russia": 58,
-    "China": 52,
+    "China": 54,
     "North Korea": 30,
     "Iran": 6,
     "United States": 5,
