@@ -1,9 +1,9 @@
 {
-  "generated_at": "2025-11-26T10:25:27Z",
-  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – 7‑DAY INTELLIGENCE BRIEF (26 Nov 2025 – 2 Dec 2025)**  \n*Prepared for Executive Leadership*  \n\n---  \n\n## EXECUTIVE SUMMARY  \n\nOver the past week the threat environment has accelerated in both breadth and depth.  Malware‑focused campaigns targeting the **SolarWinds Orion platform** and the **npm open‑source ecosystem** have generated the highest incident counts (21 malware events, 26 k compromised packages) and are now intersecting with high‑impact ransomware operations against critical infrastructure (Iberia airline, Air Miles España, multiple U.S. state agencies).  The convergence of supply‑chain compromise, active exploitation of newly disclosed **critical CVEs** (e.g., CVE‑2025‑41115 in Grafana, CVE‑2024‑40766 in SonicWall SSL‑VPN), and the resurgence of “Ransom‑as‑a‑Service” (LockBit, Cl0p, Everest) creates a multi‑vector risk profile that can simultaneously disrupt service availability, exfiltrate sensitive data, and force costly extortion payouts.  \n\nGeopolitically, the data show a clear alignment of **state‑linked actors** (e.g., the Russian‑based bullet‑proof hosting ecosystem supporting LockBit/Evil Corp) with financially motivated ransomware groups, while **APT‑24** and **ShinyHunters** continue to weaponize supply‑chain vectors against U.S. federal agencies and global enterprises.  The most pressing vulnerabilities are those with **CVSS ≥ 9.8** that are already being weaponised in the wild—Grafana (10.0), SonicWall SSL‑VPN (9.8), and the Ray distributed‑computing framework (9.8).  Immediate remediation, network segmentation, and threat‑hunts focused on these assets are essential to prevent lateral movement and ransomware encryption of mission‑critical workloads.  \n\n---  \n\n## THREAT ACTOR INTELLIGENCE  \n\n### Active Threat Actors (7‑day window)  \n| Actor | Observed Activity | Primary Motivation* | Confidence |\n|-------|-------------------|---------------------|------------|\n| **APT‑24** | 5 incidents – SolarWinds Orion, U.S. federal agencies | Espionage, strategic data collection | High |\n| **ShinyHunters** | 5 incidents – npm supply‑chain compromise, downstream code reuse | Financial gain + data theft | High |\n| **LockBit** | 3 ransomware incidents – re‑emergence, bullet‑proof hosting ties | Ransom/Extortion | Medium‑High |\n| **PlushDaemon** | 2 ransomware incidents – UK healthcare (Synnovis) | Extortion of health data | Medium |\n| **Everest** | 2 ransomware incidents – Iberia, Air Miles España | Financial extortion | Medium |\n| **Cl0p** | 0 new incidents in 7 days (but high‑impact legacy victims) | Ransom/Extortion | Medium |\n| **Conti / BlackCat / ALPHV** | No new incidents in 7 days, but active in 30‑day window | Ransom/Extortion | Medium |\n\n\\*Motivation inferred from public statements, ransom notes, and target selection.  \n\n### Threat Actor Evolution (7 d vs 30 d vs 150 d)  \n\n| Actor | 7‑day | 30‑day | 150‑day | Trend |\n|-------|-------|--------|---------|-------|\n| **APT‑24** | ↑ (5) | – | – | Emerging – first appearance in 30‑day set |\n| **ShinyHunters** | ↑ (5) | – | – | New supply‑chain focus |\n| **LockBit** | ↑ (3) | – | – | Re‑emergence after a brief lull; linked to Russian hosting |\n| **Lazarus Group** | – | 5 | 6 | Stable, but not dominant in last week |\n| **Scattered Spider** | – | – | 9 | Declining activity (no recent events) |\n| **RaccoonO365** | – | – | 3 | Low‑level, no recent spikes |\n| **Conti / ALPHV** | – | 4‑5 | – | Still active in 30‑day window, but no fresh incidents |\n\n**Key Insight:** The **7‑day surge** of APT‑24 and ShinyHunters marks a shift toward **software‑supply‑chain exploitation**, while ransomware groups are consolidating around **RaaS platforms** and leveraging compromised infrastructure (bullet‑proof hosting) to accelerate campaigns.  \n\n### Attribution & Confidence  \n\n| Indicator | Attribution | Confidence | Motivation |\n|-----------|-------------|------------|------------|\n| **SolarWinds Orion malware** | APT‑24 (based on code reuse, TTPs) | High | Strategic espionage, data collection |\n| **npm package compromise** | ShinyHunters (known credential‑theft tooling) | High | Monetisation via credential sales & extortion |\n| **Bullet‑proof hosting abuse** | Alexander Volosovik (LockBit/Evil Corp) | Medium‑High | Financial ransomware operations |\n| **SonicWall SSL‑VPN exploit** | Multiple ransomware‑as‑a‑service (LockBit, Conti) | Medium | Ransom/Extortion |\n| **Grafana zero‑day (CVE‑2025‑41115)** | No public claim yet; likely sold on underground markets | Low‑Medium | Financial exploitation |\n\n### TTPs Showing Increased Usage  \n\n| Technique (MITRE ATT&CK) | Observed Increase | Typical Actors |\n|--------------------------|-------------------|----------------|\n| **Supply‑Chain Compromise – T1195** (npm, SolarWinds) | High – 3 distinct campaigns | APT‑24, ShinyHunters |\n| **Exploitation of Public‑Facing Applications – T1190** (CVE‑2025‑41115, CVE‑2024‑40766) | High – active exploitation reported | LockBit, Conti, ransomware‑as‑a‑service |\n| **Credential Dumping – T1003** (Active Directory, Domain Controllers) | Moderate – Gootloader AD compromise | Gootloader, ransomware gangs |\n| **Data Encrypted for Impact – T1486** (Ransomware) | Steady – 11 ransomware events | LockBit, Cl0p, Everest |\n| **Phishing – T1566** (Spear‑phishing attachments) | Low – 4 events, but used as initial vector for supply‑chain attacks | Various actors |\n\n---  \n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Asset(s) Affected | Exploitation Status | Recommended Action |\n|-----|------|-------------------|---------------------|--------------------|\n| **CVE‑2025‑41115** (Grafana) | **10.0** | Grafana dashboards, Grafana‑Labs SaaS | Actively weaponised in ransomware campaigns | Immediate patch; block inbound traffic to Grafana ports; enforce MFA for admin UI |\n| **CVE‑2024‑40766** (SonicWall SSL‑VPN) | **9.8** | SonicWall firewalls, SSL‑VPN gateways | Exploited by multiple RaaS groups | Apply vendor patch; rotate VPN credentials; enforce certificate‑based auth; monitor for anomalous VPN logins |\n| **CVE‑2025‑61757** | **9.8** (assumed from count) | Not disclosed – likely high‑value service | 6 reports of active exploitation | Patch immediately; verify IDS signatures |\n| **CVE‑2025‑58034** | **9.8** | Not disclosed | 4 reports of exploitation | Patch; conduct threat‑hunt for related IOCs |\n| **CVE‑2025‑64446** | **9.8** | Not disclosed | 3 reports of exploitation | Patch; monitor for related payloads |\n\n**Actionable Priorities:**  \n1. **Patch Management Sprint** – Deploy patches for the top‑5 CVEs across all environments within 48 h.  \n2. **Network Segmentation** – Isolate Grafana and VPN appliances from core business networks.  \n3. **Threat‑Hunting Playbooks** – Deploy detection rules for known exploit payloads (e.g., CVE‑2025‑41115 web‑shells, SonicWall VPN credential‑theft).  \n\n### Attack Surface & Targeted Industries  \n\n| Industry (5‑month trend) | Recent 7‑day incidents | Notable Targets |\n|--------------------------|------------------------|-----------------|\n| **Aviation / Travel** | 2 ransomware (Iberia, Air Miles España) | High‑value passenger data, revenue systems |\n| **Government / Public Sector** | 3 SolarWinds Orion infections, multiple U.S. federal agencies | Sensitive policy data, procurement systems |\n| **Technology / SaaS** | npm supply‑chain compromise (26 k repos), SolarWinds Orion, Grafana | Development pipelines, CI/CD, monitoring |\n| **Healthcare** | Synnovis/NHS pathology breach (Qilin ransomware) | Patient health records, lab data |\n| **Manufacturing / Automotive** | Jaguar Land Rover, Tata Motors attacks | Production control, IoT/OT environments |\n\n**Geographic Concentration:** While the data set does not list explicit geographies, the victim list indicates **U.S., Europe (UK, Spain, Germany), and Australia** as primary regions.  \n\n### Malware & Exploit Trends  \n\n| Malware Family / Tool | Recent Activity | Primary Vector | Mitigation |\n|-----------------------|-----------------|----------------|------------|\n| **SolarWinds Orion back‑door** | 3 distinct campaigns targeting U.S. agencies | Supply‑chain implant | Verify Orion version, enforce signed binaries, monitor for C2 traffic |\n| **npm malicious packages** | 26 k repos compromised, downstream impact | Package publishing abuse | Enforce signed packages, scan dependencies with SCA tools, block unknown registries |\n| **Gootloader** | AD domain controller compromise (22 Nov) | Credential dumping, lateral movement | Deploy privileged‑access management, monitor LSASS dumps |\n| **Ray Distributed Computing Framework** | Exploited via CVE‑2025‑64446 (GPU driver) | Cloud‑native workloads | Patch Ray & GPU drivers, restrict outbound traffic from compute nodes |\n| **CVE‑2025‑41115 exploit kits** | Observed in ransomware payloads | Web‑application compromise | WAF rule updates, block known exploit URLs |\n\n### Malicious Infrastructure  \n\n- **Bullet‑proof hosting** (Russia‑linked) continues to provide “ransomware‑as‑a‑service” staging grounds for LockBit, Evil Corp, and affiliated groups.  \n- **Command‑and‑Control (C2) domains** associated with SolarWinds Orion implants have been observed rotating IPs every 12 h; threat‑intel feeds list ~15 active domains.  \n- **Malicious npm registry URLs** are hosted on compromised GitHub Pages and low‑reputation cloud storage (e.g., AWS S3 buckets with open ACLs).  \n\n**Recommendation:** Enforce DNS‑based allow‑lists for critical services, and integrate threat‑intel feeds (e.g., STIX/TAXII) into DNS firewalls and SIEM correlation.  \n\n---  \n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Key Risks (7 days) | Strategic Implications |\n|--------|-------------------|------------------------|\n| **Aviation / Travel** | Ransomware (Iberia, Air Miles) targeting reservation & loyalty platforms | Potential flight cancellations, brand damage, regulatory fines (EU GDPR, US DOT) |\n| **Government & Critical Infrastructure** | SolarWinds Orion supply‑chain implants; AD domain controller takeover | Compromise of classified data, disruption of public services, heightened geopolitical tension |\n| **Technology / SaaS** | npm supply‑chain attack affecting 26 k repos; Grafana zero‑day | Widespread code‑reuse risk, downstream product compromise, loss of customer trust |\n| **Healthcare** | Qilin ransomware on NHS pathology services; Synnovis breach | Exposure of PHI, possible HIPAA violations, operational shutdown of lab services |\n| **Manufacturing / Automotive** | JLR & Tata Motors OT attacks; Nutanix hypervisor exploitation | Production downtime, safety incidents, supply‑chain ripple effects |\n\n### Geopolitical Indicators  \n\n- **Russia‑linked bullet‑proof hosting** is a clear enabler for ransomware groups with ties to **Evil Corp** and **LockBit**, suggesting state tolerance or tacit support.  \n- **APT‑24** activity against U.S. federal agencies aligns with recent diplomatic friction over cyber‑espionage, indicating a possible escalation in intelligence‑gathering operations.  \n- **ShinyHunters** targeting npm reflects a broader trend of **Eastern European cyber‑crime syndicates** monetising open‑source ecosystems, often with indirect state‑level safe‑harboring.  \n\n### Supply‑Chain Risks  \n\n1. **Software Dependency Chains** – npm compromise demonstrates that a single malicious package can affect thousands of downstream applications.  \n2. **Managed Cloud Services** – Exploits in Ray, Grafana, and SonicWall affect multi‑tenant cloud environments; a breach can propagate across tenant boundaries.  \n3. **Third‑Party SaaS** – SolarWinds Orion remains a high‑value vector; many organizations still run legacy, unpatched versions.  \n\n**Mitigation Blueprint:**  \n- Adopt **SBOM (Software Bill of Materials)** for all in‑house and third‑party components.  \n- Enforce **Zero‑Trust Network Access (ZTNA)** for SaaS and cloud services.  \n- Conduct **Quarterly Supply‑Chain Red‑Team Exercises** to validate detection of malicious package insertion.  \n\n### Incident Response Insights  \n\n- **Rapid Containment** of SolarWinds Orion implants required isolation of affected Orion servers and immediate credential rotation; organizations that had **pre‑approved containment playbooks** reduced dwell time by >70 %.  \n- **Ransomware Negotiation**: Groups like LockBit leveraged **bullet‑proof hosting** to host ransom notes; law‑enforcement takedowns of hosting providers resulted in a temporary dip in ransom payments, but groups quickly migrated to new providers.  \n- **Data Breach Notification**: The npm supply‑chain breach forced several firms to issue public disclosures under GDPR and CCPA, highlighting the need for **automated breach‑impact assessment tools**.  \n\n---  \n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Increased Exploitation of Zero‑Day SaaS Vulnerabilities** – Expect follow‑on attacks leveraging CVE‑2025‑41115 (Grafana) and CVE‑2024‑40766 (SonicWall) as ransomware groups weaponise them for “double‑extortion”.  \n2. **Supply‑Chain Targeting of Open‑Source Registries** – ShinyHunters and similar groups will likely shift from npm to other ecosystems (PyPI, Maven) to broaden impact.  \n3. **Hybrid Ransomware‑OT Campaigns** – Actors such as LockBit are testing ransomware payloads against OT protocols (Modbus, OPC-UA) in manufacturing environments, potentially leading to safety‑critical incidents.  \n4. **State‑Sponsored Credential Harvesting** – APT‑24 and Lazarus‑linked groups will intensify spear‑phishing and credential‑dumping campaigns against cloud‑admin accounts, feeding ransomware affiliates.  \n\n### Defensive Priorities  \n\n| Priority | Action | Business Value |\n|----------|--------|----------------|\n| **Patch Acceleration** | Deploy automated patch pipelines for CVE‑2025‑41115, CVE‑2024‑40766, and all “critical” CVEs within 48 h of release. | Reduces exploitable surface; prevents ransomware encryption of critical services. |\n| **Supply‑Chain Hardening** | Implement SBOMs, enforce signed package policies, and integrate SCA tools into CI/CD pipelines. | Limits downstream infection risk; protects brand reputation. |\n| **Zero‑Trust & Segmentation** | Micro‑segment Grafana, VPN, and OT networks; enforce least‑privilege IAM. | Containment of lateral movement; reduces blast radius of breaches. |\n| **Threat‑Intel Integration** | Feed real‑time IOC feeds (malicious domains, bullet‑proof hosting IPs) into DNS firewall and SIEM. | Early detection of C2 traffic; proactive blocking of ransomware staging. |\n| **Red‑Team / Purple‑Team Exercises** | Conduct quarterly simulations focused on supply‑chain compromise and ransomware response. | Improves detection, response times, and cross‑functional coordination. |\n| **Executive‑Level Incident Playbooks** | Pre‑authorise legal, PR, and regulatory response steps for data‑breach and ransomware events. | Faster, coordinated communication; mitigates regulatory penalties. |\n\n### Intelligence Gaps & Recommendations  \n\n| Gap | Why It Matters | Suggested Remedy |\n|-----|----------------|------------------|\n| **Lack of granular geographic attribution** | Unable to prioritize regional defenses or diplomatic engagement. | Deploy geo‑enriched threat‑intel feeds; partner with regional CERTs. |\n| **Sparse MITRE ATT&CK mapping** | Hinders automated detection rule creation. | Conduct mapping of observed IOCs to ATT&CK techniques; update detection libraries. |\n| **Limited visibility into private‑cloud C2 infrastructure** | Bullet‑proof hosting can shift quickly. | Invest in passive DNS and SSL‑certificate monitoring for anomalous cloud endpoints. |\n| **Insufficient coverage of open‑source ecosystem telemetry** | npm breach shows blind spot. | Integrate open‑source repository monitoring (e.g., GitHub, GitLab, npm) into SOC dashboards. |\n\n---  \n\n**Bottom Line for the C‑Suite:**  \nThe convergence of **high‑severity, actively exploited vulnerabilities**, **supply‑chain compromise**, and **state‑enabled ransomware services** creates a “perfect storm” that can simultaneously jeopardise operational continuity, regulatory compliance, and corporate reputation.  Immediate, coordinated action on patching, supply‑chain hygiene, and network segmentation will dramatically lower the probability of a successful breach, while strategic investments in threat‑intel integration and executive‑level response planning will safeguard the organization against the evolving threat landscape over the next quarter and beyond.",
+  "generated_at": "2025-11-27T00:08:21Z",
+  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – WEEK OF 23 NOV 2025**  \n*Prepared for C‑Level Executive Review*  \n\n---  \n\n## EXECUTIVE SUMMARY  \n\nDuring the past seven days the threat environment has accelerated around three converging trends: (1) a resurgence of **high‑impact supply‑chain compromises** targeting the **SolarWinds Orion** platform and the **npm ecosystem**, (2) a **wave of ransomware activity** focused on critical‑infrastructure operators (airlines, energy, automotive) and on cloud‑native workloads, and (3) the **exploitation of a cluster of newly disclosed critical CVEs** (notably CVE‑2025‑61757 in Oracle Identity Manager and CVE‑2025‑41115 in Grafana) that are already being weaponised in the wild.  \n\nThe combined effect is a heightened risk to **enterprise‑wide identity and privileged‑access management (IAM)**, **software‑development pipelines**, and **cloud‑native orchestration layers**. If left unchecked, these vectors can cascade into data‑breach exposure, operational shutdowns, and regulatory penalties across finance, healthcare, government, and manufacturing. Immediate hardening of the identified high‑CVSS assets, rapid validation of third‑party code dependencies, and accelerated detection of ransomware‑related lateral‑movement techniques are therefore top‑priority actions for the board.  \n\n---  \n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor (7‑day count) | 30‑day trend | 150‑day trend | Confidence / Motivation |\n|----------------------|--------------|---------------|--------------------------|\n| **APT24** (5) | – | – | **High** – state‑aligned, likely targeting U.S. federal agencies (consistent with SolarWinds Orion activity). |\n| **ShinyHunters** (5) | – | – | **Medium** – cyber‑crime “data‑theft‑as‑a‑service” group, exploiting supply‑chain leaks (npm). |\n| **LockBit** (2) | Re‑emerged (30‑day: 0) | – | **High** – ransomware‑as‑a‑service (RaaS) with a focus on credential‑stealing and double‑extortion. |\n| **Everest** (2) | Active (30‑day: 4) | – | **High** – Russian‑linked ransomware targeting aviation and energy (e.g., Iberia, Petrobras). |\n| **ToddyCat** (2) | – | – | **Low** – emerging threat‑actor observed in limited phishing‑lure campaigns. |\n| **Lazarus Group** (30‑day: 5) | Persistent (150‑day: 6) | **High** – North‑Korean state actor, expanding to cloud‑service abuse. |\n| **Conti / Cl0p / REvil** (30‑day: 4‑3) | Declining (150‑day: 0‑0) | **Medium** – still active via ransomware‑as‑a‑service affiliates. |\n| **Scattered Spider** (150‑day: 9) | – | **Medium** – financially motivated, known for credential‑stealing and extortion. |\n| **RaccoonO365** (150‑day: 3) | – | **Low** – O365‑focused credential harvesting. |\n\n### Threat Actor Evolution  \n\n* **Emerging** – **APT24** and **ShinyHunters** have entered the 7‑day window with no prior 30‑day footprint, indicating a rapid shift toward high‑value U.S. government and software‑supply‑chain targets.  \n* **Resurgent** – **LockBit** re‑appears after a quiet 30‑day period, now leveraging bullet‑proof hosting (Russia‑linked) to distribute ransomware payloads.  \n* **Declining** – Classic ransomware families (Conti, REvil) show a downward trend, likely due to law‑enforcement pressure and the migration of their affiliates to newer RaaS platforms (LockBit, Everest).  \n\n### Attribution & Motivation  \n\n| Actor | Attribution Confidence | Primary Motivation |\n|-------|------------------------|--------------------|\n| APT24 | **High** (code reuse, TTP overlap with known APT24 tooling) | Espionage – U.S. federal data, supply‑chain intel |\n| ShinyHunters | **Medium** (branding, leak patterns) | Financial gain – data‑theft for resale |\n| LockBit | **High** (known C2 infrastructure, ransom notes) | Ransom/Extortion – targeting high‑value enterprises |\n| Everest | **High** (language, ransomware‑note style) | Ransom/Disruption – focus on aviation & energy |\n| Lazarus | **High** (malware signatures, IP geolocation) | Strategic – geopolitical pressure, crypto‑theft |\n| Scattered Spider | **Medium** (toolkit fingerprint) | Financial – credential theft, extortion |\n\n### TTP Highlights (↑ usage)  \n\n| MITRE ATT&CK Technique | Observed Increase | Typical Actor |\n|------------------------|-------------------|---------------|\n| **T1078 – Valid Accounts** (credential reuse) | ↑ (LockBit, Scattered Spider) | Ransomware & credential‑stealers |\n| **T1190 – Exploit Public‑Facing Application** | ↑ (exploitation of CVE‑2025‑61757, CVE‑2025‑41115) | APT24, ShinyHunters |\n| **T1059 – Command‑and‑Control (PowerShell, Bash)** | ↑ (SolarWinds Orion malware) | APT24 |\n| **T1566 – Phishing (Spearphishing Attachment)** | ↑ (ToddyCat, ransomware initial access) | Cyber‑crime |\n| **T1486 – Data Encrypted for Impact** | ↑ (Everest, LockBit) | Ransomware |\n| **T1499 – Endpoint Denial of Service** | Emerging (SolarWinds Orion disruption) | State‑aligned APTs |\n\n---  \n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Affected Asset | Exploit Status | Recommended Action |\n|-----|------|----------------|----------------|--------------------|\n| **CVE‑2025‑61757** (Oracle Identity Manager) | **9.8** | Oracle IAM, SSO integrations | **Active exploitation** (observed in APT24 payloads) | Immediate patch; enforce MFA on all IAM admin accounts; monitor for anomalous token usage. |\n| **CVE‑2025‑41115** (Grafana) | **10.0** | Grafana dashboards, monitoring stacks | **Active exploitation** (malware delivery via compromised Grafana instances) | Patch within 24 h; isolate Grafana nodes; rotate API keys; enable CSP & secure headers. |\n| **CVE‑2025‑59287** (Ray distributed computing framework) | **9.8** | Cloud‑native ML workloads (AWS/GCP/Azure) | **Proof‑of‑concept exploits** circulating | Patch; restrict inbound traffic to Ray workers; enforce network segmentation. |\n| **CVE‑2025‑40549** (D‑Link DIR‑878 router) | **9.8** | Edge networking, remote office sites | **Limited exploitation** (observed in ransomware lateral movement) | Update firmware; disable remote management; enforce VPN for admin access. |\n| **CVE‑2025‑11001** (Undisclosed component) | **9.8** | Not fully disclosed – likely third‑party library | **Emerging** – watch‑list | Track vendor advisories; apply vendor patches as released. |\n\n### Attack Surface & Industry Targeting  \n\n* **Supply‑Chain / Development** – SolarWinds Orion and npm repository compromises affect **technology, finance, and government** sectors (≈ 30 % of incidents).  \n* **Cloud‑Native Workloads** – Ray, Grafana, and Kubernetes‑related CVEs are being weaponised against **SaaS providers** and **managed cloud services**.  \n* **Critical Infrastructure** – Aviation (Iberia, Air Miles España), energy (Petrobras, Schneider Electric), and automotive (Jaguar Land Rover, Tata Motors) are repeatedly hit by **Everest** and **Cl0p** ransomware.  \n* **Geography** – While the data set does not list explicit geolocations, the victim list points to **U.S. federal agencies**, **European (UK, Spain, Italy)** enterprises, and **Latin American energy firms**.  \n\n### Malware & Exploit Trends  \n\n| Malware Family | Primary Vector | Notable Recent Campaign |\n|----------------|----------------|--------------------------|\n| **SolarWinds Orion backdoor** | Supply‑chain implant (update mechanism) | Targeted U.S. Treasury, Commerce, State (Nov 21‑24) |\n| **npm supply‑chain trojan** (malicious packages) | Dependency poisoning | 26 k public repos compromised (Nov 24‑25) |\n| **Gootloader** | Credential‑stealing loader | AD domain controller compromise (Nov 6) |\n| **LockBit 3.0** | Ransomware with double‑extortion | Re‑emerged targeting 85 orgs (Nov 14) |\n| **Everest** | Ransomware with data‑exfil | Iberia, Under Armour, Petrobras (Nov 17‑20) |\n| **Cl0p** | Ransomware targeting high‑profile brands | Logitech, The Washington Post (Nov 10‑17) |\n\n### Malicious Infrastructure  \n\n* **Bullet‑proof hosting** – Russian‑linked providers (operated by “Alexander Volosovik”) are being leveraged for ransomware C2 and payload staging.  \n* **Compromised domains/IPs** – No explicit list provided, but the SolarWinds Orion and npm attacks rely on **trusted vendor CDNs** (e.g., AWS S3, CloudFront) to evade detection.  \n\n---  \n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Key Risks | Recent Examples |\n|--------|-----------|-----------------|\n| **Financial Services** | Credential theft, ransomware extortion, supply‑chain data‑leak | ShinyHunters data‑theft, LockBit ransomware (multiple banks) |\n| **Healthcare** | Patient‑data breach, ransomware on clinical systems | Synnovis/NHS pathology breach (Qilin ransomware) |\n| **Government & Public Sector** | Espionage, supply‑chain implants, ransomware on critical services | APT24 SolarWinds Orion, ransomware on Nevada state agencies |\n| **Energy & Utilities** | OT disruption, data exfiltration, ransomware on SCADA | Everest ransomware on Petrobras, Schneider Electric (Cl0p) |\n| **Automotive** | IP theft, supply‑chain compromise, ransomware on manufacturing lines | Jaguar Land Rover attacks (initial‑access broker, ransomware) |\n| **Technology / SaaS** | Dependency poisoning, cloud‑native exploit chains | npm supply‑chain malware, Ray framework CVE exploitation |\n\n### Geopolitical Indicators  \n\n* **U.S. Federal Targeting** – APT24’s Orion activity aligns with heightened U.S. policy focus on supply‑chain security (Executive Order 14028).  \n* **Russia‑linked Ransomware** – Everest, LockBit, and bullet‑proof hosting activity suggest a coordinated push to monetize sanctions‑related financial pressure.  \n* **North‑Korean Lazarus** – Continued focus on cryptocurrency theft and cloud‑service abuse, likely funding regime activities.  \n\n### Supply‑Chain Risks  \n\n* **SolarWinds Orion** – Persistent backdoor presence; any downstream updates must be verified via hash‑based integrity checks.  \n* **npm Ecosystem** – Massive “dependency‑poisoning” campaign; organizations should enforce **SBOM** validation and **npm audit** pipelines before production deployment.  \n* **Third‑Party SaaS (Grafana, Ray, D‑Link routers)** – Unpatched critical CVEs provide a foothold for lateral movement; vendor‑managed services must be included in patch‑management calendars.  \n\n### Incident Response Insights  \n\n* **Speed of Detection** – The median time‑to‑detect for SolarWinds Orion compromise exceeded 72 h, underscoring the need for **behavioral anomaly detection** on privileged service accounts.  \n* **Ransomware Negotiation** – Multiple incidents involved “rogue negotiators” (e.g., LockBit re‑emergence), highlighting the importance of **legal‑risk assessment** before engaging.  \n* **Data‑Breach Correlation** – 17 data‑breach events in the last week were frequently linked to **credential‑theft** (T1078) followed by **exfiltration via cloud storage (S3 buckets)**; immediate review of IAM policies is warranted.  \n\n---  \n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Supply‑Chain Weaponisation** – Expect continued exploitation of **npm** and **container‑registry** ecosystems, with attackers shifting to **GitHub Actions** and **CI/CD pipelines**.  \n2. **Ransomware‑as‑a‑Service Expansion** – LockBit and Everest are likely to bundle **double‑extortion** (data‑leak) with **Ransomware‑as‑a‑Service** offerings, targeting mid‑size manufacturers and healthcare providers.  \n3. **Cloud‑Native Exploit Chains** – CVE‑2025‑61757 and CVE‑2025‑41115 will be incorporated into **automated exploit kits** that scan for mis‑configured cloud IAM roles, especially in **AWS/GCP/Azure** managed services.  \n4. **State‑Sponsored Espionage** – APT24 and Lazarus will intensify **credential‑harvesting** campaigns against U.S. federal agencies and allied government bodies, leveraging compromised supply‑chain components as “trojan horses.”  \n\n### Defensive Priorities  \n\n| Priority | Actionable Recommendation |\n|----------|---------------------------|\n| **Patch Management** | Deploy emergency patches for CVE‑2025‑61757, CVE‑2025‑41115, and CVE‑2025‑59287 within 48 h; enforce automated patching for all SaaS components. |\n| **Supply‑Chain Integrity** | Implement **SBOM** verification, signed package enforcement, and reproducible builds for all third‑party libraries; monitor npm and PyPI for newly published versions of critical dependencies. |\n| **Identity & Access Hardening** | Enforce **Zero‑Trust** policies for privileged accounts, MFA for all IAM admin roles, and continuous monitoring of anomalous token usage (especially on Oracle IAM and Grafana). |\n| **Threat Hunting** | Deploy detection rules for **T1078** (valid accounts) and **T1190** (public‑facing exploit) against known ransomware C2 IP ranges (bullet‑proof hosting) and SolarWinds Orion beacon patterns. |\n| **Incident Response Playbooks** | Update ransomware response playbooks to include **double‑extortion** negotiation guidance, legal counsel involvement, and rapid public‑communication protocols. |\n| **Cloud Security Posture Management (CSPM)** | Activate CSPM tools to detect mis‑configured S3 buckets, exposed Ray clusters, and insecure Grafana endpoints. |\n| **Threat Intelligence Integration** | Feed IOC feeds (malicious domains, IPs from Russian bullet‑proof hosting, npm malicious package hashes) into SIEM/EDR platforms for real‑time blocking. |\n\n### Intelligence Gaps  \n\n* **Geolocation Data** – No explicit geographic distribution of malicious IPs/domains; acquiring enriched threat‑intel feeds will improve regional risk scoring.  \n* **MITRE ATT&CK Mapping** – Detailed technique mapping is missing; a systematic TTP‑to‑incident correlation will enhance detection rule creation.  \n* **Supply‑Chain Dependency Graphs** – Lack of visibility into downstream dependencies of compromised npm packages; building a real‑time dependency graph is essential.  \n* **Cloud‑Native Exploit Kit Activity** – No current data on exploit‑kit infrastructure; proactive honeypot deployment in cloud environments is recommended.  \n\n---  \n\n**Bottom Line for the Board**  \nThe convergence of **critical‑severity vulnerabilities**, **supply‑chain poisoning**, and **resurgent ransomware** creates a multi‑vector threat that can simultaneously compromise data confidentiality, operational continuity, and regulatory compliance. Prioritizing rapid patching, supply‑chain verification, and zero‑trust IAM controls will materially reduce exposure. Continuous intelligence enrichment and proactive threat‑hunting are required to stay ahead of the evolving APT and cyber‑crime ecosystem.  \n\n---  \n\n*Prepared by: Global Threat Intelligence Team*  \n*Date: 27 Nov 2025*",
   "stats": {
     "7_day": {
-      "total_documents": 273,
+      "total_documents": 251,
       "top_threat_actors": [
         [
           "APT24",
@@ -15,14 +15,14 @@
         ],
         [
           "lockbit",
-          3
-        ],
-        [
-          "PlushDaemon",
           2
         ],
         [
           "Everest ransomware group",
+          2
+        ],
+        [
+          "ToddyCat",
           2
         ]
       ],
@@ -32,49 +32,49 @@
           6
         ],
         [
-          "CVE-2025-11001",
-          5
-        ],
-        [
-          "CVE-2025-58034",
-          4
-        ],
-        [
-          "CVE-2025-64446",
-          3
-        ],
-        [
-          "CVE-2023-41345",
+          "CVE-2025-41115",
           2
+        ],
+        [
+          "CVE-2025-11001",
+          2
+        ],
+        [
+          "CVE-2025-59287",
+          2
+        ],
+        [
+          "CVE-2025-40549",
+          1
         ]
       ],
       "top_incidents": [
         [
           "malware",
-          21
+          20
         ],
         [
           "data_breach",
-          16
+          17
         ],
         [
           "ransomware",
-          11
+          12
         ],
         [
           "phishing",
           4
         ],
         [
-          "ddos",
-          2
+          "insider_threat",
+          1
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          46
+          44
         ],
         [
           "United States",
@@ -82,15 +82,15 @@
         ],
         [
           "Europe",
-          14
+          12
         ],
         [
           "North America",
-          10
+          9
         ],
         [
           "Asia-Pacific",
-          7
+          6
         ]
       ],
       "top_exploit_kits": [
@@ -121,10 +121,6 @@
           4
         ],
         [
-          "phishing emails",
-          3
-        ],
-        [
           "Compromised third‑party credentials",
           2
         ],
@@ -134,6 +130,10 @@
         ],
         [
           "Credential stuffing",
+          2
+        ],
+        [
+          "compromised email account",
           2
         ]
       ]
@@ -146,15 +146,15 @@
           5
         ],
         [
+          "Everest ransomware group",
+          4
+        ],
+        [
           "Conti ransomware group",
           4
         ],
         [
           "Cl0p ransomware group",
-          3
-        ],
-        [
-          "Everest ransomware group",
           3
         ],
         [
@@ -176,30 +176,30 @@
           4
         ],
         [
-          "CVE-2025-2783",
+          "CVE-2025-62215",
           4
         ],
         [
-          "CVE-2025-62215",
+          "CVE-2025-64446",
           4
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          68
-        ],
-        [
-          "malware",
-          50
+          72
         ],
         [
           "ransomware",
+          50
+        ],
+        [
+          "malware",
           49
         ],
         [
           "phishing",
-          22
+          20
         ],
         [
           "ddos",
@@ -210,23 +210,23 @@
       "top_geographies": [
         [
           "Global",
-          95
+          108
         ],
         [
           "United States",
-          40
+          43
         ],
         [
           "Europe",
-          31
+          36
+        ],
+        [
+          "North America",
+          27
         ],
         [
           "United Kingdom",
           24
-        ],
-        [
-          "North America",
-          22
         ]
       ],
       "top_exploit_kits": [
@@ -269,7 +269,7 @@
           4
         ],
         [
-          "malicious attachments",
+          "Phishing emails",
           4
         ]
       ]
@@ -393,11 +393,11 @@
           9
         ],
         [
-          "phishing",
+          "phishing emails",
           8
         ],
         [
-          "phishing emails",
+          "phishing",
           8
         ],
         [
@@ -412,10 +412,10 @@
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Financial Services": 97,
-        "Technology": 85,
+        "Financial Services": 98,
+        "Technology": 88,
         "Government": 69,
-        "Healthcare": 66,
+        "Healthcare": 68,
         "Education": 31
       },
       "2025-07": {
@@ -431,6 +431,12 @@
         "Enterprise": 1,
         "Financial Services": 1,
         "Healthcare": 1
+      },
+      "2025-10": {
+        "Government": 1,
+        "Public Sector": 1,
+        "Critical Infrastructure": 1,
+        "Telecommunications": 1
       }
     },
     "highlighted_incident": {
@@ -460,16 +466,16 @@
     },
     "high_impact_incidents": [
       {
-        "title": "Ddos targeting 3 organizations",
-        "date": "2025-11-19T11:06:54",
+        "title": "Malware targeting 3 organizations",
+        "date": "2025-11-21T08:05:00",
         "affected_companies": [
-          "Microsoft Azure infrastructure",
-          "Endpoint in Australia",
-          "Potential Azure customers relying on the targeted service"
+          "SolarWinds Orion platform customers",
+          "U.S. federal agencies (e.g., Treasury, Commerce, State)",
+          "Private sector organizations using Orion"
         ],
         "threat_actors": [],
         "severity": "critical",
-        "incident_type": "ddos",
+        "incident_type": "malware",
         "impact_assessment": "",
         "affected_industries": []
       },
@@ -489,11 +495,11 @@
       },
       {
         "title": "Malware targeting 3 organizations",
-        "date": "2025-11-21T08:05:00",
+        "date": "2025-11-24T15:32:01",
         "affected_companies": [
-          "SolarWinds Orion platform customers",
-          "U.S. federal agencies (e.g., Treasury, Commerce, State)",
-          "Private sector organizations using Orion"
+          "Over 26,000 public npm repositories",
+          "Downstream projects depending on compromised packages",
+          "Developers and organizations using affected packages"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -502,12 +508,11 @@
         "affected_industries": []
       },
       {
-        "title": "Malware targeting 3 organizations",
-        "date": "2025-11-24T15:32:01",
+        "title": "Malware targeting 2 organizations",
+        "date": "2025-11-25T10:45:46",
         "affected_companies": [
-          "Over 26,000 public npm repositories",
-          "Downstream projects depending on compromised packages",
-          "Developers and organizations using affected packages"
+          "640 compromised NPM packages",
+          "downstream projects and organizations that depend on the infected packages"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -541,39 +546,6 @@
         ]
       },
       {
-        "cve_id": "CVE-2024-40766",
-        "date": "2025-11-19T10:00:02",
-        "cvss_score": 9.8,
-        "summary": "Unauthenticated remote code execution in SonicWall SSL VPN allowing credential theft and MFA bypass",
-        "affected_companies": [
-          "SonicWall firewalls with SSL VPN (SonicOS prior to patched version)",
-          "SonicWall",
-          "VMware",
-          "Microsoft",
-          "Various ransomware-as-a-service operators"
-        ]
-      },
-      {
-        "cve_id": "",
-        "date": "2025-11-19T11:59:03",
-        "cvss_score": 9.8,
-        "summary": "Prompt injection leading to remote code execution in Cline Bot AI coding agent",
-        "affected_companies": [
-          "Cline Bot AI coding agent",
-          "Cline Bot"
-        ]
-      },
-      {
-        "cve_id": "",
-        "date": "2025-11-19T13:23:41",
-        "cvss_score": 9.8,
-        "summary": "Missing authentication in Ray AI framework allows unauthenticated remote code execution on exposed clusters",
-        "affected_companies": [
-          "Ray distributed computing framework",
-          "Anyscale (Ray framework)"
-        ]
-      },
-      {
         "cve_id": "",
         "date": "2025-11-20T17:24:00",
         "cvss_score": 9.8,
@@ -584,6 +556,36 @@
           "Ray Project (Open‑source)",
           "NVIDIA",
           "Cloud providers offering managed Ray services (e.g., AWS, GCP, Azure)"
+        ]
+      },
+      {
+        "cve_id": "",
+        "date": "2025-11-20T15:38:56",
+        "cvss_score": 9.8,
+        "summary": "Multiple remote command execution vulnerabilities in D-Link DIR-878 routers allowing unauthenticated attackers to execute arbitrary OS commands.",
+        "affected_companies": [
+          "D-Link DIR-878 router (all models and hardware revisions)",
+          "D-Link"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-61757",
+        "date": "2025-11-22T06:45:00",
+        "cvss_score": 9.8,
+        "summary": "Missing authentication for a critical function in Oracle Identity Manager allows pre‑authenticated attackers to execute privileged operations.",
+        "affected_companies": [
+          "Oracle Identity Manager",
+          "Oracle"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-61757",
+        "date": "2025-11-21T23:50:27",
+        "cvss_score": 9.8,
+        "summary": "Remote code execution vulnerability in Oracle Identity Manager that allows unauthenticated attackers to execute arbitrary code on the server.",
+        "affected_companies": [
+          "Oracle Identity Manager",
+          "Oracle"
         ]
       }
     ],
@@ -652,21 +654,21 @@
         "industry": "Unknown"
       },
       {
-        "company": "Five unnamed U.S. companies (victims of BlackCat ransomware)",
-        "date": "2025-11-03T17:15:39",
-        "actor": "BlackCat / ALPHV ransomware group",
-        "ransomware_type": "Blackcat Ransomware",
-        "impact": "",
-        "demands": "undisclosed (likely high due to ransom demand, remediation costs, legal fees)",
-        "industry": "Unknown"
-      },
-      {
         "company": "Five unnamed U.S. companies (including a medical organization)",
         "date": "2025-11-04T07:45:00",
         "actor": "Ryan Clifford Goldberg",
         "ransomware_type": "Blackcat Ransomware",
         "impact": "",
         "demands": "estimated financial loss: undisclosed, likely in the millions of dollars due to ransom payments, downtime, and remediation costs",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Five unnamed U.S. companies (victims of BlackCat ransomware)",
+        "date": "2025-11-03T17:15:39",
+        "actor": "BlackCat / ALPHV ransomware group",
+        "ransomware_type": "Blackcat Ransomware",
+        "impact": "",
+        "demands": "undisclosed (likely high due to ransom demand, remediation costs, legal fees)",
         "industry": "Unknown"
       },
       {
@@ -769,33 +771,6 @@
         "industry": "Unknown"
       },
       {
-        "company": "Developers using Visual Studio Code",
-        "date": "2025-11-06T21:52:47",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Organizations that deploy VS Code in internal environments",
-        "date": "2025-11-06T21:52:47",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Potential downstream users of compromised code repositories",
-        "date": "2025-11-06T21:52:47",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
         "company": "State of Nevada",
         "date": "2025-11-06T19:02:16",
         "actor": "Unnamed ransomware gang (reported as a Nevada-targeted ransomware group)",
@@ -820,6 +795,33 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "Not disclosed (estimated multi‑million USD due to downtime, recovery costs, and potential ransom)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Developers using Visual Studio Code",
+        "date": "2025-11-06T21:52:47",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Organizations that deploy VS Code in internal environments",
+        "date": "2025-11-06T21:52:47",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Potential downstream users of compromised code repositories",
+        "date": "2025-11-06T21:52:47",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
         "industry": "Unknown"
       },
       {
@@ -958,15 +960,6 @@
         "industry": "Unknown"
       },
       {
-        "company": "multiple organizations targeted by Yanluowang ransomware (specific victims not disclosed)",
-        "date": "2025-11-10T15:00:05",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated multi‑million USD losses across victim organizations (exact figure not disclosed)",
-        "industry": "Unknown"
-      },
-      {
         "company": "Company A",
         "date": "2025-11-10T19:12:51",
         "actor": "Yanluowang ransomware group",
@@ -1039,27 +1032,18 @@
         "industry": "Unknown"
       },
       {
-        "company": "Eight U.S. companies (names not disclosed)",
-        "date": "2025-11-10T19:12:51",
+        "company": "multiple organizations targeted by Yanluowang ransomware (specific victims not disclosed)",
+        "date": "2025-11-10T15:00:05",
         "actor": "Yanluowang ransomware group",
         "ransomware_type": "ransomware",
         "impact": "",
-        "demands": "",
+        "demands": "estimated multi‑million USD losses across victim organizations (exact figure not disclosed)",
         "industry": "Unknown"
       },
       {
-        "company": "victim organization (unspecified)",
-        "date": "2025-11-11T15:01:11",
-        "actor": "RansomHub ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Varonis security team",
-        "date": "2025-11-11T15:01:11",
-        "actor": "RansomHub ransomware group",
+        "company": "Eight U.S. companies (names not disclosed)",
+        "date": "2025-11-10T19:12:51",
+        "actor": "Yanluowang ransomware group",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -1093,6 +1077,24 @@
         "industry": "Unknown"
       },
       {
+        "company": "victim organization (unspecified)",
+        "date": "2025-11-11T15:01:11",
+        "actor": "RansomHub ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Varonis security team",
+        "date": "2025-11-11T15:01:11",
+        "actor": "RansomHub ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
         "company": "Synnovis",
         "date": "2025-11-12T12:28:42",
         "actor": "Unknown",
@@ -1104,24 +1106,6 @@
       {
         "company": "UK healthcare providers using Synnovis pathology services",
         "date": "2025-11-12T12:28:42",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Synnovis",
-        "date": "2025-11-13T11:16:43",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "London hospitals (multiple NHS trusts)",
-        "date": "2025-11-13T11:16:43",
         "actor": "Unknown",
         "ransomware_type": "ransomware",
         "impact": "",
@@ -1150,6 +1134,24 @@
         "company": "Patients whose pathology data were stored by Synnovis",
         "date": "2025-11-13T11:13:54",
         "actor": "Qilin ransomware group (attributed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Synnovis",
+        "date": "2025-11-13T11:16:43",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "London hospitals (multiple NHS trusts)",
+        "date": "2025-11-13T11:16:43",
+        "actor": "Unknown",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -1216,24 +1218,6 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "Amount demanded (not disclosed) – donated to cybercrime research",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Nutanix AHV customers",
-        "date": "2025-11-14T15:02:34",
-        "actor": "Akira ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "organizations using Nutanix hypervisor in critical sectors",
-        "date": "2025-11-14T15:02:34",
-        "actor": "Akira ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
         "industry": "Unknown"
       },
       {
@@ -1318,18 +1302,27 @@
         "industry": "Unknown"
       },
       {
-        "company": "Logitech",
-        "date": "2025-11-17T11:10:44",
-        "actor": "Cl0p ransomware group",
+        "company": "Nutanix AHV customers",
+        "date": "2025-11-14T15:02:34",
+        "actor": "Akira ransomware group",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
         "industry": "Unknown"
       },
       {
-        "company": "Office of the Pennsylvania Attorney General",
-        "date": "2025-11-17T15:57:48",
-        "actor": "INC Ransom gang",
+        "company": "organizations using Nutanix hypervisor in critical sectors",
+        "date": "2025-11-14T15:02:34",
+        "actor": "Akira ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Logitech",
+        "date": "2025-11-17T11:10:44",
+        "actor": "Cl0p ransomware group",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -1342,6 +1335,15 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "estimated financial loss not disclosed, likely high due to ransom demand, remediation costs, and potential regulatory fines",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Office of the Pennsylvania Attorney General",
+        "date": "2025-11-17T15:57:48",
+        "actor": "INC Ransom gang",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
         "industry": "Unknown"
       },
       {
@@ -1477,6 +1479,51 @@
         "ransomware_type": "Lockbit Ransomware",
         "impact": "",
         "demands": "Not disclosed; sanctions may result in asset freezes and loss of revenue for the hosting provider and increased ransom costs for victims",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Petrobras (Brazilian energy giant)",
+        "date": "2025-11-20T17:41:34",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Petrobras seismic survey data storage systems",
+        "date": "2025-11-20T17:41:34",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Jaguar Land Rover (JLR)",
+        "date": "2025-11-12T01:00:00",
+        "actor": "Unnamed Initial Access Broker",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated $150‑$250 million in ransom payments, remediation costs, and lost revenue",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Third‑party suppliers linked to JLR",
+        "date": "2025-11-12T01:00:00",
+        "actor": "Unnamed Initial Access Broker",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated $150‑$250 million in ransom payments, remediation costs, and lost revenue",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Potential downstream customers of affected suppliers",
+        "date": "2025-11-12T01:00:00",
+        "actor": "Unnamed Initial Access Broker",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated $150‑$250 million in ransom payments, remediation costs, and lost revenue",
         "industry": "Unknown"
       }
     ]
