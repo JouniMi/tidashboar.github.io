@@ -73,7 +73,7 @@ RSS Feeds → Language Model Enrichment → JSON Files → Dashboard Visualizati
 ### **View Live Dashboard**
 Visit the deployed dashboard at:
 ```
-https://tidashboar.github.io
+[https://tidashboar.threathunt.blog](https://tidashboar.threathunt.blog/)
 ```
 
 ## 📁 Project Structure
