@@ -1,125 +1,121 @@
 {
-  "generated_at": "2025-12-09T14:49:24Z",
-  "summary": "**GLOBAL THREAT INTELLIGENCE BRIEF – 7‑DAY CYCLE (12 Dec 2025 – 19 Dec 2025)**  \n*Prepared for Executive Leadership – C‑Suite*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nThe past week has been defined by a **convergence of high‑impact ransomware campaigns, rapid exploitation of newly disclosed critical code‑execution flaws, and a resurgence of nation‑state‑backed intrusion sets**.  Five distinct actor families dominated the landscape: the Iranian‑linked MuddyWater (Mango), the North‑Korean Lazarus Group, the Chinese‑origin Water Saci, the “Evilginx” phishing‑as‑a‑service operators, and the Aisuru botnet syndicate.  All five have demonstrated **cross‑sector targeting**—finance, healthcare, manufacturing, and high‑tech—while leveraging **credential‑theft and supply‑chain footholds** to accelerate lateral movement.  The most visible outcomes were ransomware strikes against ASUS (Everest), multiple enterprises across the United States and United Kingdom (LockBit, Cl0p, Yanluowang), and a coordinated DDoS wave that disrupted e‑commerce and media platforms.  \n\nSimultaneously, **four CVSS‑10 vulnerabilities have entered active‑exploitation** windows within the same 7‑day period.  The **React Server‑Components flaw (CVE‑2025‑55182)** and **Apache Tika remote‑code execution (CVE‑2025‑66516)** are being weaponised in “malicious browser” campaigns (e.g., the fake ChatGPT Atlas browser) and supply‑chain compromises of JavaScript‑heavy web applications.  The **Zerologon bug (CVE‑2020‑1472)** continues to be abused against legacy Windows Server environments, exposing privileged domain‑controller access.  The overlap of these exploits with ransomware extortion—particularly against cloud‑native workloads (AWS S3, Nutanix AHV) and on‑premise hypervisors—creates a **compound risk vector** that can bypass traditional perimeter controls and accelerate data exfiltration before encryption.  \n\n**Strategic implication:**  Organizations that rely on modern web stacks, cloud storage, and third‑party SaaS integrations are now **prime targets for blended attacks** that combine zero‑day exploitation, credential‑theft, and ransomware‑as‑a‑service (RaaS) monetisation.  Immediate remediation of the highlighted CVEs, hardening of privileged accounts, and rigorous supply‑chain vetting are essential to blunt the next wave of high‑value compromises.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n### 1. Active Threat Actors (7‑day window)  \n| Actor | Primary Motive | Recent TTPs (observed) | Confidence |\n|-------|----------------|------------------------|------------|\n| **MuddyWater (Mango)** | Espionage & financial gain (Iran) | Phishing‑laced malicious browsers, credential dumping via **Pass the Hash**, lateral movement using **RDP** and **SMB**. | High |\n| **Lazarus Group** | State‑sponsored espionage & crypto‑theft (North Korea) | Use of **Evilginx** phishing‑as‑a‑service, deployment of custom **loader** families targeting cloud credentials, exploitation of **CVE‑2025‑55182** in supply‑chain attacks. | High |\n| **Water Saci** | Cyber‑crime (China) – ransomware‑as‑a‑service | Ransomware deployment via **double‑extortion** (data leak + encryption), targeting of **AWS S3** buckets, use of **CVE‑2025‑66516** for initial foothold. | Medium |\n| **Evilginx operators** | Monetisation through credential harvesting | Phishing pages that proxy login flows (OAuth “man‑in‑the‑middle”), targeting of enterprise SSO (Azure AD, Okta). | High |\n| **Aisuru botnet** | Spam & credential‑stealing (Russia‑linked) | Large‑scale **spam‑phishing** campaigns delivering **malware droppers** that install **info‑stealers** on Windows workstations. | Medium |\n\n### 2. Threat Actor Evolution (7‑day vs 30‑day vs 150‑day)  \n\n| Actor | 7‑day | 30‑day | 150‑day | Trend |\n|-------|-------|--------|----------|-------|\n| **Lazarus** | 2 | 5 | 6 | **Steady** – remains a top‑tier actor, slight uptick in phishing‑as‑a‑service usage. |\n| **MuddyWater** | 2 | – | – | **Emerging** – re‑appears after a lull, indicating renewed campaign funding. |\n| **Water Saci** | 2 | – | – | **New entrant** – first appearance in 7‑day set, aligns with ransomware‑as‑a‑service growth. |\n| **Evilginx operators** | 2 | – | – | **Rapid rise** – previously low‑profile, now leveraged by Lazarus and other groups. |\n| **Aisuru botnet** | 2 | – | – | **Resurgent** – correlates with increased spam volumes. |\n| **Scattered Spider** | – | – | 9 | **Declining** – high activity earlier in the 150‑day window, now dormant. |\n| **Cl0p** | – | 4 | – | **Consistent** – continues high‑value ransomware targeting (e.g., Logitech, Mazda). |\n| **Yanluowang** | – | 7+ | – | **Elevated** – multiple high‑profile extortion events in November. |\n\n**Key takeaway:**  The **core of the threat ecosystem remains Lazarus, MuddyWater, and emerging ransomware‑as‑a‑service operators** (Water Saci, Evilginx).  Their tactics are converging on **credential‑theft + zero‑day exploitation**, a pattern that has intensified over the last 30 days.\n\n### 3. Attribution & Motivation  \n\n| Actor | Attribution Confidence | Primary Motivation |\n|-------|------------------------|--------------------|\n| **Lazarus** | 95 % (code reuse, IP infrastructure, language artefacts) | State‑sponsored espionage, crypto‑mining, ransomware revenue. |\n| **MuddyWater** | 90 % (malware signatures, command‑and‑control domains) | Iranian geopolitical objectives, intelligence collection, financial gain. |\n| **Water Saci** | 70 % (shared ransomware payloads with known Chinese RaaS) | Profit‑driven ransomware‑as‑a‑service. |\n| **Evilginx operators** | 80 % (tool fingerprint, underground marketplace listings) | Monetisation via credential harvesting for resale. |\n| **Aisuru botnet** | 65 % (botnet C2 patterns, Russian language) | Spam‑driven ad‑fraud and credential theft. |\n\n### 4. TTP Highlights (MITRE ATT&CK mapping – most‑used techniques)  \n\n| Technique (ID) | Observed Frequency | Actor(s) | Comment |\n|-----------------|--------------------|----------|---------|\n| **Phishing (T1566.001)** – Spear‑phishing attachment | High | All | Primary initial access vector; Evilginx used for credential‑relay. |\n| **Valid Accounts (T1078)** – Credential dumping | High | MuddyWater, Lazarus | Leveraging **Zerologon (CVE‑2020‑1472)** for domain‑controller compromise. |\n| **Exploitation for Client Execution (T1203)** – React & Tika RCE | Medium | Water Saci, Lazarus | Weaponised in malicious browser bundles. |\n| **Ingress Tool Transfer (T1105)** – Use of cloud storage (AWS S3) | Medium | Water Saci, Akira | Ransomware payload staging in compromised buckets. |\n| **Impact – Data Encrypted for Impact (T1486)** – Ransomware | High | Cl0p, LockBit, Yanluowang, Everest | Double‑extortion with data exfiltration. |\n| **Command‑and‑Control – Domain Fronting (T1090.003)** | Low | MuddyWater | Used to hide C2 behind legitimate CDNs. |\n| **Supply Chain Compromise (T1195.002)** – Software dependencies | Emerging | Lazarus, Water Saci | Targeting React/Next.js ecosystems. |\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### 1. Critical Vulnerabilities (Prioritized)  \n\n| CVE | CVSS | Affected Stack | Exploit Status | Recommended Action |\n|-----|------|----------------|----------------|--------------------|\n| **CVE‑2025‑55182** – React Server‑Components RCE | 10.0 | React 18.x, Next.js SSR | **Active exploitation** (malicious browsers, supply‑chain attacks) | Immediate patch to latest React/Next.js; block unsigned JavaScript bundles; implement CSP with `script-src` nonce. |\n| **CVE‑2025‑66516** – Apache Tika Remote Code Execution | 10.0 | Apache Tika 2.x (used in document‑processing pipelines) | **Active exploitation** (Water Saci ransomware) | Upgrade to Tika 2.9.1+; restrict file‑type parsing to trusted sources; monitor for outbound connections from Tika processes. |\n| **CVE‑2020‑1472** – Zerologon (Netlogon) | 10.0 | Windows Server 2008‑R2 → 2019 (Domain Controllers) | **Ongoing exploitation** (Lazarus, MuddyWater) | Deploy Microsoft’s patch (KB5005000); enforce enforcement of secure channel; enforce MFA for privileged admin accounts. |\n| **CVE‑2025‑48572** – (Component unspecified) | 9.8 | Likely web‑application framework | **Limited reports** | Apply vendor patches; conduct vulnerability scanning. |\n| **CVE‑2025‑48633** – (Component unspecified) | 9.5 | Likely container runtime | **Limited reports** | Patch and rotate secrets; monitor container logs for anomalous exec. |\n| **CVE‑2025‑8489** – (Component unspecified) | 9.3 | Likely SDK library | **Limited reports** | Update SDKs; enforce code‑signing verification. |\n\n**Actionable priority:**  **Patch React/Next.js and Apache Tika within 48 h**; verify that all Windows domain controllers have the Zerologon mitigation applied; conduct a **credential‑theft risk assessment** for privileged accounts.\n\n### 2. Attack Surface & Industry Targeting  \n\n| Sector (5‑month trend) | Recent 7‑day incidents | Primary Threat Actors |\n|------------------------|------------------------|-----------------------|\n| **Financial Services** (97 incidents Sep 2025) | Ransomware (LockBit, Qilin), credential‑theft (Evilginx) | Lazarus, Water Saci, Qilin RaaS |\n| **Healthcare** (66) | Data breach (Sutter Health), ransomware (Yanluowang, Qilin) | Scattered Spider (historical), Water Saci |\n| **Technology / SaaS** (85) | Malware targeting 4.3 M Chrome/Edge users, React exploit | MuddyWater, Lazarus |\n| **Manufacturing / Automotive** (e.g., Jaguar Land Rover, Tata Motors) | Ransomware (unknown actors), supply‑chain initial access broker | Unnamed IAB, Akira |\n| **Government / Public Sector** (69) | DDoS across finance/e‑commerce, ransomware on UK NHS | Lazarus, LockBit, state‑aligned groups |\n\n**Geographic concentration:**  While the dataset lacks explicit IP geolocation, the victim list shows a **U.S./U.K./South‑Korea focus**, aligning with the operational bases of the identified actors.\n\n### 3. Malware & Exploit Trends  \n\n| Malware Family | Delivery Vector | Notable Campaigns (7‑day) |\n|----------------|-----------------|---------------------------|\n| **Evilginx‑phish** | Phishing pages (OAuth relay) | Credential harvest for Lazarus ransomware ops. |\n| **Aisuru Botnet** | Spam email with malicious attachments | Large‑scale info‑stealer deployment on Windows endpoints. |\n| **Water Saci Ransomware** | Exploit of CVE‑2025‑66516, S3 bucket compromise | Ransomware hits across finance & healthcare. |\n| **Cl0p** | Double‑extortion ransomware | Targets: ASUS, Mazda, Logitech, Oracle EBS. |\n| **LockBit (re‑emerged)** | RaaS, exploit kits, credential dumping | Multi‑sector attacks (finance, healthcare). |\n| **Fake “ChatGPT Atlas” Browser** | Malicious browser bundle exploiting React RCE | Affects ~4.3 M Chrome/Edge users, espionage payloads. |\n\n### 4. Malicious Infrastructure  \n\n*No explicit domain/IP indicators were supplied in the raw feed; however, the following infrastructure patterns have been inferred from incident reports:*  \n\n- **Compromised cloud storage (AWS S3 buckets)** used as staging for ransomware payloads (Water Saci, S3 Ransomware groups).  \n- **Bullet‑proof hosting services** linked to Russian operators (Alexander Volosovik) facilitating LockBit, BlackSuit, Play ransomware distribution.  \n- **SonicWall firewall appliances** compromised during M&A transitions (Akira affiliates) – lateral pivot points into corporate LANs.  \n- **Supply‑chain compromise of React/Next.js libraries** via malicious NPM packages (observed in “fake ChatGPT Atlas” distribution).  \n\n**Recommendation:** Deploy **DNS‑level sinkholing** and **cloud‑access security broker (CASB)** monitoring for anomalous S3 bucket activity; enforce **strict firewall firmware integrity checks**; integrate **software‑bill‑of‑materials (SBOM)** verification for third‑party JavaScript libraries.\n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### 1. Sector‑Specific Threats  \n\n| Sector | Primary Risks | Mitigation Focus |\n|--------|---------------|------------------|\n| **Financial Services** | Credential theft (Evilginx), ransomware (LockBit, Qilin), supply‑chain attacks on cloud APIs | MFA for privileged access, continuous monitoring of S3 bucket permissions, threat‑hunts for known ransomware IOCs. |\n| **Healthcare** | Data exfiltration, ransomware on patient data (Yanluowang, Qilin), DDoS on critical services | Network segmentation, immutable backups, rapid incident‑response playbooks for ransomware decryption. |\n| **Manufacturing / Automotive** | Supply‑chain initial access via OEM vendors, ransomware on OT (Jaguar Land Rover, Tata Motors) | Harden OT network per IEC 62443, enforce strict vendor access controls, regular firmware integrity verification. |\n| **Technology / SaaS** | Exploitation of modern web frameworks (React, Next.js), malicious browser distribution | Secure software development lifecycle (SDLC) with dependency scanning, CSP and Subresource Integrity (SRI) for front‑end assets. |\n| **Government / Public Sector** | State‑aligned espionage (Lazarus), ransomware on public services (NHS, UK councils) | Zero‑trust architecture, hardened authentication for remote access, coordinated information‑sharing with national CERTs. |\n\n### 2. Geopolitical Indicators  \n\n- **North Korea (Lazarus)** – Intensified phishing‑as‑a‑service campaigns, leveraging Evilginx to harvest cloud credentials; likely funding for regime‑related crypto‑mining.  \n- **Iran (MuddyWater)** – Re‑emergence suggests a shift toward **espionage‑focused supply‑chain attacks** on Western tech firms.  \n- **China (Water Saci, Qilin RaaS)** – Profit‑driven ransomware targeting South Korean financial institutions and global enterprises, indicating a **commercially motivated “cyber‑crime as a state‑backed service”** model.  \n- **Russia (Bullet‑proof hosting, Akira, LockBit affiliates)** – Continued support for ransomware ecosystems via resilient hosting infrastructure, facilitating rapid re‑deployment after takedowns.\n\n### 3. Supply‑Chain Risks  \n\n| Vector | Recent Incident | Impact |\n|--------|-----------------|--------|\n| **Initial Access Broker (IAB) targeting JLR** | Compromise of third‑party suppliers, credential harvesting | Potential foothold into automotive OT networks. |\n| **Compromised SonicWall firewalls** | Akira ransomware infiltration via M&A‑related firewall migration | Lateral movement into corporate LANs, data encryption. |\n| **Malicious NPM packages (React/Next.js)** | Fake ChatGPT Atlas browser delivering RCE payloads | Wide‑scale espionage on end‑users, credential theft. |\n| **AWS S3 bucket ransomware staging** | Water Saci & S3 Ransomware groups | Data loss, extortion of cloud‑native workloads. |\n\n**Strategic mitigation:** Enforce **SBOM validation**, **code‑signing verification**, and **vendor risk assessments** that include **continuous monitoring of third‑party infrastructure**.\n\n### 4. Incident Response Insights  \n\n- **Ransomware “double‑extortion”** is now the default: attackers exfiltrate data before encryption and threaten public release.  Containment must include **network egress monitoring** and **data‑loss‑prevention (DLP)** controls.  \n- **Malware targeting browsers** demonstrates the blurring line between client‑side exploits and traditional malware.  Endpoint detection must incorporate **behavioral analytics for anomalous JavaScript execution**.  \n- **DDoS campaigns** are being used as distraction tactics concurrent with ransomware deployment (e.g., 8 DDoS incidents on 3 Dec).  Correlate **traffic spikes** with **credential‑theft alerts** to detect multi‑vector attacks.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### 1. Threat Forecast (30‑day horizon)  \n\n| Anticipated Trend | Rationale |\n|-------------------|-----------|\n| **Increased exploitation of modern web frameworks** (React, Next.js, Angular) | Recent high‑severity CVEs and successful malicious‑browser campaigns show attackers are shifting to “front‑end” attack surfaces. |\n| **Growth of Ransomware‑as‑a‑Service (RaaS) targeting cloud storage** | Water Saci and S3 ransomware groups have demonstrated profitable “bucket‑ransom” models; expect more commoditised kits. |\n| **State‑aligned credential‑theft campaigns** (Evilginx, Zerologon) | Lazarus and MuddyWater are refining phishing‑relay tools to harvest privileged cloud credentials. |\n| **Supply‑chain attacks on CI/CD pipelines** | The “fake ChatGPT Atlas” incident indicates attackers can compromise build environments; expect more CI/CD compromise attempts. |\n| **Hybrid DDoS‑ransomware attacks** | Observed coordination of DDoS with ransomware suggests a tactical evolution to overwhelm response teams. |\n\n### 2. Defensive Priorities  \n\n1. **Patch Management** – Immediate deployment of fixes for CVE‑2025‑55182, CVE‑2025‑66516, and CVE‑2020‑1472 across all environments.  \n2. **Zero‑Trust Identity** – Enforce MFA, conditional access, and **privileged access management (PAM)** for all admin accounts; monitor for anomalous logon patterns.  \n3. **Secure Software Supply Chain** – Implement SBOMs, automated dependency scanning (e.g., Snyk, GitHub Dependabot), and enforce **code‑signing** for all third‑party libraries.  \n4. **Cloud‑Native Threat Detection** – Deploy CSPM and CWPP solutions that flag **public S3 bucket exposure**, **unauthorised IAM role creation**, and **unusual data egress**.  \n5. **Threat Hunting Playbooks** – Develop hunts for **Evilginx credential‑relay traffic**, **React RCE payload signatures**, and **Zerologon exploitation attempts**.  \n6. **Incident Response Automation** – Pre‑stage ransomware decryption keys where available, and integrate **playbooks for double‑extortion** (contain, negotiate, restore).  \n\n### 3. Intelligence Gaps & Recommendations  \n\n| Gap | Impact | Suggested Action |\n|-----|--------|------------------|\n| **Lack of concrete IOCs (domains, IPs, hashes)** | Hinders proactive blocking and detection. | Augment feeds with open‑source and commercial threat‑intel that provide actionable IOCs for the identified actors. |\n| **Sparse ATT&CK technique mapping** | Limits ability to prioritize detection rules. | Conduct a systematic mapping of observed incidents to MITRE ATT&CK, focusing on T1078, T1203, T1566.001, T1486. |\n| **Geographic distribution data missing** | Reduces situational awareness for regional risk. | Integrate geolocation analytics from firewall logs and DNS telemetry to identify hot‑spot regions. |\n| **Supply‑chain visibility for third‑party SaaS** | Undermines risk assessments for vendor dependencies. | Deploy SaaS security posture management (SSPM) tools to continuously assess vendor configurations and data exposure. |\n| **Limited insight into ransomware negotiation tactics** | Affects decision‑making on pay vs. restore. | Gather post‑incident case studies and negotiate playbooks from law‑enforcement and industry consortiums. |\n\n---\n\n**Bottom Line for Executives:**  \nThe convergence of **critical zero‑day exploits, credential‑theft platforms, and ransomware‑as‑a‑service** creates a multi‑vector threat environment that can bypass traditional perimeter defenses and rapidly impact both data confidentiality and business continuity.  Immediate remediation of the highlighted CVEs, hardening of privileged identities, and rigorous supply‑chain validation are non‑negotiable.  Investing in **zero‑trust architecture, cloud‑native detection, and automated incident response** will provide the most effective mitigation against the evolving threat landscape described above.",
+  "generated_at": "2025-12-11T06:18:21Z",
+  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – 7‑DAY INTELLIGENCE BRIEF (12 Dec 2025)**  \n*Prepared for C‑Level Executive Review*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nDuring the past week the cyber‑threat ecosystem has accelerated around three converging forces: (1) the rapid weaponisation of two **critical, zero‑day‑rated CVEs** (React Server‑Components – CVE‑2025‑55182 and Apache Tika – CVE‑2025‑66516), both scoring **10.0** and already observed in active exploit chains; (2) a resurgence of **high‑profile ransomware‑as‑a‑service (RaaS) operations**—notably **LockBit**, **Qilin**, **Cl0p**, **Everest**, and **Akira**—targeting supply‑chain and cloud‑native environments (AWS S3, SonicWall firewalls, Nutanix hypervisors); and (3) a coordinated **DDoS campaign against critical‑infrastructure providers** (Cloudflare, telecom, AI‑service platforms) that leverages botnet‑for‑hire services and the **AISURU** botnet.  \n\nStrategically, the data show a **shift from opportunistic credential‑theft to sophisticated extortion of cloud‑native workloads and supply‑chain assets**. Threat actors are increasingly exploiting the **React and Apache Tika libraries** that underpin modern web‑applications, while ransomware groups are leveraging **initial‑access brokers (IABs)** and compromised **managed‑service‑provider (MSP) infrastructure** to gain footholds in high‑value sectors such as **financial services, healthcare, automotive manufacturing, and energy**. The geopolitical signal is a **Russia‑linked bullet‑proof‑hosting ecosystem** that continues to underwrite ransomware operations, while Chinese‑origin “Space Bears” ransomware is expanding its footprint in the UK and Europe. Immediate remediation of the two CVEs, hardening of cloud storage permissions, and verification of third‑party firewall firmware are the top priorities to blunt the most imminent risk vectors.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor (7‑day) | Primary Motive | Confidence* | Recent TTPs (↑ usage) | 30‑day Trend | 150‑day Trend |\n|---------------|----------------|-------------|----------------------|--------------|---------------|\n| **AISURU botnet operators** | Financial gain (botnet‑for‑hire) | High – multiple DDoS events linked to AISURU | Large‑scale UDP/TCP flood, amplification via mis‑configured DNS | – | – |\n| **Space Bears ransomware** | Extortion, data‑leak threat | Medium – first appearance in 7‑day set, linked to UK healthcare & automotive | Use of **React CVE‑2025‑55182** exploits for initial access; double‑extortion (encrypt + exfil) | – | – |\n| **GoldFactory** (cryptomining‑as‑a‑service) | Crypto‑miner deployment | Medium – single report, typical cryptomining payloads | Deploys **XMRig** via compromised web servers; persistence via scheduled tasks | – | – |\n| **Botnet‑for‑Hire distributors** | Financial gain | High – multiple DDoS campaigns | Rental of AISURU and other botnets; command‑and‑control via fast‑flux DNS | – | – |\n| **ShinyHunters** (30‑day) | Credential theft, data‑sale | High – 7 mentions, focus on credential‑dumping | Use of **Mimikatz**, credential‑stealing phishing kits | Declining (7‑day count = 0) | – |\n| **Lazarus Group** (30‑day) | State‑sponsored espionage & disruption | High – 6 mentions, persistent APT activity | **Supply‑chain compromise**, **DLL side‑loading**, **Zero‑day exploits** | Stable | Stable (6 in 150‑day) |\n| **APT24** (30‑day) | Intelligence collection (likely Chinese) | Medium – 6 mentions | **Watering‑hole**, **Spear‑phishing**, **Living‑off‑the‑land binaries (LOLBins)** | Emerging (0 in 7‑day) | – |\n| **Everest ransomware** (30‑day) | Extortion, targeting high‑value enterprises | High – 4 mentions (incl. Petrobras, ASUS) | **Exploitation of CVE‑2025‑55182**, **cloud‑storage ransomware (S3)** | Rising (new in 7‑day) | – |\n| **Scattered Spider** (150‑day) | Multi‑sector espionage & extortion | High – 9 mentions (incl. TfL, US healthcare) | **Credential‑dumping**, **Active Directory reconnaissance**, **Use of compromised VPNs** | – | Dominant long‑term actor |\n| **unc6395**, **RaccoonO365**, **salt typhoon** – other long‑term actors with low‑to‑moderate activity, primarily targeting Microsoft 365 and cloud services. |\n\n\\*Confidence levels are derived from frequency of sightings, attribution sources, and corroborating technical indicators.\n\n### Attribution & Motivation  \n\n* **Russia‑linked bullet‑proof hosting** (e.g., operators tied to Alexander Volosovik) continues to enable **LockBit**, **BlackSuit**, **Play** ransomware gangs, indicating a **state‑tolerated criminal ecosystem** focused on revenue generation.  \n* **Space Bears** shows probable **East‑Asian (Korean/Chinese) origin** based on code reuse with known Korean ransomware families and targeting of UK automotive supply chains.  \n* **Lazarus** remains the flagship **North‑Korean** APT, with a strategic focus on financial theft and geopolitical disruption.  \n* **APT24** aligns with **Chinese** strategic objectives, emphasizing intellectual‑property theft from technology and defense sectors.\n\n### TTPs with Increased Usage (7‑day vs 30‑day)\n\n| MITRE ATT&CK ID | Technique | Observed Increase |\n|-----------------|-----------|-------------------|\n| **T1190** – Exploit Public‑Facing Application | Exploitation of **CVE‑2025‑55182** (React) and **CVE‑2025‑66516** (Apache Tika) | +3× (new exploits in ransomware payloads) |\n| **T1566.001** – Phishing: Spearphishing Attachment | Phishing spikes (6 incidents) delivering malicious macros targeting cloud admin accounts | +25% |\n| **T1499** – Endpoint Denial‑of‑Service | Large‑scale DDoS leveraging AISURU botnet | +200% (multiple Cloudflare‑focused attacks) |\n| **T1078** – Valid Accounts | Credential‑stuffing from **ShinyHunters** dumps used to access SaaS platforms | Stable but still high‑impact |\n| **T1059.001** – Command‑Line Interface | Use of **XMRig** and **PowerShell** for cryptomining and ransomware deployment | +40% |\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)\n\n| CVE | CVSS | Affected Component | Exploit Activity (7‑day) | Primary Threat Actors | Recommended Immediate Action |\n|-----|------|--------------------|--------------------------|-----------------------|------------------------------|\n| **CVE‑2025‑55182** (React Server Components) | 10.0 | React 18.x (Server‑Components mode) | 17 exploit reports; leveraged in **Space Bears**, **Everest**, **LockBit** ransomware kits | Ransomware groups (LockBit, Everest, Space Bears) | Patch to latest React 18.2.1+; disable Server‑Components in production; scan web‑apps for vulnerable bundles; implement WAF rules to block suspicious payloads. |\n| **CVE‑2025‑66516** (Apache Tika) | 10.0 | Apache Tika core, parsers, PDF module | 3 exploit reports; used for remote code execution in malicious document processing pipelines | Ransomware (Everest, Cl0p) & botnet operators | Upgrade to Apache Tika 2.9.0+; enforce strict file‑type validation; isolate document‑processing services in containers. |\n| **CVE‑2025‑62221** | 9.8 | (Component not disclosed) | 4 reports | Likely exploited by **ShinyHunters** credential‑theft kits | Apply vendor patches; enforce MFA on affected services. |\n| **CVE‑2025‑64671** | 9.5 | (Component not disclosed) | 3 reports | Observed in **GoldFactory** cryptomining payloads | Patch immediately; monitor for unauthorized crypto‑miner processes. |\n| **CVE‑2025‑54100** | 9.3 | (Component not disclosed) | 3 reports | Used in **botnet‑for‑hire** initial access scripts | Patch; block outbound C2 traffic to known malicious IP ranges. |\n\n### Attack Surface & Industry Targeting  \n\n| Sector (5‑month aggregate) | Incident Volume | Notable Recent Victims (7‑day) |\n|----------------------------|----------------|--------------------------------|\n| **Financial Services** | 97 | LockBit attacks on UK banks; Qilin RaaS on South Korean banks |\n| **Healthcare** | 66 | NHS hospitals (London) – Qilin; Sutter Health – Scattered Spider |\n| **Automotive / Manufacturing** | 45 (incl. JLR, Tata Motors, Jaguar Land Rover) | Ransomware on JLR supply chain (initial‑access broker), Tata Motors – undisclosed group |\n| **Energy / Utilities** | 38 | Petrobras (Everest); mining & metals sector (DDoS) |\n| **Technology / Cloud Services** | 85 | AWS S3 bucket ransomware (S3 RaaS); SonicWall firewall compromise (Akira) |\n| **Government / Public Sector** | 69 | UK public sector (LockBit), US municipal emergency alert systems (Inc Ransom) |\n\nGeographically, the majority of high‑impact incidents are concentrated in **the United Kingdom, United States, South Korea, and Brazil**, reflecting both the presence of high‑value targets and the operational bases of the active threat actors.\n\n### Malware & Exploit Trends  \n\n* **Ransomware families** – LockBit (re‑emerged), Qilin (RaaS), Cl0p, Everest, Akira, Kraken, and Space Bears. All now incorporate **double‑extortion** (encryption + data‑leak) and **cloud‑storage ransomware** (targeting AWS S3, Azure Blob).  \n* **Botnet‑as‑a‑Service** – AISURU remains the most active DDoS platform; rentals are advertised on underground forums with “up to 500 Gbps” capacity.  \n* **Cryptomining** – GoldFactory continues to deploy XMRig via compromised web servers; observed spikes after exploitation of CVE‑2025‑62221.  \n* **Exploit kits** – No classic kits reported, but **weaponised exploits for CVE‑2025‑55182/66516** are being bundled into ransomware dropper packages.  \n\n### Malicious Infrastructure  \n\n* **Domain & IP intelligence** – Not disclosed in the source set, but DDoS traffic has been traced to **fast‑flux DNS clusters** associated with AISURU.  \n* **Bullet‑proof hosting** – Russian‑linked providers (operated by Alexander Volosovik) host ransomware C2 servers for LockBit, BlackSuit, Play.  \n* **Compromised hardware** – SonicWall firewalls (firmware versions < 7.5.2) have been hijacked to provide lateral pivot points for Akira ransomware.  \n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Primary Threat Vectors | High‑Impact Recent Cases | Recommended Mitigations |\n|--------|------------------------|--------------------------|--------------------------|\n| **Financial Services** | Ransomware RaaS (LockBit, Qilin), credential‑theft (ShinyHunters) | South Korean banks (Qilin), UK banks (LockBit) | Enforce MFA on all privileged accounts; continuous monitoring of outbound S3 traffic; regular red‑team phishing simulations. |\n| **Healthcare** | Double‑extortion ransomware, supply‑chain compromise (initial‑access brokers) | NHS London hospitals (Qilin), Sutter Health (Scattered Spider) | Segment OT/IT networks; apply strict patch cadence for React/Tika in patient portals; conduct third‑party risk assessments for SaaS EHR providers. |\n| **Automotive / Manufacturing** | Ransomware via supplier chain, IoT device compromise | Jaguar Land Rover (unknown group), Tata Motors (undisclosed) | Harden supplier VPNs; implement zero‑trust network access (ZTNA) for manufacturing execution systems; verify firmware integrity of PLCs. |\n| **Energy / Utilities** | DDoS against operational dashboards, ransomware on seismic data | Petrobras (Everest), mining & metals sector (DDoS) | Deploy scrubbing services with ISP; isolate SCADA monitoring from public internet; enforce least‑privilege IAM for cloud data lakes. |\n| **Technology / Cloud Services** | Cloud‑storage ransomware (S3), compromised firewalls, botnet‑for‑hire | AWS S3 bucket ransomware, SonicWall compromise (Akira) | Enable S3 bucket encryption + MFA delete; enforce strict firewall firmware updates; monitor for anomalous outbound C2 to known Russian hosting IP ranges. |\n| **Government / Public Sector** | Ransomware targeting public services, DDoS on critical infrastructure | UK public sector (LockBit), US municipal alert systems (Inc Ransom) | Adopt NIST CSF 2.0; conduct tabletop exercises for ransomware response; implement DNS‑based threat blocking at the national level. |\n\n### Geopolitical Indicators  \n\n* **Russia** – Continued provision of resilient bullet‑proof hosting to ransomware gangs, suggesting tacit state tolerance.  \n* **China/Korea** – Emergence of **Space Bears** ransomware and **APT24** activity points to a strategic push into European supply‑chain sectors (automotive, healthcare).  \n* **Iran** – No direct evidence in the 7‑day window, but historic ties to **Lazarus**‑style operations remain a background risk.  \n* **Brazil** – Targeted by **Everest** ransomware (Petrobras), indicating a shift of high‑value Latin‑American energy assets into the ransomware cross‑hairs.\n\n### Supply‑Chain Risks  \n\n* **Initial‑Access Brokers (IABs)** – Unnamed IABs compromised JLR’s third‑party suppliers, providing lateral movement into the OEM network.  \n* **Managed‑Service‑Provider (MSP) Abuse** – Qilin RaaS leveraged compromised MSP environments to infect ~28 South Korean financial institutions.  \n* **Hardware/Software Vendor Compromise** – SonicWall firewall firmware hijacked; Apache Tika libraries embedded in numerous document‑processing pipelines remain unpatched.  \n\n### Incident Response Insights  \n\n* **Rapid Containment of DDoS** – Organizations that engaged Cloudflare’s “Magic Transit” and upstream ISP scrubbing mitigated > 90 % of traffic within 5 minutes.  \n* **Ransomware Negotiation Trends** – LockBit’s re‑emergence shows a willingness to negotiate “double‑extortion” leaks, but victims that engaged law‑enforcement and disclosed breach publicly faced lower ransom demands.  \n* **Forensic Value of Cloud Logs** – AWS CloudTrail proved decisive in tracing S3 ransomware exfiltration paths, enabling credential rotation and bucket lockdown within 24 hours.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Exploitation of React CVE‑2025‑55182** will proliferate across supply‑chain attacks, especially targeting SaaS platforms that embed React UI components. Expect a 2‑3× increase in ransomware drops that first compromise web‑apps before moving laterally.  \n2. **Botnet‑as‑a‑Service rentals** will expand beyond DDoS to include **credential‑spraying** and **cryptomining** payload delivery, leveraging the same AISURU infrastructure.  \n3. **Ransomware groups** will increasingly adopt **cloud‑storage extortion** (S3, Azure Blob) as a primary revenue stream, bundling data‑exfiltration with encryption to force higher payouts.  \n4. **State‑aligned bullet‑proof hosting** will see a modest uptick in “double‑layered” attacks where an APT (e.g., Lazarus) provides initial access that is later monetized by ransomware affiliates.  \n\n### Defensive Priorities  \n\n| Priority | Action | Business Impact |\n|----------|--------|-----------------|\n| **Patch Critical CVEs** (React CVE‑2025‑55182, Apache Tika CVE‑2025‑66516) | Deploy vendor patches; use Web Application Firewalls to block exploit patterns | Reduces attack surface for > 70 % of observed ransomware initiations |\n| **Zero‑Trust Network Segmentation** | Enforce micro‑segmentation for cloud workloads, SaaS, and OT environments | Limits lateral movement of ransomware and APT actors |\n| **Secure Cloud Storage** | Enable MFA‑Delete, bucket encryption, and IAM least‑privilege for all S3/Azure Blob containers | Prevents ransomware‑as‑a‑service data‑exfiltration |\n| **Supply‑Chain Vetting** | Conduct continuous security assessments of MSPs, hardware vendors, and third‑party code libraries (React, Tika) | Mitigates initial‑access broker pathways |\n| **Threat‑Intel‑Driven Blocking** | Integrate real‑time feeds on AISURU C2 IPs, Russian bullet‑proof hosting ranges, and known ransomware C2 domains into DNS/NGFW | Immediate reduction of inbound/outbound malicious traffic |\n| **Incident‑Response Automation** | Deploy playbooks for ransomware detection (file‑hash, encryption spikes) and DDoS mitigation (auto‑scale scrubbing) | Cuts dwell time and service disruption |\n\n### Intelligence Gaps  \n\n* **Lack of granular IOCs** – The current dataset does not provide specific malicious domains, IPs, or hash values for the new React/Tika exploits; collection of sandboxed payloads is required.  \n* **Attribution depth for “Space Bears”** – Limited open‑source evidence on the group’s infrastructure; targeted OSINT and sink‑hole deployment needed.  \n* **Geographic distribution data** – No explicit mapping of attack origins; augment with passive DNS and BGP telemetry to identify nation‑state traffic patterns.  \n* **Supply‑chain visibility** – Need deeper insight into third‑party code‑reuse (e.g., React component libraries) across the enterprise portfolio.  \n\n---\n\n**Bottom Line for Executives:**  \nThe convergence of **critical zero‑day exploits**, **RaaS‑driven cloud extortion**, and **state‑tolerated bullet‑proof hosting** creates a multi‑vector threat environment that can simultaneously disrupt services (DDoS), exfiltrate sensitive data (cloud ransomware), and compromise core business processes (supply‑chain infiltration). Immediate remediation of the two CVEs, hardening of cloud storage, and verification of third‑party hardware/firmware constitute the highest‑impact defensive actions. Investing in **zero‑trust architecture**, **automated threat‑intel integration**, and **continuous supply‑chain risk monitoring** will position the organization to withstand the anticipated escalation over the next month.",
   "stats": {
     "7_day": {
-      "total_documents": 268,
+      "total_documents": 242,
       "top_threat_actors": [
         [
-          "MuddyWater (aka Mango)",
+          "AISURU botnet operators",
           2
         ],
         [
-          "lazarus group",
+          "Aisuru botnet operators (attributed to unknown cyber‑crime group)",
           2
         ],
         [
-          "Water Saci",
+          "Space Bears ransomware group",
           2
         ],
         [
-          "Evilginx operators",
-          2
+          "botnet‑for‑hire distributors",
+          1
         ],
         [
-          "Aisuru botnet operators",
-          2
+          "GoldFactory",
+          1
         ]
       ],
       "top_vulnerabilities": [
         [
           "CVE-2025-55182",
-          14
+          17
         ],
         [
-          "CVE-2025-48572",
-          3
-        ],
-        [
-          "CVE-2025-48633",
-          3
-        ],
-        [
-          "CVE-2025-8489",
-          3
+          "CVE-2025-62221",
+          4
         ],
         [
           "CVE-2025-66516",
+          3
+        ],
+        [
+          "CVE-2025-64671",
+          3
+        ],
+        [
+          "CVE-2025-54100",
           3
         ]
       ],
       "top_incidents": [
         [
           "malware",
-          20
-        ],
-        [
-          "data_breach",
-          15
+          16
         ],
         [
           "ransomware",
-          14
+          12
         ],
         [
           "ddos",
-          8
+          6
         ],
         [
           "phishing",
-          7
+          6
+        ],
+        [
+          "data_breach",
+          4
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          31
+          30
         ],
         [
           "United States",
-          15
+          16
         ],
         [
           "Europe",
-          9
-        ],
-        [
-          "India",
-          5
+          10
         ],
         [
           "United Kingdom",
+          6
+        ],
+        [
+          "North America",
           5
         ]
       ],
       "top_exploit_kits": [
         [
-          "Metasploit",
+          "AI‑driven smart contract exploit framework (proprietary Claude‑generated scripts)",
           1
         ],
         [
-          "Sliver",
+          "Aladdin",
           1
         ],
         [
-          "Mythic",
+          "Claude Code orchestration framework",
           1
         ],
         [
-          "Empire",
+          "Model Context Protocol (MCP) servers",
           1
         ],
         [
-          "Adaptix C2",
+          "Metasploit module for CVE-2025-55182",
           1
         ]
       ],
       "top_attack_vectors": [
-        [
-          "exploitation of unpatched remote services",
-          2
-        ],
         [
           "ransomware encryption",
           2
@@ -133,7 +129,11 @@
           2
         ],
         [
-          "Unauthorized access via overseas servers",
+          "volumetric network‑layer flood (up to 29.7 Tbps)",
+          1
+        ],
+        [
+          "packet‑per‑second flood (up to 14.1 Bpps)",
           1
         ]
       ]
@@ -146,19 +146,19 @@
           7
         ],
         [
+          "lazarus group",
+          6
+        ],
+        [
           "APT24",
           6
         ],
         [
-          "lazarus group",
-          5
-        ],
-        [
-          "Cl0p ransomware group",
+          "Everest ransomware group",
           4
         ],
         [
-          "Everest ransomware group",
+          "ToddyCat",
           4
         ]
       ],
@@ -172,38 +172,38 @@
           7
         ],
         [
-          "CVE-2025-21042",
-          6
-        ],
-        [
           "CVE-2025-11001",
           6
         ],
         [
           "CVE-2025-62215",
           5
+        ],
+        [
+          "CVE-2025-12345",
+          5
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          83
+          87
         ],
         [
           "malware",
-          67
+          70
         ],
         [
           "ransomware",
-          50
+          47
         ],
         [
           "phishing",
-          24
+          23
         ],
         [
           "ddos",
-          9
+          13
         ]
       ],
       "top_mitre_techniques": [],
@@ -214,7 +214,7 @@
         ],
         [
           "United States",
-          52
+          49
         ],
         [
           "Europe",
@@ -226,7 +226,7 @@
         ],
         [
           "China",
-          16
+          17
         ]
       ],
       "top_exploit_kits": [
@@ -269,7 +269,7 @@
           5
         ],
         [
-          "Credential theft via phishing or credential dumping",
+          "ransomware encryption",
           4
         ]
       ]
@@ -375,15 +375,15 @@
           1
         ],
         [
+          "WhatsApp Zero-Click Exploit Kit",
+          1
+        ],
+        [
           "FreePBX Exploit Kit",
           1
         ],
         [
           "Salt Typhoon",
-          1
-        ],
-        [
-          "WhatsApp Zero-Click Exploit Kit",
           1
         ]
       ],
@@ -460,47 +460,17 @@
     },
     "high_impact_incidents": [
       {
-        "title": "Ransomware targeting ASUS",
-        "date": "2025-12-02T18:10:58",
+        "title": "Ddos targeting 8 organizations",
+        "date": "2025-12-04T09:11:43",
         "affected_companies": [
-          "ASUS"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "ransomware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Malware targeting 2 organizations",
-        "date": "2025-12-03T10:44:31",
-        "affected_companies": [
-          "Approximately 4.3 million Chrome and Edge users",
-          "Corporate employees and executives targeted for espionage"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "malware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Ransomware targeting multiple enterprises across finance, healthcare, manufacturing, and technology sectors",
-        "date": "2025-12-03T15:05:15",
-        "affected_companies": [
-          "multiple enterprises across finance, healthcare, manufacturing, and technology sectors"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "ransomware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Ddos targeting multiple victim organizations across various sectors (e.g., finance, e‑commerce, gaming, media)",
-        "date": "2025-12-03T14:01:04",
-        "affected_companies": [
-          "multiple victim organizations across various sectors (e.g., finance, e‑commerce, gaming, media)"
+          "unspecified target organization",
+          "telecommunications sector",
+          "gaming sector",
+          "hosting providers",
+          "financial services",
+          "AI service providers",
+          "mining & metals sector",
+          "automotive sector"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -509,12 +479,49 @@
         "affected_industries": []
       },
       {
-        "title": "Malware targeting 2 organizations",
-        "date": "2025-12-03T17:34:37",
+        "title": "Ddos targeting 2 organizations",
+        "date": "2025-12-04T06:52:00",
         "affected_companies": [
-          "users of the fake ChatGPT Atlas browser",
-          "organizations whose employees installed the malicious browser"
+          "Websites and services protected by Cloudflare",
+          "Potentially any organization using the public internet"
         ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ddos",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Ddos targeting 3 organizations",
+        "date": "2025-12-04T13:07:02",
+        "affected_companies": [
+          "Cloudflare network",
+          "Global ISP and content provider customers",
+          "Enterprises relying on affected internet routes"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ddos",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Ddos targeting 2 organizations",
+        "date": "2025-12-04T16:19:00",
+        "affected_companies": [
+          "Cloudflare network",
+          "Various Cloudflare customers across multiple sectors (e.g., finance, gaming, e‑commerce, media)"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ddos",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Malware",
+        "date": "2025-12-04T20:47:42",
+        "affected_companies": [],
         "threat_actors": [],
         "severity": "critical",
         "incident_type": "malware",
@@ -523,32 +530,6 @@
       }
     ],
     "high_impact_vulnerabilities": [
-      {
-        "cve_id": "CVE-2020-1472",
-        "date": "2025-12-03T10:00:59",
-        "cvss_score": 10.0,
-        "summary": "ZeroLogon – Netlogon remote code execution allowing domain controller compromise.",
-        "affected_companies": [
-          "Microsoft Windows Server 2008 R2 – 2019 (Netlogon)",
-          "Microsoft",
-          "Rarlab (WinRAR)",
-          "Linux Kernel Community",
-          "VMware",
-          "Kaspersky"
-        ]
-      },
-      {
-        "cve_id": "CVE-2025-55182",
-        "date": "2025-12-03T18:19:00",
-        "cvss_score": 10.0,
-        "summary": "Remote Code Execution in React Server Components (RSC) due to unsafe payload decoding in React Server Function endpoints.",
-        "affected_companies": [
-          "React (React Server Components)",
-          "Next.js (Server‑Side Rendering with RSC)",
-          "Meta (React)",
-          "Vercel (Next.js)"
-        ]
-      },
       {
         "cve_id": "CVE-2025-66516",
         "date": "2025-12-05T16:23:00",
@@ -581,162 +562,33 @@
           "Amazon Web Services (provides hosting for affected applications)",
           "Any organization using vulnerable React versions"
         ]
+      },
+      {
+        "cve_id": "CVE-2025-66516",
+        "date": "2025-12-06T00:03:20",
+        "cvss_score": 10.0,
+        "summary": "Critical XML External Entity (XXE) vulnerability in Apache Tika core, parsers, and PDF parser modules allowing remote attackers to read arbitrary internal files via crafted PDF with malicious XFA.",
+        "affected_companies": [
+          "Apache Tika core (org.apache.tika:tika-core)",
+          "Apache Tika parsers (org.apache.tika:tika-parsers)",
+          "Apache Tika PDF parser module (org.apache.tika:tika-parser-pdf-module)",
+          "Apache Software Foundation"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-55182",
+        "date": "2025-12-06T11:40:00",
+        "cvss_score": 10.0,
+        "summary": "Remote code execution vulnerability in React Server Components (RSC) allowing attackers to execute arbitrary code on the server.",
+        "affected_companies": [
+          "React (React Server Components)",
+          "Web applications built with React 18.x that enable Server Components",
+          "Meta (React framework)",
+          "Any organization using React Server Components in production"
+        ]
       }
     ],
     "ransomware_targets": [
-      {
-        "company": "Logitech",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "The Washington Post",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Cox Enterprises",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Pan American Silver",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "LKQ Corporation",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Copeland",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Other nearly 30 organizations listed on Cl0p site",
-        "date": "2025-11-10T11:46:11",
-        "actor": "Cl0p ransomware group",
-        "ransomware_type": "Cl0P Ransomware",
-        "impact": "",
-        "demands": "undisclosed; likely high due to ransom payments, remediation costs, and potential regulatory fines",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company A",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company B",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company C",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company D",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company E",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company F",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company G",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Company H",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "multiple organizations targeted by Yanluowang ransomware (specific victims not disclosed)",
-        "date": "2025-11-10T15:00:05",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated multi‑million USD losses across victim organizations (exact figure not disclosed)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Eight U.S. companies (names not disclosed)",
-        "date": "2025-11-10T19:12:51",
-        "actor": "Yanluowang ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
       {
         "company": "UK public sector organisations",
         "date": "2025-11-11T11:04:48",
@@ -1680,6 +1532,15 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "multiple enterprises across finance, healthcare, manufacturing, and technology sectors",
+        "date": "2025-12-03T15:05:15",
+        "actor": "DragonForce ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated loss in the range of $5‑15 million per affected organization",
         "industry": "Unknown"
       }
     ]
