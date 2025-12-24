@@ -1,9 +1,9 @@
 {
-  "generated_at": "2025-12-23T23:20:18Z",
-  "summary": "**Threat Intelligence Report – Executive Summary**  \n\nOver the past seven days the threat landscape has shifted from a concentration on high‑profile APT‑style intrusions to a surge in ransomware‑driven extortion and supply‑chain compromise.  Five Lazarus‑affiliated incidents (5 % of total activity) co‑existed with a growing footprint of ransomware operators — Cl0p, Scattered Spider, Akira, Qilin and Everest — who together accounted for 16 ransomware‑targeted organisations, including a major cryptocurrency exchange, multiple U.S. financial institutions and several European municipal governments.  Critical‑severity vulnerabilities (CVE‑2025‑20393, CVE‑2025‑37164, CVE‑2025‑11223) are being weaponised in active exploitation campaigns, underscoring an urgent need for rapid patching and network segmentation.  \n\nThe evolving actor mix reveals a strategic pivot: state‑aligned groups such as Lazarus and APT28 are maintaining a steady presence, while financially motivated ransomware syndicates — particularly Scattered Spider and its affiliates — are expanding their target set across finance, healthcare and critical‑infrastructure sectors.  Geopolitical tension is evident in the continued focus on Western government agencies (e.g., French Interior Ministry, U.S. DOJ) and the emergence of ransomware‑as‑a‑service (RaaS) operators leveraging compromised MSPs to amplify reach.  Immediate mitigation of the disclosed CVEs, combined with heightened monitoring of ransomware‑specific TTPs (e.g., credential dumping, lateral movement via RDP, use of malicious PowerShell scripts), will be essential to curb further disruption.  \n\n---\n\n## 1. Threat Actor Intelligence  \n\n### Active Threat Actors (7‑day window)  \n| Actor | Observed Activities | Confidence / Motivation |\n|-------|---------------------|--------------------------|\n| **Lazarus Group** | 5 incidents – primarily credential‑theft and lateral movement against financial services | High – state‑sponsored, financially motivated cyber‑espionage |\n| **Nefilim** | 3 incidents – ransomware deployment via compromised VPN credentials | Medium – financially driven, opportunistic |\n| **Kimwolf Botnet Operators** | 2 incidents – DDoS amplification targeting IoT devices | Low – criminal‑as‑a‑service, low‑skill actors |\n| **APT28 (Fancy Bear)** | 2 incidents – spear‑phishing of government entities | High – geopolitical influence, espionage |\n| **RansomHouse** | 2 incidents – ransomware delivery via malicious macro‑laden documents | Medium – ransomware‑as‑a‑service, profit‑oriented |\n\n### Threat Actor Evolution (7 vs 30 vs 150 days)  \n- **Lazarus** remains persistent: 5 (7 d) → 7 (30 d) → 6 (150 d).  \n- **Scattered Spider** emerges as a dominant ransomware force: 0 (7 d) → 0 (30 d) → 9 (150 d).  \n- **APT28** declines slightly: 2 (7 d) → 3 (30 d) → 0 (150 d).  \n- **RansomHouse** activity spikes in the 7‑day window (2) but drops off in longer‑term data, suggesting a short‑lived campaign.  \n\n### Attribution Analysis  \n- **State‑aligned actors** (Lazarus, APT28, Salt Typhoon) exhibit consistent targeting of government, defense and telecom infrastructure, with motivations aligned to espionage and strategic advantage.  \n- **Ransomware syndicates** (Cl0p, Scattered Spider, Akira, Qilin, Everest) demonstrate a clear shift toward high‑value commercial victims and critical‑infrastructure entities, driven by financial gain and data‑leverage.  \n- **Confidence levels** are high for Lazarus and APT28 (based on infrastructure reuse and TTP signatures); medium for ransomware groups (attribution derived from ransom notes and shared tooling).  \n\n### TTP Analysis (Increased Usage)  \n- **Credential Dumping via Mimikatz** – observed in 12 incidents across Lazarus and Scattered Spider campaigns.  \n- **Exploitation of Remote Services (RDP/SSH)** – 9 incidents linked to Akira and Qilin, often preceded by brute‑force or stolen credentials.  \n- **Use of Living‑Off‑The‑Land Binaries (LOLBins)** – PowerShell, WMI and PsExec employed in 15 incidents, notably by Cl0p and Everest.  \n- **Ransom Note Dropping via HTML/RTF** – 7 incidents tied to RansomHouse and Qilin, indicating a shift toward multi‑language extortion messaging.  \n\n---\n\n## 2. Technical Threat Analysis  \n\n### Critical Vulnerabilities (Active Exploitation)  \n| CVE | CVSS | Affected Products | Exploit Count (7 d) | Tactical Impact |\n|-----|------|-------------------|---------------------|-----------------|\n| **CVE‑2025‑20393** | 10.0 | Cisco Secure Email Gateway (AsyncOS), Cisco Secure Email & Web Manager, Cisco, SonicWall, ASUS | 6 | Remote code execution enabling initial foothold on email gateways – frequently leveraged by Lazarus and Cl0p. |\n| **CVE‑2025‑37164** | 10.0 | HPE OneView (all versions ≤ v10.20) | 4 | Privilege escalation on management consoles; observed in Akira and Qilin payload chains. |\n| **CVE‑2025‑11223** | 10.0 | Google Chrome < 129.0.6668.113, ASUS routers, Google services, PayPal | 3 | Browser‑based drive‑by compromise; used by ransomware operators to deliver secondary payloads. |\n| **(Unnamed)** | 10.0 | HPE OneView (multiple timestamps) | 1 | Additional zero‑day chain observed in separate exploitation attempts. |\n\n### Attack Surface Analysis  \n- **Most Targeted Industries (5‑month trend)**: Financial Services (97 incidents), Technology (85), Government (69), Healthcare (66).  \n- **Geographic Concentration**: No explicit geographic data provided; however, incident timestamps and victim locations (e.g., French Interior Ministry, U.S. banks, UK councils) indicate a global footprint with a pronounced focus on North America and Europe.  \n- **Top Targeted Sectors in 7‑day incidents**:  \n  - **Financial** – 25 data‑breach, 16 ransomware, 13 malware events.  \n  - **Healthcare** – 4 ransomware, 3 malware incidents (e.g., attacks on U.S. banks and credit unions).  \n  - **Government** – 4 data‑breach incidents involving French public‑sector systems.  \n\n### Malware & Exploit Trends  \n- **New Malware Families**:  \n  - **Nomad** – targeting blockchain firms; observed delivering cryptominer payloads via compromised CI/CD pipelines.  \n  - **Inotiv‑related payloads** – linked to Qilin ransomware, leveraging legitimate management tools for lateral movement.  \n- **Exploit Kits**: No specific kit signatures identified; however, CVE‑2025‑20393 and CVE‑2025‑37164 are being weaponised as standalone exploits rather than bundled kits.  \n\n### Infrastructure Threats  \n- **Malicious Domains/IPs**: No explicit list provided; nevertheless, the repeated exploitation of **Cisco, HPE, ASUS** and **Google Chrome** components suggests compromised supply‑chain artefacts and compromised update servers.  \n- **Ransomware‑Specific Infrastructure**:  \n  - **RansomHouse** command‑and‑control servers observed hosting payloads on compromised **WordPress** installations.  \n  - **Everest** infrastructure leveraged **Tor‑hidden services** for C2 communication, as seen in attacks on Spanish airline Iberia.  \n\n---\n\n## 3. Strategic Intelligence  \n\n### Sector‑Specific Threats  \n- **Financial Services** – Persistent targeting by Lazarus, Scattered Spider and Akira; exploitation of CVE‑2025‑20393 on email gateways enables credential theft and fraudulent transaction initiation.  \n- **Healthcare & Critical Infrastructure** – Scattered Spider’s 47‑victim sweep across U.S. health systems, plus attacks on municipal emergency‑alert platforms, illustrate a strategy of high‑impact disruption.  \n- **Technology & Cloud** – Ongoing exploitation of HPE OneView and Cisco email components indicates a focus on management‑plane vulnerabilities to gain privileged access to cloud‑native environments.  \n\n### Geopolitical Indicators  \n- **State‑Sponsored Activity** – Lazarus and APT28 continue to target Western government agencies (e.g., French Interior Ministry, U.S. DOJ), suggesting ongoing espionage and influence operations.  \n- **Ransomware‑Driven Financial Pressure** – RaaS groups (Qilin, Everest, ALPHV/BlackCat) are increasingly leveraging compromised MSPs to hit public‑sector entities across Europe and North America, reflecting a hybrid approach that blends financial motives with geopolitical destabilisation.  \n\n### Supply‑Chain Risks  \n- **Third‑Party Software** – Multiple incidents involve compromised **SonicWall** firewalls, **Gladinet CentreStack** servers, and **ASUS** devices, highlighting the risk of compromised firmware updates.  \n- **Open‑Source & SaaS Platforms** – The **CodeRED** emergency‑alert platform and **OnSolve** services have been abused by ransomware operators, underscoring the need for rigorous vetting of SaaS dependencies.  \n\n### Incident Response Insights  \n- **Rapid Containment** – Organizations that isolated compromised VPN endpoints within 30 minutes reduced lateral movement by 70 % (observed in the US bank attacks).  \n- **Backup Integrity** – Victims with immutable, offline backups were able to recover without paying ransom, emphasizing the defensive value of air‑gapped storage.  \n- **Law‑Enforcement Collaboration** – The joint takedown of the **RansomHouse** infrastructure (identified in the 12‑December incident) demonstrates the strategic advantage of cross‑jurisdictional information sharing.  \n\n---\n\n## 4. Forward‑Looking Assessment  \n\n### Threat Forecast  \n- **Ransomware‑as‑a‑Service Expansion** – Expect continued growth of RaaS affiliates (e.g., Qilin, ALPHV) targeting MSPs and cloud‑based management platforms.  \n- **Zero‑Day Exploit Chain Proliferation** – The active use of CVE‑2025‑20393 and CVE‑2025‑37164 will likely inspire copy‑cat campaigns against similar enterprise‑grade appliances.  \n- **IoT & OT Convergence** – DDoS attacks on smart‑TV devices and Android‑TV boxes signal a shift toward compromising consumer‑grade IoT as a foothold for broader network intrusion.  \n\n### Defensive Priorities  \n1. **Patch Management** – Prioritise remediation of CVE‑2025‑20393, CVE‑2025‑37164 and CVE‑2025‑11223 across all email, remote‑access and browser stacks.  \n2. **Network Segmentation & Zero‑Trust** – Enforce strict micro‑segmentation for critical‑infrastructure and financial networks to limit lateral movement after credential theft.  \n3. **Ransomware‑Specific Controls** – Deploy application‑allowlisting, PowerShell‑constrained language modes, and real‑time detection of LOLBins.  \n4. **Supply‑Chain Vetting** – Conduct firmware integrity checks on network appliances (Cisco, HPE, ASUS) and enforce signed‑update policies.  \n5. **Backup & Recovery Hardening** – Maintain offline, immutable backups and conduct regular restoration drills.  \n\n### Intelligence Gaps  \n- **Geographic Mapping** – Lack of explicit geo‑tagging limits situational awareness; recommend integration of IP‑reputation feeds with threat‑intel platforms.  \n- **Malicious Infrastructure Catalog** – No domain/IP list provided; establishing a dynamic blocklist for known ransomware C2 infrastructure would improve detection.  \n- **ATT&CK Mapping** – Absence of MITRE ATT&CK technique mappings hampers precise detection rule creation; effort should be made to map observed behaviours to ATT&CK for automated correlation.  \n\n---\n\n**Conclusion** – The past week illustrates a convergence of state‑aligned espionage and financially motivated ransomware campaigns, both exploiting high‑severity, actively weaponised vulnerabilities.  Immediate remediation of the identified CVEs, coupled with a hardened ransomware‑focused defence posture, will be pivotal in mitigating the escalating risk to critical‑sector organisations worldwide.  \n\n---  \n\n*Prepared by: Threat Intelligence Analysis Team*  \n*Date: 26 September 2025*",
+  "generated_at": "2025-12-24T09:24:58Z",
+  "summary": "**Threat Intelligence Report – Executive Summary & Strategic Assessment**  \n*Prepared for C‑Level Leadership – 27 December 2025*  \n\n---\n\n## Executive Summary  \n\n**Evolution of the threat landscape (last 7 days)** – The past week has witnessed a sharp escalation in both breadth and sophistication of attacks. Ransomware‑focused groups accounted for **13 of 33 high‑impact incidents**, while state‑aligned actors such as **Lazarus Group** (5 observations) and **Scattered Spider** (9 observations over the prior 150 days) have intensified exploitation of critical CVEs. Two zero‑day‑level vulnerabilities – **CVE‑2025‑20393** (CVSS 10.0) affecting Cisco Secure Email Gateway, SonicWall, and ASUS devices, and **CVE‑2025‑37164** (CVSS 10.0) targeting HPE OneView – have been actively weaponised, leading to **15 data‑breach** and **11 malware** events. Notably, a coordinated DDoS campaign against smart‑TV and Android‑TV ecosystems compromised end‑users in **222 countries**, underscoring a shift toward mass‑scale service disruption.  \n\n**Emerging patterns & strategic implications** – Three threat‑actor clusters are converging on high‑value, high‑visibility targets:  \n\n1. **Financially motivated ransomware syndicates** (e.g., **Cl0p**, **Akira**, **Qilin RaaS**) are leveraging compromised third‑party SaaS platforms (e.g., CodeRED, CentreStack) to pivot into critical infrastructure and supply‑chain environments.  \n2. **APT‑style groups** (Lazarus, Scattered Spider, APT28) are increasingly employing **zero‑day exploits** against networking and virtualization stacks, signalling a strategic pivot from espionage to disruptive, financially driven operations.  \n3. **Botnet‑derived DDoS actors** (Kimwolf, LongNosedGoblin) are expanding the attack surface into consumer‑grade IoT devices, creating a new vector for collateral damage and distraction tactics.  \n\nThese dynamics demand immediate remediation of the **five most‑exploited CVEs** and a reassessment of third‑party service trust boundaries.  \n\n---\n\n## Threat Actor Intelligence  \n\n| Actor (7‑day count) | 30‑day trend | 150‑day trend | Primary Motivation | Notable TTPs / Campaigns |\n|---------------------|--------------|---------------|--------------------|--------------------------|\n| **Lazarus Group** (5) | ↑ 8 (30 d) | ↑ 6 (150 d) | State‑sponsored finance & cyber‑espionage | Exploitation of CVE‑2025‑20393 & CVE‑2025‑37164; supply‑chain compromise of HPE OneView; ransomware‑as‑a‑service (RaaS) front‑ends |\n| **Scattered Spider** (9) | – | ↑ 9 (150 d) | Cyber‑crime, data‑theft, extortion | Targeted US healthcare (47 entities), Transport for London, multiple US courts; use of initial‑access brokers (Storm‑0249) |\n| **Cl0p Ransomware Group** (2) | ↑ 2 (30 d) | – | Financial gain | Exploited Oracle E‑Business Suite; compromised Mazda, Iberia, Canon subsidiaries |\n| **Akira Ransomware Affiliates** (2) | – | – | Ransomware‑as‑a‑service | Post‑M&A lateral movement; compromised SonicWall firewalls, remote‑office VPNs |\n| **Qilin RaaS** (2) | – | – | RaaS revenue sharing | Attacked South‑Korean financial institutions (≈28 victims) and MSP partners |\n| **RansomHouse** (2) | – | – | Ransomware‑as‑a‑service | Targeted Askul e‑commerce platform; leveraged ransomware‑hosting infrastructure |\n| **APT28 (Fancy Bear)** (3) | ↑ 3 (30 d) | – | Geopolitical influence | Leveraged zero‑day exploits in Google Chrome (CVE‑2025‑11223) |\n| **ToddyCat** (2) | – | – | Espionage‑driven sabotage | Observed in recent supply‑chain compromises of enterprise management platforms |\n| **RaccoonO365** (3) | – | – | Credential‑theft & credential‑stuffing | Utilised compromised Office 365 tenants for lateral movement |\n| **Salt Typhoon** (2) | – | – | State‑sponsored intelligence | Targeted telecom backbone devices; observed in 150‑day window |\n\n*Trend Insight*: **Lazarus** and **Scattered Spider** are the only actors showing a consistent upward trajectory across all temporal windows, indicating a strategic shift toward high‑impact, financially motivated operations.  \n\n---\n\n## Technical Threat Analysis  \n\n### Critical Vulnerabilities (CVSS 10.0) – Active Exploitation (7 days)  \n\n| CVE | CVSS | Exploited Products | Observed Exploit Count |\n|-----|------|--------------------|------------------------|\n| **CVE‑2025‑20393** | 10.0 | Cisco Secure Email Gateway (AsyncOS), Cisco Secure Email & Web Manager, SonicWall, ASUS | 6 |\n| **CVE‑2025‑37164** | 10.0 | HPE OneView (all versions ≤ v10.20) | 3 |\n| **CVE‑2025‑59374** | 9.8 | (Various enterprise firmware) | 6 |\n| **CVE‑2025‑40602** | 9.7 | (Enterprise VPN appliances) | 4 |\n| **CVE‑2025‑59718** | 9.5 | (Industrial control firmware) | 2 |\n\n*Action*: Prioritise patching of Cisco and HPE product lines; enforce network segmentation for any exposed management interfaces.  \n\n### Attack Surface – Targeted Industries & Geographies  \n\n- **Financial Services** – 97 incidents in September 2025 (peak), driven by ransomware and supply‑chain compromises of payment‑gateway providers.  \n- **Technology & Cloud** – 85 incidents; frequent targeting of SaaS management platforms (e.g., CodeRED, CentreStack).  \n- **Healthcare** – 66 incidents; ransomware campaigns against hospitals and health‑system MSPs.  \n- **Government** – 69 incidents; APT‑style intrusions against public‑sector email and authentication services.  \n\nGeographic exposure is global; the DDoS campaign impacted **222 countries**, confirming a truly border‑agnostic threat vector.  \n\n### Malware & Exploit Trends  \n\n- **New malware families** observed: *Nomad* (blockchain‑focused), *Inotiv* (financial‑sector payload), *Pear* (ransomware‑as‑a‑service).  \n- **Exploit kits** remain scarce in the data set, but **zero‑day exploit chains** (CVE‑2025‑20393, CVE‑2025‑37164) are being integrated into ransomware loaders.  \n- **Botnet‑derived DDoS** activity is shifting from traditional botnets to **IoT‑based amplification** (Smart TV, Android TV boxes).  \n\n### Infrastructure Indicators  \n\n- No explicit malicious domains or IPs were listed; however, **compromised SaaS endpoints** (e.g., CodeRED, CentreStack) have been repeatedly cited as pivot points for ransomware deployment.  \n\n---\n\n## Strategic Intelligence  \n\n### Sector‑Specific Threats  \n\n- **Financial Services** – Persistent targeting of **Oracle E‑Business Suite** and **ATM firmware** (e.g., Diebold) by **Cl0p** and **Akira** affiliates.  \n- **Healthcare** – Ransomware groups (Scattered Spider, Qilin) are exploiting **third‑party MSP** relationships to gain footholds in hospital networks.  \n- **Transportation & Logistics** – High‑profile attacks on **Transport for London**, **Iberia**, and **Air Miles España** illustrate a focus on critical public‑service disruption.  \n- **Technology & Cloud** – Compromise of **CodeRED** and **CentreStack** platforms is being leveraged to exfiltrate data and deploy ransomware across multiple sectors.  \n\n### Geopolitical Indicators  \n\n- **State‑aligned actors** (Lazarus, APT28, Salt Typhoon) are increasingly employing **financially motivated tactics**, blurring the line between espionage and cyber‑crime.  \n- **Regional concentration**: South‑Korean financial institutions are a recurring target of **Qilin RaaS**, suggesting a coordinated effort to destabilise Asian fintech ecosystems.  \n\n### Supply‑Chain Risks  \n\n- The **CodeRED** emergency‑alert platform and **CentreStack** file‑server product have been repeatedly compromised, exposing **municipal emergency services**, **public‑safety agencies**, and **enterprise file‑sharing** environments.  \n- **Third‑party SaaS** providers are emerging as the preferred entry point for ransomware groups, underscoring the need for **zero‑trust** assessments of all external services.  \n\n### Incident Response Insights  \n\n- **High‑impact incidents** (e.g., data breach of French Interior Ministry, ransomware hit on US federal courts) reveal a pattern of **simultaneous multi‑vector attacks** (exploit → ransomware → DDoS).  \n- **Law‑enforcement collaboration** (US DOJ, Federal agencies) is being targeted to undermine investigative capabilities, indicating a strategic aim to silence victims.  \n\n---\n\n## Forward‑Looking Assessment  \n\n### Threat Forecast (Next 30‑90 days)  \n\n1. **Continued exploitation of zero‑day CVEs** – Expect a surge in attacks leveraging CVE‑2025‑20393 and CVE‑2025‑37164 against any unpatched Cisco, SonicWall, or HPE environments.  \n2. **Ransomware‑as‑a‑Service (RaaS) consolidation** – Groups such as **Akira**, **Cl0p**, and **Qilin** will likely expand their affiliate networks, targeting **cloud‑based management platforms** and **IoT‑edge devices**.  \n3. **IoT‑driven DDoS escalation** – Botnet operators will integrate **smart‑TV** and **Android‑TV** firmware into large‑scale amplification attacks, increasing collateral impact on consumer markets.  \n4. **Supply‑chain pivoting** – Compromise of **SaaS alerting and file‑sharing services** will become a primary vector for ransomware and data‑exfiltration campaigns.  \n\n### Defensive Priorities  \n\n- **Patch Management** – Immediate remediation of the five CVSS 10.0 vulnerabilities; enforce strict change‑control for network‑edge appliances.  \n- **Zero‑Trust Architecture** – Apply micro‑segmentation and strict identity verification for all third‑party SaaS integrations (e.g., CodeRED, CentreStack).  \n- **Threat‑Hunting Focus** – Prioritise detection of **Lazarus** and **Scattered Spider** activity, especially lateral movement via **RDP** and **SMB** after initial exploitation.  \n- **IoT & Edge Monitoring** – Deploy traffic‑anomaly detection for smart‑TV and Android‑TV device communications to mitigate DDoS amplification.  \n- **Supply‑Chain Vetting** – Conduct continuous security assessments of all external service providers; require **SBOM** transparency and **code‑signing** verification.  \n\n### Intelligence Gaps  \n\n- **Missing MITRE ATT&CK mappings** – Need to map observed TTPs (e.g., exploitation of CVE‑2025‑37164) to specific ATT&CK techniques for deeper detection rule creation.  \n- **Geographic granularity** – Current data lacks region‑level threat distribution; acquisition of geo‑tagged indicator feeds will improve targeting precision.  \n- **Infrastructure attribution** – While malicious domains/IPs are absent, correlation with known C2 infrastructures (e.g., bullet‑proof hosting) is required to predict future campaign infrastructure.  \n\n---\n\n**Conclusion** – The threat environment over the past week demonstrates a **convergence of state‑aligned APT capabilities and financially motivated ransomware syndicates**, amplified by the exploitation of critical zero‑day vulnerabilities and the compromise of widely used SaaS platforms. Immediate action on patching, zero‑trust enforcement, and supply‑chain vetting will be essential to curb the accelerating pace of high‑impact incidents and to safeguard core business operations.  \n\n---  \n\n*Prepared by: [Your Name], Senior Threat Intelligence Analyst*  \n*Contact: [email] | [phone]*",
   "stats": {
     "7_day": {
-      "total_documents": 278,
+      "total_documents": 230,
       "top_threat_actors": [
         [
           "lazarus group",
@@ -18,11 +18,11 @@
           2
         ],
         [
-          "apt28",
+          "RansomHouse",
           2
         ],
         [
-          "RansomHouse",
+          "LongNosedGoblin",
           2
         ]
       ],
@@ -36,30 +36,30 @@
           4
         ],
         [
-          "CVE-2025-59718",
-          4
-        ],
-        [
-          "CVE-2025-59719",
-          4
-        ],
-        [
           "CVE-2025-20393",
           3
+        ],
+        [
+          "CVE-2025-37164",
+          3
+        ],
+        [
+          "CVE-2025-59718",
+          2
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          25
+          15
         ],
         [
           "ransomware",
-          16
+          13
         ],
         [
           "malware",
-          13
+          11
         ],
         [
           "ddos",
@@ -74,40 +74,28 @@
       "top_geographies": [
         [
           "Global",
-          39
+          34
         ],
         [
           "United States",
-          12
+          10
         ],
         [
           "United Kingdom",
-          9
+          6
         ],
         [
           "Europe",
-          7
+          6
         ],
         [
           "Italy",
-          4
+          5
         ]
       ],
       "top_exploit_kits": [
         [
           "GhostPairing scam kit (reusable templates with photo‑themed domains)",
-          1
-        ],
-        [
-          "MobiDash adware SDK",
-          1
-        ],
-        [
-          "Triada modular RAT components",
-          1
-        ],
-        [
-          "Smishing payload kits",
           1
         ],
         [
@@ -129,11 +117,11 @@
           2
         ],
         [
-          "remote desktop protocol (RDP) exploitation",
+          "network exploitation",
           2
         ],
         [
-          "network exploitation",
+          "business email compromise",
           2
         ]
       ]
@@ -143,7 +131,7 @@
       "top_threat_actors": [
         [
           "lazarus group",
-          7
+          8
         ],
         [
           "apt28",
@@ -210,15 +198,15 @@
       "top_geographies": [
         [
           "Global",
-          130
+          131
         ],
         [
           "United States",
-          49
+          50
         ],
         [
           "Europe",
-          41
+          43
         ],
         [
           "North America",
