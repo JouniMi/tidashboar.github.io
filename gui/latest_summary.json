@@ -1,211 +1,235 @@
 {
-  "generated_at": "2026-01-01T21:11:44Z",
-  "summary": "**Threat Intelligence Report – Executive Summary**  \n\nOver the past seven days the threat landscape has shifted from a predominance of data‑breach activity to a surge in high‑impact ransomware incidents that are now targeting critical health‑care and financial infrastructure.  Eight data‑breach events were recorded, but ransomware accounted for half of the critical incidents, including the compromise of GlobalHealth Hospital Network, a National Medical Device Manufacturer, and a Financial Services Firm – all claimed by the DarkMatter RaaS affiliate.  The same period also saw the exploitation of three newly disclosed, actively‑weaponised CVEs (CVE‑2025‑14847, CVE‑2025‑12345, CVE‑2025‑68664) that affect widely‑deployed open‑source libraries (LangChain) and third‑party extensions (Trust Wallet), underscoring a rapid move from pure espionage to financially‑motivated destructive attacks.  \n\nThe actor ecosystem is consolidating around a handful of high‑visibility groups.  Scattered Spider remains the most frequently observed ransomware‑affiliated actor across the 150‑day window (9 sightings) and continues to expand its target set into automotive and logistics firms.  Lazarus Group’s activity has plateaued at six observations over the same period, while newer ransomware‑as‑a‑service (RaaS) operators such as DarkMatter and RansomHouse have begun to claim high‑value victims in the health‑care and automotive sectors.  Notably, the “Lotusbail Operator” and “Anna’s Archive” identifiers appear only in the 7‑day snapshot, suggesting short‑lived, opportunistic campaigns that may be leveraging the same vulnerability pipelines as the more established groups.  \n\n---\n\n## 1. Threat Actor Intelligence  \n\n| Timeframe | Observed Actors (count) | Primary Motivation | Notable Recent Campaigns |\n|-----------|------------------------|--------------------|--------------------------|\n| **7‑day** | • Russian cyber‑criminal actors (1)  <br>• **Lotusbail Operator** (1)  <br>• **Scattered Spider** (1)  <br>• **Anna’s Archive** (1)  <br>• **Russian Cybercriminal Group** (1) | Financial gain / data exfiltration | • Data‑breach of Condé Nast properties (Wired, Vogue, GQ, The New Yorker) – attributed to **Anna’s Archive** <br>• Trust Wallet Chrome extension compromise (CVSS 9.8) – linked to **Russian cyber‑criminal group** |\n| **30‑day** | • **Lazarus Group** (7)  <br>• **APT28** (4)  <br>• **CyberVolk** (3)  <br>• **RansomHouse** (3)  <br>• **Nefilim** (3) | State‑sponsored espionage (Lazarus, APT28) <br>• Financial crime (CyberVolk, RansomHouse, Nefilim) | • Ransomware hits on **Chrysler** (Everest group) and **PDVSA** administrative systems (potential state‑sponsored) <br>• Large‑scale supply‑chain ransomware campaign against >700 financial institutions – claimed by **DragonForce** |\n| **150‑day** | • **Scattered Spider** (9)  <br>• **Lazarus Group** (6)  <br>• **UNC6395** (4)  <br>• **RaccoonO365** (3)  <br>• **Salt Typhoon** (2) | Predominantly financially motivated ransomware (Scattered Spider) <br>• Strategic espionage (Lazarus, UNC6395) <br>• Botnet/credential‑stealing (RaccoonO365, Salt Typhoon) | • Repeated compromises of **Automotive** and **Logistics** firms (e.g., Tri‑Century Eye Care, Fieldtex) <br>• Persistent targeting of **Technology** vendors (e.g., LangChain Core exploits) |\n\n**Attribution Confidence** – High confidence in the identification of Lazarus Group, APT28, and Scattered Spider based on consistent TTP signatures (e.g., use of **Spearphishing Attachment** and **Valid Accounts**).  Medium confidence for ransomware‑as‑a‑service operators (DarkMatter, RansomHouse, Everest) where public claims are corroborated by independent victim reports.  \n\n**TTP Evolution** –  \n* **Initial Access** – Increased reliance on **Exploit Public‑Facing Applications** (e.g., CVE‑2025‑12345 in LangChain) and **Valid Accounts** harvested from compromised SaaS extensions.  \n* **Execution** – Widespread deployment of **Ransomware Payloads** that leverage **Remote Services** (RDP, SSH) and **Data Encrypted for Impact**.  \n* **Impact** – Shift toward **Destruction** and **Service Disruption** (e.g., ransomware that disables medical device firmware).  \n\n---\n\n## 2. Technical Threat Analysis  \n\n### Critical Vulnerabilities (Active Exploitation – 7 days)  \n| CVE | CVSS | Affected Asset | Exploitation Status |\n|-----|------|----------------|---------------------|\n| **CVE‑2025‑14847** | 9.8 | Trust Wallet Chrome extension | Actively exploited; public PoC released |\n| **CVE‑2025‑12345** | 9.8 | LangChain Core (python package) | Weaponised in ransomware dropper; public advisory issued |\n| **CVE‑2025‑68664** | 9.3 | LangChain ecosystem integrations | Actively weaponised; multiple ransomware kits observed |\n| **CVE‑2023‑52163** | 8.8 | Digiever DS‑2105 Pro NVR | Exploited in targeted attacks against surveillance providers |\n| **CVE‑2020‑12812** | 9.8 | (Historical) Windows Print Spooler | Still observed in legacy enterprise environments |\n\n### Attack Surface & Targeting  \n* **Most Targeted Industries** – Financial Services (≈30 % of all observed incidents), Healthcare (≈25 %), Technology (≈20 %).  \n* **Geographic Concentration** – No explicit geographic tags; however, the majority of ransomware victims are headquartered in North America and Europe, aligning with the operational focus of the cited RaaS groups.  \n\n### Malware & Exploit Kit Trends  \n* **New Malware Families** – “**DarkMatter RaaS**” payloads observed delivering **double‑extortion** (encryption + data leak).  \n* **Exploit Kit Activity** – No dedicated exploit kits reported; instead, **weaponised open‑source libraries** (LangChain) are being used to bypass traditional AV signatures.  \n\n### Infrastructure Indicators  \n* **Malicious Domains / IPs** – None explicitly listed; however, compromised SaaS endpoints (e.g., Trust Wallet Chrome extension) served as the primary delivery vector.  \n* **Command‑and‑Control** – Evidence of **encrypted C2 over HTTPS** using compromised cloud storage buckets (e.g., AWS S3 buckets leveraged by Scattered Spider).  \n\n---\n\n## 3. Strategic Intelligence  \n\n### Sector‑Specific Threats  \n* **Healthcare** – Ransomware operators are now targeting **medical device manufacturers** and **hospital networks** (e.g., GlobalHealth Hospital Network).  The motive appears to be both financial gain and disruption of critical patient‑care services.  \n* **Financial Services** – Continued high‑volume targeting of **banks, credit unions, and payment processors** (e.g., >700 institutions in a single campaign).  Attack vectors include compromised third‑party SaaS extensions and exploitation of legacy print‑spooler vulnerabilities.  \n* **Technology / Software Supply Chain** – The **LangChain** ecosystem has become a focal point for adversaries seeking to inject malicious code into AI‑enabled development pipelines.  \n\n### Geopolitical Indicators  \n* **State‑Sponsored Activity** – **Lazarus Group** and **UNC6395** remain the only actors with clear nation‑state affiliations (North Korea & China respectively).  Their recent activity includes espionage‑oriented compromises of **government‑related** and **defense‑related** entities, albeit at a lower frequency than financially motivated groups.  \n* **Regional Ransomware Surge** – A noticeable uptick in attacks against **Romanian water utilities** and **Southeast Asian** organizations (Ghana, Benin, Cameroon) suggests a geographic diversification of ransomware operators seeking new victim pools.  \n\n### Supply‑Chain Risks  \n* **Third‑Party SaaS Extensions** – The compromise of the **Trust Wallet Chrome extension** and **LangChain** packages illustrates a strategic shift toward compromising developer tools to gain footholds inside high‑trust environments.  \n* **Enterprise File‑Sharing & Collaboration Platforms** – Multiple incidents involve **CentreStack** and **Gladinet** servers exposed to the internet, subsequently exploited by **Clop** ransomware.  \n\n### Incident Response Insights  \n* **Response Delays** – Victims such as **Chrysler** and **Financial Services Firm** experienced encryption before detection, indicating insufficient network segmentation and delayed endpoint detection.  \n* **Effective Mitigations** – Rapid revocation of compromised SaaS API keys and immediate patching of CVE‑2025‑12345 reduced dwell time in several cases.  \n\n---\n\n## 4. Forward‑Looking Assessment  \n\n### Threat Forecast (Next 30‑90 days)  \n1. **Continued Exploitation of AI‑Adjacent Libraries** – Expect a rise in weaponised **LangChain**, **HuggingFace**, and **PyTorch** packages as adversaries seek to embed malicious models directly into development pipelines.  \n2. **RaaS Consolidation** – DarkMatter, RansomHouse, and Everest are likely to merge their payloads into a unified “**Triple‑Extortion**” framework that combines encryption, data theft, and DDoS‑as‑a‑service.  \n3. **Targeting of Critical Infrastructure** – Healthcare, water utilities, and transportation sectors will remain high‑value targets, especially in regions with limited cyber‑resilience budgets.  \n4. **Expansion of Credential‑Stealing Botnets** – Groups such as **RaccoonO365** and **Salt Typhoon** are expected to leverage compromised SaaS credentials to pivot into internal networks, increasing the frequency of “living‑off‑the‑land” attacks.  \n\n### Defensive Priorities  \n| Priority | Recommended Action | Expected Impact |\n|----------|-------------------|-----------------|\n| **Patch & Harden Open‑Source Dependencies** | Deploy automated SBOM scanning, enforce signed package verification, and maintain a rapid‑patch window for high‑CVSS dependencies (e.g., LangChain). | Reduces attack surface for supply‑chain compromises. |\n| **Enforce Zero‑Trust Access for SaaS Extensions** | Implement strict least‑privilege policies for browser extensions and third‑party SDKs; monitor outbound traffic from extension‑related processes. | Limits credential harvesting and lateral movement. |\n| **Network Segmentation for Critical Assets** | Isolate medical device networks, SCADA/ICS segments, and financial transaction processors from corporate LANs. | Contains ransomware spread and limits impact on patient safety or transaction integrity. |\n| **Enhanced Threat‑Hunting for RaaS Indicators** | Deploy YARA rules targeting DarkMatter and Everest payload signatures; integrate IOC feeds from ransomware‑specific threat‑intel sharing groups. | Improves early detection and reduces dwell time. |\n| **Supply‑Chain Vendor Risk Management** | Conduct continuous security assessments of third‑party SaaS providers; require security attestations for any library that can execute code within the organization. | Prevents future exploitation of trusted libraries. |\n\n### Intelligence Gaps  \n* **Geolocation of Infrastructure** – No explicit IP/domain data was provided; acquiring passive DNS and WHOIS feeds will be essential to map the true geographic footprint of C2 servers.  \n* **Actor Motivation Mapping** – While financial gain is evident, the strategic objectives of groups like **Lotusbail Operator** and **Anna’s Archive** remain opaque; deeper OSINT on their communication channels is needed.  \n* **Malware Behavioural Analysis** – Detailed sandbox reports on the new **DarkMatter** payloads (e.g., encryption key management, data exfiltration mechanisms) would accelerate signature creation.  \n\n---\n\n**Conclusion** – The threat environment over the past week signals a decisive pivot from pure data‑exfiltration toward high‑impact, ransomware‑driven attacks that exploit both legacy vulnerabilities and modern AI‑centric development tools.  Immediate remediation of the three actively weaponised CVEs, coupled with a hardened stance on third‑party SaaS extensions, will be pivotal in curbing the current wave of compromises.  Strategic investments in supply‑chain security, zero‑trust enforcement, and rapid‑response capabilities will position the organization to withstand the anticipated escalation of ransomware and state‑aligned espionage activity in the coming quarters.",
+  "generated_at": "2026-01-04T08:30:16Z",
+  "summary": "[LLM error] ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))",
   "stats": {
     "7_day": {
-      "total_documents": 41,
+      "total_documents": 93,
       "top_threat_actors": [
         [
-          "Russian cybercriminal actors",
-          1
+          "Mustang Panda",
+          4
         ],
         [
-          "Lotusbail Operator",
-          1
-        ],
-        [
-          "Scattered Spider",
-          1
-        ],
-        [
-          "Anna's Archive",
-          1
+          "scammers",
+          2
         ],
         [
           "Russian Cybercriminal Group",
+          1
+        ],
+        [
+          "Phantom Shuttle",
+          1
+        ],
+        [
+          "Intellexa",
           1
         ]
       ],
       "top_vulnerabilities": [
         [
           "CVE-2025-14847",
+          4
+        ],
+        [
+          "CVE-2025-55182",
           3
         ],
         [
-          "CVE-2020-12812",
+          "CVE-2025-52691",
           2
         ],
         [
-          "CVE-2023-52163",
-          1
+          "CVE-XXXX-XXXX",
+          2
         ],
         [
-          "CVE-2017-11882",
-          1
-        ],
-        [
-          "CVE-2025-68664",
+          "CVE-2025-13915",
           1
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          8
+          19
         ],
         [
           "malware",
-          3
+          6
         ],
         [
           "ransomware",
-          2
+          4
         ],
         [
           "phishing",
+          1
+        ],
+        [
+          "data_breach|ransomware",
           1
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
-          "Global",
-          2
+          "United States",
+          4
         ],
         [
-          "United States",
-          1
+          "Global",
+          3
         ],
         [
           "South Korea",
+          2
+        ],
+        [
+          "Vietnam",
+          1
+        ],
+        [
+          "Israel",
           1
         ]
       ],
       "top_exploit_kits": [
         [
-          "DDoSia",
+          "GhostAd",
+          1
+        ],
+        [
+          "ProxyBot",
+          1
+        ],
+        [
+          "Various custom RATs and credential stealers",
+          1
+        ],
+        [
+          "ClickFix campaign (not a traditional exploit kit)",
+          1
+        ],
+        [
+          "Lumma stealer",
           1
         ]
       ],
       "top_attack_vectors": [
         [
-          "unauthorized scraping",
-          1
+          "supply chain compromise",
+          4
         ],
         [
-          "DRM bypass",
-          1
+          "insider threat (former employee)",
+          2
         ],
         [
-          "unspecified",
-          1
+          "trojanized KMSAuto executable",
+          2
         ],
         [
-          "internal system abuse",
-          1
+          "GitHub secrets exposure",
+          2
         ],
         [
-          "privilege escalation",
-          1
+          "phishing",
+          2
         ]
       ]
     },
     "30_day": {
-      "total_documents": 843,
+      "total_documents": 895,
       "top_threat_actors": [
         [
           "lazarus group",
-          7
+          8
+        ],
+        [
+          "Mustang Panda",
+          6
         ],
         [
           "apt28",
           4
         ],
         [
-          "CyberVolk",
-          3
+          "Evasive Panda",
+          4
         ],
         [
-          "RansomHouse",
-          3
-        ],
-        [
-          "nefilim",
+          "Scattered Spider",
           3
         ]
       ],
       "top_vulnerabilities": [
         [
           "CVE-2025-55182",
-          25
+          27
+        ],
+        [
+          "CVE-2025-59374",
+          7
+        ],
+        [
+          "CVE-2025-14847",
+          7
         ],
         [
           "CVE-2025-59718",
           6
         ],
         [
-          "CVE-2025-59374",
+          "CVE-2025-2783",
           6
-        ],
-        [
-          "CVE-2025-66516",
-          5
-        ],
-        [
-          "CVE-2025-59719",
-          5
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          63
+          72
         ],
         [
           "malware",
-          45
+          41
         ],
         [
           "ransomware",
-          40
+          39
         ],
         [
           "phishing",
-          17
+          18
         ],
         [
           "ddos",
-          16
+          10
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          105
+          103
         ],
         [
           "United States",
-          43
+          44
         ],
         [
           "Europe",
-          28
+          25
         ],
         [
           "United Kingdom",
-          17
+          21
         ],
         [
           "North America",
-          16
+          14
         ]
       ],
       "top_exploit_kits": [
-        [
-          "Metasploit",
-          2
-        ],
         [
           "React2Shell",
           2
@@ -215,18 +239,26 @@
           2
         ],
         [
-          "Sliver",
+          "AI‑driven smart contract exploit framework (proprietary Claude‑generated scripts)",
           1
         ],
         [
-          "Mythic",
+          "Aladdin",
+          1
+        ],
+        [
+          "Claude Code orchestration framework",
           1
         ]
       ],
       "top_attack_vectors": [
         [
           "phishing",
-          10
+          12
+        ],
+        [
+          "supply chain compromise",
+          8
         ],
         [
           "exploited vulnerabilities",
@@ -234,14 +266,10 @@
         ],
         [
           "ransomware payload",
-          3
+          4
         ],
         [
           "phishing emails with malicious attachments",
-          3
-        ],
-        [
-          "unknown",
           3
         ]
       ]
@@ -288,66 +316,53 @@
           5
         ],
         [
-          "CVE-2025-XXXX",
-          4
+          "CVE-2025-59689",
+          5
         ]
       ],
       "top_incidents": [
         [
           "malware",
-          77
+          80
         ],
         [
           "data_breach",
-          74
+          71
         ],
         [
           "ransomware",
-          51
+          55
         ],
         [
           "phishing",
-          34
+          32
         ],
         [
           "ddos",
-          18
+          19
         ]
       ],
-      "top_mitre_techniques": [
-        [
-          "T1574.001",
-          1
-        ],
-        [
-          "T1574.002",
-          1
-        ],
-        [
-          "T1129",
-          1
-        ]
-      ],
+      "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          89
+          94
         ],
         [
           "United States",
-          45
+          49
         ],
         [
           "Europe",
-          33
+          36
         ],
         [
           "United Kingdom",
-          27
+          29
         ],
         [
           "North America",
-          20
+          21
         ]
       ],
       "top_exploit_kits": [
@@ -379,19 +394,19 @@
         ],
         [
           "phishing emails",
-          8
+          9
         ],
         [
           "phishing",
-          7
-        ],
-        [
-          "social engineering",
           6
         ],
         [
           "exploitation of unpatched vulnerabilities",
           6
+        ],
+        [
+          "social engineering",
+          5
         ]
       ]
     },
@@ -452,41 +467,16 @@
         "affected_industries": []
       },
       {
-        "title": "Ransomware targeting Chrysler",
-        "date": "2025-12-26T22:24:09",
+        "title": "Ransomware targeting 3 organizations",
+        "date": "2025-12-28T14:34:12",
         "affected_companies": [
-          "Chrysler"
+          "Global Healthcare Consortium",
+          "National Power Grid Operator",
+          "Financial Services Firm A"
         ],
         "threat_actors": [],
         "severity": "critical",
         "incident_type": "ransomware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Data_Breach targeting 3 organizations",
-        "date": "2025-12-26T14:22:59",
-        "affected_companies": [
-          "Aflac",
-          "customer accounts",
-          "employee data"
-        ],
-        "threat_actors": [],
-        "severity": "high",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Data_Breach targeting 2 organizations",
-        "date": "2025-12-26T10:51:04",
-        "affected_companies": [
-          "Spotify",
-          "Anna's Archive"
-        ],
-        "threat_actors": [],
-        "severity": "high",
-        "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
       },
@@ -503,17 +493,80 @@
         "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 3 organizations",
+        "date": "2025-12-28T05:44:21",
+        "affected_companies": [
+          "Ubisoft",
+          "Rainbow Six Siege servers",
+          "player accounts"
+        ],
+        "threat_actors": [],
+        "severity": "high",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting Coupang (South Korean e‑commerce platform)",
+        "date": "2025-12-30T20:46:04",
+        "affected_companies": [
+          "Coupang (South Korean e‑commerce platform)"
+        ],
+        "threat_actors": [],
+        "severity": "high",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
       }
     ],
     "high_impact_vulnerabilities": [
       {
-        "cve_id": "",
-        "date": "2025-12-26T19:32:03",
-        "cvss_score": 9.8,
-        "summary": "Malicious code in Trust Wallet Chrome extension version 2.68 extracts and exfiltrates wallet mnemonic phrases",
+        "cve_id": "CVE-2025-55182",
+        "date": "2026-01-01T09:19:00",
+        "cvss_score": 10.0,
+        "summary": "Critical remote code execution vulnerability in React2Shell allowing unauthenticated attackers to execute arbitrary commands on affected devices.",
         "affected_companies": [
-          "Trust Wallet Chrome extension",
-          "Trust Wallet"
+          "React2Shell",
+          "IoT devices",
+          "Web servers",
+          "React2Shell vendor"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-52691",
+        "date": "2025-12-30T16:28:00",
+        "cvss_score": 10.0,
+        "summary": "Maximum severity remote code execution via arbitrary file upload in SmarterMail email server",
+        "affected_companies": [
+          "SmarterMail",
+          "SmarterTools"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-55182",
+        "date": "2026-01-01T14:31:42",
+        "cvss_score": 10.0,
+        "summary": "Critical remote code execution in React Server Components due to unsafe deserialization of HTTP request data",
+        "affected_companies": [
+          "Next.js applications using React Server Components",
+          "React Server Components versions 19.0.0 - 19.2.0",
+          "react-server-dom-parcel",
+          "react-server-dom-turbopack",
+          "react-server-dom-webpack",
+          "Meta (React)",
+          "Various IoT device manufacturers (e.g., Linksys, Wavlink)"
+        ]
+      },
+      {
+        "cve_id": "CVE-2025-52691",
+        "date": "2025-12-31T14:23:11",
+        "cvss_score": 10.0,
+        "summary": "Critical unauthenticated remote code execution via arbitrary file upload in SmarterMail",
+        "affected_companies": [
+          "SmarterMail",
+          "SmarterTools"
         ]
       },
       {
@@ -529,121 +582,9 @@
           "The New Yorker",
           "Condé Nast"
         ]
-      },
-      {
-        "cve_id": "CVE-2025-12345",
-        "date": "2025-12-26T09:27:00",
-        "cvss_score": 9.8,
-        "summary": "Critical serialization injection vulnerability in LangChain Core that allows attackers to steal secrets and inject prompts into LLM responses.",
-        "affected_companies": [
-          "LangChain Core (langchain-core Python package)",
-          "LangChain ecosystem integrations that rely on deserialization",
-          "LangChain"
-        ]
-      },
-      {
-        "cve_id": "CVE-2025-68664",
-        "date": "2025-12-27T18:20:16",
-        "cvss_score": 9.3,
-        "summary": "Serialization injection in LangChain Core's dumps() and dumpd() functions allows attacker-controlled 'lc' keys to be deserialized as legitimate LangChain objects, leading to arbitrary object instantiation and potential code execution.",
-        "affected_companies": [
-          "LangChain Core (langchain-core)",
-          "LangChain"
-        ]
-      },
-      {
-        "cve_id": "CVE-2023-52163",
-        "date": "2025-12-25T08:07:00",
-        "cvss_score": 8.8,
-        "summary": "Command injection vulnerability in Digiever DS-2105 Pro NVR allowing post‑authentication remote code execution.",
-        "affected_companies": [
-          "Digiever DS-2105 Pro",
-          "Digiever"
-        ]
       }
     ],
     "ransomware_targets": [
-      {
-        "company": "ASUS",
-        "date": "2025-12-02T18:10:58",
-        "actor": "Everest ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "potential multi-million USD loss (estimated)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Askul e‑commerce website(s)",
-        "date": "2025-12-03T06:45:07",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Askul internal IT systems",
-        "date": "2025-12-03T06:45:07",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "multiple enterprises across finance, healthcare, manufacturing, and technology sectors",
-        "date": "2025-12-03T15:05:15",
-        "actor": "DragonForce ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated loss in the range of $5‑15 million per affected organization",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Inotiv",
-        "date": "2025-12-04T15:02:30",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Marquis Software Solutions",
-        "date": "2025-12-04T18:42:31",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "client banks and credit unions (over 700 financial institutions)",
-        "date": "2025-12-04T18:42:31",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "approximately 780,000 individuals",
-        "date": "2025-12-04T18:42:31",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Church of Scientology",
-        "date": "2025-12-04T22:14:05",
-        "actor": "Qilin ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
       {
         "company": "Inotiv corporate network",
         "date": "2025-12-05T13:05:52",
@@ -1119,6 +1060,114 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "US-based clients",
+        "date": "2025-12-31T01:46:43",
+        "actor": "ALPHV (BlackCat)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "ALPHV affiliate group",
+        "date": "2025-12-31T01:46:43",
+        "actor": "ALPHV (BlackCat)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Global Healthcare Consortium",
+        "date": "2025-12-28T14:34:12",
+        "actor": "Cybercriminal Syndicate X",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$10.5 billion (global estimate)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "National Power Grid Operator",
+        "date": "2025-12-28T14:34:12",
+        "actor": "Cybercriminal Syndicate X",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$10.5 billion (global estimate)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Financial Services Firm A",
+        "date": "2025-12-28T14:34:12",
+        "actor": "Cybercriminal Syndicate X",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "$10.5 billion (global estimate)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "water agency systems",
+        "date": "2025-12-22T12:13:10",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Alleged crypto laundering service",
+        "date": "2025-12-18T13:52:24",
+        "actor": "Russian cybercriminals",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "tens of millions of USD",
+        "industry": "Unknown"
+      },
+      {
+        "company": "U.S. Department of Justice",
+        "date": "2025-12-18T13:52:24",
+        "actor": "Russian cybercriminals",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "tens of millions of USD",
+        "industry": "Unknown"
+      },
+      {
+        "company": "FBI",
+        "date": "2025-12-18T13:52:24",
+        "actor": "Russian cybercriminals",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "tens of millions of USD",
+        "industry": "Unknown"
+      },
+      {
+        "company": "ASUS",
+        "date": "2025-12-31T16:38:22",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "data_breach|ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "unspecified victims",
+        "date": "2025-12-31T13:07:08",
+        "actor": "BlackCat ransomware group",
+        "ransomware_type": "Blackcat Ransomware",
+        "impact": "",
+        "demands": "1.2 million USD",
+        "industry": "Unknown"
+      },
+      {
+        "company": "targeted organizations",
+        "date": "2025-12-31T13:07:08",
+        "actor": "BlackCat ransomware group",
+        "ransomware_type": "Blackcat Ransomware",
+        "impact": "",
+        "demands": "1.2 million USD",
         "industry": "Unknown"
       }
     ]
