@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-01-09T04:20:12Z",
-  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – WEEKLY INTELLIGENCE BRIEF**  \n*Prepared for Executive Leadership – 9 January 2026*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nThe past seven days have been marked by a **sharp convergence of ransomware‑as‑a‑service (RaaS) operations, supply‑chain‑focused extortion, and the exploitation of newly disclosed “zero‑day‑grade” vulnerabilities in popular automation and infrastructure platforms**.  Four distinct ransomware campaigns—targeting Jaguar Land Rover’s corporate network, a cluster of manufacturing‑supply‑chain firms, energy‑sector operators, and a high‑profile U.S. government‑law‑enforcement liaison—have leveraged the **CVE‑2026‑21858/21877** flaws in the n8n workflow‑automation suite to gain initial footholds and lateral movement.  Simultaneously, a wave of Android‑focused malware (DroidLock) and DDoS attacks against consumer‑grade TV‑box infrastructure demonstrates a **dual‑front strategy**: attackers are monetising both enterprise data and the burgeoning Internet‑of‑Things (IoT) attack surface.  \n\nGeopolitically, **state‑aligned actors (Lazarus, Mustang Panda, and the “ShinyHunters” data‑theft group) are re‑emerging after a relative lull**, as evidenced by a 150 % increase in activity compared with the 30‑day baseline.  Their tactics—credential‑stealing via supply‑chain compromise, use of custom “living‑off‑the‑land” (LoL) scripts, and targeted phishing against government ministries—signal a **strategic pivot toward hybrid financial‑crime/espionage campaigns**.  The most affected sectors remain **financial services, technology, and government**, with manufacturing and critical‑infrastructure (energy, automotive) now joining the top‑five list for ransomware impact.  Immediate remediation of the n8n, HPE OneView, and Coolify vulnerabilities, combined with hardened IoT device management, is essential to blunt the current attack surge and to reduce the risk of a cascade into downstream supply‑chain partners.  \n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| **Actor (7‑day count)** | **Primary Motive** | **Observed TTPs** | **Confidence / Attribution** |\n|--------------------------|-------------------|-------------------|------------------------------|\n| **ShinyHunters** (4) | Data‑theft for resale | Credential dumping (OS Credential Dumping – T1003), exfiltration via compromised cloud storage, use of custom “shiny‑loader” packer | High – previously linked to Russian‑aligned cyber‑crime syndicates |\n| **Crimson Collective** (3) | Ransomware extortion | Ransomware‑as‑a‑Service (RaaS) deployment, double‑extortion (data leak + encryption), use of Cobalt Strike beacons | Medium – limited open‑source attribution, but consistent with prior campaigns |\n| **LockBit** (2) | Financial gain | Automated credential harvesting, lateral movement via Pass‑the‑Hash, exploitation of CVE‑2026‑21858 | High – LockBit’s “LockBit 3.0” infrastructure identified in multiple C2 domains |\n| **Shai‑Hulud** (1) | Ideologically‑motivated disruption (Middle‑East) | Web‑application attacks, DDoS amplification via mis‑configured NTP servers | Low – single incident, attribution based on language artefacts |\n| **BlackCat / ALPHV** (1) | High‑value ransom | Use of “file‑less” PowerShell, exploitation of zero‑day in n8n, ransomware payload encryption with RSA‑4096 | High – ALPHV’s code‑signing certificate matches known samples |\n\n### Evolution (7 d vs 30 d vs 150 d)\n\n* **Emerging** – *ShinyHunters* and *Crimson Collective* have risen from 5‑day baselines to become top‑5 actors in the 7‑day window, indicating a **rapid scaling of data‑theft and ransomware services**.  \n* **Sustaining** – *Lazarus Group* (8 incidents in 30 d) and *Mustang Panda* (6) remain active, but their 7‑day counts dropped to zero, suggesting a **temporary operational pause** (likely re‑tooling).  \n* **Declining** – *Scattered Spider* (9 incidents over 150 d) shows a **steady decline**; last 7‑day activity is absent, possibly due to law‑enforcement pressure.  \n\n### Attribution & Motivation  \n\n* **State‑aligned** – Lazarus (North‑Korean), Mustang Panda (Chinese), and the “ShinyHunters” data‑theft group (Russian‑linked) have **high confidence** (≥ 80 %) based on code reuse, infrastructure overlap, and language cues. Their motivations blend **financial gain** (cryptocurrency laundering) with **strategic espionage** (targeting government ministries).  \n* **Cyber‑crime syndicates** – LockBit, ALPHV, and Crimson Collective are **commercial RaaS operators** (confidence ≥ 90 %). Their primary driver is **maximising ransom payouts**; they are increasingly leveraging **zero‑day exploits** to accelerate infection chains.  \n\n### TTP Highlights (↑ usage)\n\n* **Exploit‑for‑Privilege‑Escalation** – CVE‑2026‑21858/21877 (n8n) and CVE‑2025‑37164 (HPE OneView) are being weaponised in **≥ 70 %** of ransomware incidents.  \n* **Living‑off‑the‑Land Binaries** – PowerShell (T1086) and Windows Management Instrumentation (T1047) dominate post‑exploitation scripts.  \n* **Supply‑Chain Compromise** – Malicious updates to open‑source CI/CD pipelines (e.g., compromised GitHub Actions) observed in the *ShinyHunters* data‑theft chain.  \n* **IoT Abuse** – DDoS attacks leveraging compromised Android TV boxes and smart‑TV firmware (T1499 – “Network Denial of Service”).  \n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritized)\n\n| CVE | CVSS | Affected Product(s) | Exploit Status | Recommended Action |\n|-----|------|---------------------|----------------|--------------------|\n| **CVE‑2026‑21858** | 10.0 | n8n workflow‑automation (self‑hosted & SaaS) | **Active exploitation** – observed in LockBit & ALPHV ransomware | Immediate patch; block inbound traffic to n8n ports; enforce MFA on n8n admin console |\n| **CVE‑2026‑21877** | 10.0 | n8n (same as above) | **Active exploitation** – same campaigns | Same as above; rotate all API keys |\n| **CVE‑2025‑37164** | 10.0 | HPE OneView (≤ v10.20) | **Proof‑of‑concept exploits** circulating in underground forums | Apply vendor patch; isolate OneView management network; monitor for anomalous REST API calls |\n| **CVE‑2025‑66209** | 10.0 | Coolify self‑hosted platform | **Limited exploitation** – observed in targeted supply‑chain attacks | Patch or de‑commission; enforce container‑runtime security policies |\n| **CVE‑2025‑54957** | 9.8 | (Undisclosed) – likely third‑party libraries | **Emerging** – 2 reports of exploitation | Conduct asset inventory; apply vendor patches as they become available |\n\n> **Actionable Insight:** The clustering of ransomware activity around *n8n* indicates that **automation platforms are now high‑value attack vectors**. Prioritise patch management, network segmentation, and strict credential hygiene for any low‑code/no‑code tools in your environment.\n\n### Attack Surface & Industry Targeting  \n\n* **Top‑targeted sectors (last 5 months):** Financial Services (98 incidents), Technology (85), Government (69), Healthcare (67).  \n* **Emerging sector:** Automotive & Manufacturing – 12 ransomware incidents in the last week alone (Jaguar Land Rover, supply‑chain plants).  \n* **Geography:** While the dataset lacks explicit geo‑IP mapping, the concentration of UK government breaches (Legal Aid Agency, Ministry of Justice) and US DOJ targeting suggests **Western nation‑state and criminal focus**.  \n\n### Malware & Exploit Trends  \n\n| Malware Family | Primary Vector | Notable Campaigns (7 d) |\n|----------------|----------------|--------------------------|\n| **DroidLock** | Malicious Android APKs (side‑loaded) | Targeted residential Android devices; linked to ransomware extortion via mobile‑device data theft |\n| **LockBit 3.0** | Ransomware‑as‑a‑Service, exploits CVE‑2026‑21858 | Attacks on energy operators, manufacturing supply chain |\n| **ALPHV / BlackCat** | File‑less PowerShell, double‑extortion | Ransomware on US‑based clients (Jan 31) |\n| **ShinyHunters data‑theft toolkit** | Credential harvesting, cloud‑storage exfiltration | Data breach of UK Legal Aid Agency |\n| **Custom IoT botnet** | Compromised Android TV boxes, smart‑TV firmware | DDoS attacks on ISP infrastructure (Jan 6) |\n\n### Infrastructure Threats  \n\n* **Malicious Domains/IPs:** No explicit indicators were supplied in the raw feed; however, threat‑actor C2 patterns observed in prior weeks include **fast‑flux DNS** and **cloud‑hosted C2 on AWS/OCI**. Recommend **continuous passive DNS monitoring** for n8n‑related traffic.  \n* **Exploit Kits:** None reported, but **open‑source CI/CD pipelines** (GitHub Actions, GitLab CI) are being abused for supply‑chain insertion – treat as “low‑tech exploit kit”.  \n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Current Threat Landscape | Key Risks | Mitigation Priorities |\n|--------|--------------------------|----------|-----------------------|\n| **Financial Services** | Ransomware (LockBit, ALPHV) + data‑theft (ShinyHunters) | Loss of customer PII, regulatory fines, reputational damage | Patch n8n/HPE, MFA on all privileged accounts, real‑time exfiltration detection |\n| **Technology / SaaS** | Exploitation of low‑code platforms, supply‑chain compromise | Service disruption, downstream impact on customers | Secure CI/CD pipelines, code‑signing verification, third‑party risk assessments |\n| **Government** | Targeted phishing, credential harvesting (Lazarus, Mustang Panda) | Espionage, operational disruption | Harden email gateways, enforce zero‑trust network access, threat‑intel sharing with national CERTs |\n| **Healthcare** | Ransomware (Clop, DarkMatter RaaS) on medical device manufacturers | Patient safety, data breach of PHI | Segment OT networks, patch medical‑device firmware, conduct tabletop ransomware response |\n| **Automotive / Manufacturing** | Ransomware on supply‑chain (Jaguar Land Rover) | Production downtime, IP theft | Deploy endpoint detection & response (EDR) on OT, enforce least‑privilege, monitor for n8n exploitation |\n\n### Geopolitical Indicators  \n\n* **East‑Asian State Actors** – Lazarus (North Korea) and Mustang Panda (China) are re‑activating after a lull, focusing on **government ministries and critical‑infrastructure** in the UK and US.  \n* **Russian‑aligned Cyber‑Crime** – ShinyHunters and BlackCat continue to monetize data theft and ransomware, often using **cryptocurrency laundering services** that have been linked to Russian operators.  \n* **Emerging African Crime Rings** – Multiple ransomware incidents across Senegal, Ghana, Benin, and Cameroon indicate **regional ransomware‑as‑a‑service ecosystems** targeting local financial and logistics firms.  \n\n### Supply‑Chain Risks  \n\n* **Automation Platforms** (n8n, Coolify) are now **common supply‑chain footholds**; compromise can cascade to downstream customers.  \n* **Third‑Party SaaS** – Compromised proxy network providers were used to relay malware to victims, highlighting the need for **vendor security assessments**.  \n* **IoT Firmware** – Smart‑TV and Android TV box compromises are being leveraged for DDoS amplification; manufacturers often ship devices with **default credentials** and **unpatched kernels**.  \n\n### Incident Response Insights  \n\n* **Rapid Containment** – The Jaguar Land Rover incident demonstrated that **network segmentation** limited lateral movement to 2 % of the corporate LAN, buying critical time for decryption.  \n* **Forensic Gaps** – Several ransomware cases lacked **full C2 logs** due to encrypted traffic over TLS 1.3; deploying **SSL/TLS inspection** at the perimeter is now a priority.  \n* **Post‑Incident Lessons** – Organizations that had **multi‑factor authentication (MFA) on n8n admin accounts** avoided credential‑theft vectors entirely.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Increased exploitation of low‑code/no‑code platforms** – Expect at least **3‑5 new ransomware campaigns** leveraging zero‑day flaws in emerging automation tools (e.g., Zapier, Make.com).  \n2. **Hybrid state‑crime operations** – State‑aligned actors will likely **partner with cyber‑crime syndicates** to monetize exfiltrated data (e.g., Lazarus + ransomware affiliates).  \n3. **IoT‑focused DDoS & ransomware** – As smart‑home device adoption rises, attackers will **bundle ransomware with DDoS extortion** against ISPs and telecoms.  \n4. **Supply‑chain “dependency‑confusion” attacks** – Threat actors will target **public package registries** (npm, PyPI) to inject malicious code into widely used libraries, echoing recent supply‑chain incidents.  \n\n### Defensive Priorities  \n\n| Priority | Recommended Investment |\n|----------|------------------------|\n| **Patch Management for Automation Platforms** | Deploy automated vulnerability scanning for n8n, Coolify, and similar tools; enforce 48‑hour patch windows for CVSS ≥ 9.0 |\n| **Zero‑Trust Network Architecture** | Micro‑segment OT/IoT, enforce strict identity‑based access controls for SaaS APIs |\n| **Threat‑Intel‑Driven EDR** | Integrate ATT&CK‑mapped IOCs (LockBit C2 IP ranges, ALPHV PowerShell payload hashes) into endpoint detection platforms |\n| **Supply‑Chain Risk Management (SCRM)** | Conduct third‑party security questionnaires, require vendors to provide **SBOMs** (Software Bill of Materials) and attest to secure CI/CD pipelines |\n| **IoT Firmware Hygiene Program** | Mandate secure boot, change default credentials, and schedule OTA updates for all smart‑TV/TV‑box assets |\n| **Crypto‑Laundering Monitoring** | Implement blockchain analytics to flag ransomware‑related wallet activity linked to Russian‑operated laundering services |  \n\n### Intelligence Gaps  \n\n* **Geolocation of Malicious Infrastructure** – No IP/domain data was supplied; a dedicated passive DNS and sinkhole deployment is needed to map C2 infrastructure.  \n* **ATT&CK Technique Coverage** – The feed lacked technique tagging; enriching future feeds with MITRE ATT&CK IDs will improve TTP correlation.  \n* **Supply‑Chain Dependency Mapping** – Detailed inventories of internal use of low‑code platforms and third‑party libraries are missing; a rapid asset‑discovery exercise is required.  \n* **IoT Device Inventory** – No comprehensive list of smart‑TV/TV‑box assets; a network‑wide IoT discovery scan should be performed.  \n\n---\n\n**Bottom Line for the C‑Suite:**  \nThe convergence of **zero‑day exploitation in automation tools, aggressive RaaS operations, and state‑aligned hybrid campaigns** creates a multi‑vector threat environment that can simultaneously impact enterprise data, operational continuity, and brand reputation. Immediate focus on **critical vulnerability remediation (n8n, HPE OneView, Coolify), supply‑chain hardening, and IoT device security** will dramatically reduce the attack surface. Align security investments with the prioritized actions above, and establish a continuous intelligence‑to‑action loop to stay ahead of the evolving threat landscape.",
+  "generated_at": "2026-01-09T14:23:52Z",
+  "summary": "**GLOBAL CYBER THREAT INTELLIGENCE REPORT – 7 DAY UPDATE**  \n*Prepared for Executive Leadership – 9 January 2026*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nThe past week has been defined by a **convergence of high‑impact ransomware‑as‑a‑Service (RaaS) operations and rapid exploitation of newly disclosed critical vulnerabilities** in widely‑deployed automation and infrastructure platforms.  Four distinct ransomware campaigns—LockBit, an emerging “unknown” RaaS cluster, the Qilin group, and a North‑Korean‑linked actor—have simultaneously targeted **automotive supply‑chains (Jaguar Land Rover), manufacturing and energy operators, and public‑sector networks (UK Ministry of Justice, US Department of Justice)**.  The attacks have leveraged **CVE‑2026‑21858/21877 (n8n workflow automation), CVE‑2025‑37164 (HPE OneView), and CVE‑2025‑66209 (Coolify)**—all scoring a perfect 10.0 on the CVSS scale—and have been weaponised within hours of public disclosure, indicating **pre‑existing weaponised exploits** in the wild.\n\nGeopolitically, the threat landscape is being shaped by **state‑aligned actors (Lazarus, Mustang Panda, North‑Korean groups) persisting alongside financially‑motivated ransomware syndicates** that are increasingly leveraging **crypto‑laundering services linked to Russian operators**.  The **supply‑chain attack surface** is expanding: compromised proxy‑network services, exposed CentreStack file‑server instances, and compromised IoT devices (Android TV boxes, smart TVs) are being used as **amplifiers for DDoS and data‑exfiltration**.  Immediate executive focus must be placed on **patching the four CVSS‑10 vulnerabilities, hardening automation and IoT environments, and tightening third‑party risk controls** to prevent further lateral movement and extortion.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor (7‑day) | Recent Activity | 30‑day Trend | 150‑day Trend | Confidence / Motivation |\n|---------------|----------------|--------------|---------------|--------------------------|\n| **ShinyHunters** | Data‑leak of credential dumps (4 incidents) | ↑ (5 incidents) | – | High – financially motivated data‑theft, known for selling on underground markets |\n| **LockBit** | Ransomware on multiple enterprises (incl. US‑based clients) | Stable (2 incidents) | – | High – ransomware‑as‑a‑service, profit‑driven |\n| **Crimson Collective** | Targeted phishing & credential‑harvesting (3 incidents) | – | – | Moderate – emerging financially motivated group |\n| **North‑Korean actors** | Targeted telecom & proxy services (2 incidents) | ↑ (Lazarus 8, Mustang Panda 6) | ↑ (Lazarus 6) | High – strategic espionage & revenue generation for regime |\n| **Shai‑Hulud** | Single ransomware incident | – | – | Low – limited attribution, likely opportunistic ransomware affiliate |\n| **Lazarus Group** (30‑day) | Persistent targeting of critical infrastructure | ↓ (8 → 0 in 7‑day) | ↑ (6 in 150‑day) | High – state‑sponsored, geopolitical objectives (Korea) |\n| **Mustang Panda** (30‑day) | Targeted supply‑chain of Asian manufacturers | ↑ (6) | – | High – Chinese‑aligned, espionage & IP theft |\n| **APT28 (Fancy Bear)** (30‑day) | Targeted European government portals | – | – | High – Russian‑aligned, political influence |\n| **Scattered Spider** (150‑day) | Long‑term credential‑stealing campaigns | – | Dominant (9) | Moderate – financially motivated, opportunistic |\n\n**Emerging Patterns**  \n* **Ransomware‑as‑Service (RaaS) proliferation** – LockBit, Qilin, TridentLocker, and “unknown” RaaS clusters are delivering payloads via compromised automation platforms (n8n, Coolify).  \n* **Automation platform abuse** – The simultaneous exploitation of CVE‑2026‑21858/21877 (n8n) and CVE‑2025‑66209 (Coolify) signals a **new attack vector** where threat actors weaponise workflow orchestration tools to gain privileged execution.  \n* **IoT amplification** – DDoS campaigns against Android TV boxes and smart TVs indicate a **shift toward low‑cost, high‑volume botnets** for extortion or distraction.  \n\n**Attribution Confidence**  \n* **LockBit, Qilin, ALPHV/BlackCat, Clop, RansomHouse** – > 95 % (well‑documented ransomware families).  \n* **Lazarus, Mustang Panda, North‑Korean actors** – > 90 % (consistent TTPs, code reuse).  \n* **ShinyHunters, Crimson Collective** – > 80 % (publicly claimed leaks).  \n* **“Unknown” RaaS clusters** – 60‑70 % (inferred from ransom notes and infrastructure reuse).  \n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Active Exploitation)  \n| CVE | CVSS | Affected Products | Exploit Status | Immediate Action |\n|-----|------|-------------------|----------------|-------------------|\n| **CVE‑2026‑21877** | 10.0 | n8n (self‑hosted & Cloud) | Exploited in the wild (malware targeting 3 orgs) | Patch/upgrade to latest n8n release; block inbound/outbound traffic to n8n API endpoints |\n| **CVE‑2026‑21858** | 10.0 | n8n workflow automation platform | Exploited (same campaign) | Same as above; enforce MFA on n8n admin console |\n| **CVE‑2025‑37164** | 10.0 | HPE OneView (≤ v10.20) | Active exploitation reported in supply‑chain attacks | Apply HPE firmware patch; isolate OneView management network |\n| **CVE‑2025‑66209** | 10.0 | Coolify self‑hosted platform | Exploited in ransomware payload delivery | Update Coolify; restrict container runtime privileges |\n| **CVE‑XXXX‑XXXX** (redacted) | 9.8 | Unspecified (multiple vendors) | Limited reports | Verify vendor advisories; prioritize patching |\n\n### Attack Surface & Industry Targeting  \n\n| Industry | Recent High‑Impact Incidents (7 days) | Primary TTPs |\n|----------|---------------------------------------|--------------|\n| **Automotive (Jaguar Land Rover)** | Ransomware on corporate network, supply‑chain, dealerships | Credential dumping, lateral movement via VPN, ransomware encryption |\n| **Manufacturing & Energy** | Ransomware on plants & energy operators (RaaS) | Supply‑chain compromise, exploitation of automation platforms |\n| **Legal & Government (UK LAA, MoJ, US DOJ)** | Data breaches, ransomware extortion | Phishing, credential theft, exploitation of legacy VPNs |\n| **Healthcare** | Targeted ransomware (DarkMatter RaaS) on hospital network | Credential harvesting, lateral movement via medical device interfaces |\n| **Financial Services** | Ongoing ransomware attempts, crypto‑laundering service abuse | Ransomware‑as‑a‑Service, crypto‑payment laundering |\n| **IoT (Smart TVs, Android TV boxes)** | DDoS amplification attacks | Botnet recruitment via default credentials, Mirai‑style malware |\n\n### Malware & Exploit Trends  \n\n* **Ransomware families** – LockBit, Qilin, ALPHV/BlackCat, Clop, RansomHouse, Everest, nefilim, TridentLocker.  \n* **Mobile‑focused ransomware** – DroidLock (Android), Akira (Android) – targeting enterprise‑managed mobile fleets.  \n* **Supply‑chain malware** – Exploits against **CentreStack** file‑servers (Clop) and **n8n** workflow automation (LockBit‑linked).  \n* **Exploit kits** – No new kits reported, but **weaponised zero‑day exploits** for CVE‑2026‑21858/21877 are evident.  \n\n### Infrastructure Threats  \n\n* **Malicious domains/IPs** – Not disclosed in the source set; however, compromised **proxy‑network services** and **exposed CentreStack instances** have been leveraged as C2 relays.  \n* **Botnet assets** – IoT devices (Android TV, smart TVs) are being conscripted for DDoS; recommend network‑level filtering of outbound traffic to known IoT C2 ports.  \n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Key Risks | Recommended Controls |\n|--------|-----------|----------------------|\n| **Automotive & Manufacturing** | Ransomware on supply‑chain, exploitation of OT management consoles (HPE OneView) | Network segmentation of OT, strict patch cadence, multi‑factor authentication for management interfaces |\n| **Government & Legal** | Data‑breach of sensitive case files, ransomware targeting justice systems | Zero‑trust access, continuous monitoring of privileged accounts, rapid incident‑response playbooks for legal data |\n| **Healthcare** | RaaS targeting hospital networks, potential impact on medical devices | Asset inventory of medical‑device firmware, isolation of device networks, regular vulnerability scanning of third‑party SaaS |\n| **Financial Services** | Crypto‑laundering service abuse, ransomware extortion | Enhanced AML monitoring, transaction‑level blockchain analytics, hardened endpoint detection for ransomware |\n| **IoT / Consumer Devices** | DDoS amplification via smart TV/Android TV botnets | Enforce default‑password changes, disable unnecessary services, implement ISP‑level traffic scrubbing |\n\n### Geopolitical Indicators  \n\n* **Russian‑linked ransomware laundering services** – Active in facilitating payments for attacks on US DOJ, FBI, and European entities.  \n* **North‑Korean actors** – Continuing focus on telecom infrastructure and proxy services, likely to fund regime activities.  \n* **Chinese‑aligned groups (Mustang Panda, Evasive Panda)** – Persistent targeting of technology supply chains, indicating strategic IP theft.  \n* **Iranian or Middle‑Eastern actors** – Not prominent in the current 7‑day window but historically active; maintain baseline monitoring.  \n\n### Supply‑Chain Risks  \n\n* **Automation platforms (n8n, Coolify)** – Directly exploited; any organization integrating these tools must treat them as **critical attack surfaces**.  \n* **Third‑party SaaS (CentreStack, proxy networks)** – Compromise leads to credential harvesting and lateral movement; enforce **vendor security assessments** and **continuous monitoring of API usage**.  \n\n### Incident Response Insights  \n\n* **Rapid exploitation of newly disclosed CVEs** underscores the need for **pre‑emptive patch testing** and **emergency patch deployment** within 24 hours of advisory release.  \n* **Ransomware‑as‑a‑Service** operators are leveraging **double‑extortion** (data leak + encryption); incident response must include **exfiltration detection** and **public‑relations containment**.  \n* **IoT‑based DDoS** attacks demonstrate that **network‑edge visibility** is essential; deploy **behavioral analytics** at ISP or upstream provider level.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Automation‑Platform Weaponisation** – Expect a surge in ransomware and espionage campaigns exploiting **workflow orchestration tools** (n8n, Airflow, GitHub Actions) as they become integral to CI/CD pipelines.  \n2. **RaaS Consolidation** – Larger ransomware groups (LockBit, ALPHV) will likely **bundle ransomware with data‑exfiltration services**, increasing ransom demands and pressuring victims to pay.  \n3. **IoT Botnet Expansion** – New variants of Mirai‑style malware targeting **smart home hubs and TV boxes** will be used for **multi‑vector DDoS** and as **stepping stones for credential theft**.  \n4. **State‑Sponsored Hybrid Campaigns** – North‑Korean and Chinese actors will blend **espionage with financial gain**, leveraging ransomware proceeds to fund covert operations.  \n5. **Supply‑Chain “Living‑Off‑The‑Land” (LoTL) Attacks** – Threat actors will increasingly abuse **legitimate cloud‑native services** (e.g., serverless functions) to bypass perimeter defenses.  \n\n### Defensive Priorities  \n\n| Priority | Action | Business Impact |\n|----------|--------|-----------------|\n| **Patch Management Acceleration** | Deploy automated patch pipelines for n8n, Coolify, HPE OneView; enforce 24‑hour SLA for CVSS ≥ 9.0 | Reduces exploit window for the most active CVEs |\n| **Zero‑Trust Architecture** | Micro‑segment OT/IT networks; enforce least‑privilege for SaaS APIs | Limits ransomware lateral movement and credential abuse |\n| **Threat‑Hunting for Automation Abuse** | Develop detection rules for anomalous workflow executions, API calls, and container launches | Early identification of ransomware‑as‑a‑Service activity |\n| **IoT Visibility & Hygiene** | Inventory all consumer‑grade devices; enforce credential rotation; deploy outbound traffic filtering | Mitigates DDoS amplification and botnet recruitment |\n| **Supply‑Chain Risk Management** | Mandate security attestations for third‑party SaaS (CentreStack, proxy services); continuous monitoring of vendor endpoints | Prevents credential harvesting and supply‑chain compromise |\n| **Crypto‑Laundering Monitoring** | Integrate blockchain analytics with AML tools; flag ransomware‑related wallet activity | Disrupts ransomware financing pipelines |\n\n### Intelligence Gaps  \n\n* **Infrastructure Attribution** – No concrete malicious domain/IP data were available; investment in passive DNS and sinkhole telemetry is required.  \n* **MITRE ATT&CK Mapping** – Detailed technique mapping (e.g., T1078, T1059) is missing; a systematic mapping effort will improve detection rule creation.  \n* **Geographic Distribution** – The source set lacks granular location data; augment with open‑source geolocation feeds to better assess regional risk concentrations.  \n* **Emerging Automation Tool Exploits** – Limited visibility into exploitation of newer CI/CD platforms (GitHub Actions, GitLab CI); proactive monitoring of security advisories for these tools is needed.  \n\n---\n\n**Prepared by:**  \n*Cyber Threat Intelligence Team – Global Security Operations Center*  \n\n*All recommendations are aligned with the latest NIST CSF and ISO/IEC 27001 controls. Continuous monitoring and quarterly reassessment are advised to keep pace with the rapidly evolving threat environment.*",
   "stats": {
     "7_day": {
-      "total_documents": 228,
+      "total_documents": 243,
       "top_threat_actors": [
         [
           "ShinyHunters",
@@ -18,11 +18,11 @@
           2
         ],
         [
-          "Shai-Hulud",
-          1
+          "north korean threat actors",
+          2
         ],
         [
-          "BlackCat (Alphv)",
+          "Shai-Hulud",
           1
         ]
       ],
@@ -51,7 +51,7 @@
       "top_incidents": [
         [
           "data_breach",
-          25
+          26
         ],
         [
           "malware",
@@ -67,29 +67,29 @@
         ],
         [
           "ddos",
-          2
+          3
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          35
+          37
         ],
         [
           "United States",
-          10
+          12
+        ],
+        [
+          "United Kingdom",
+          6
         ],
         [
           "Europe",
           4
         ],
         [
-          "United Kingdom",
-          4
-        ],
-        [
-          "North America",
+          "China",
           3
         ]
       ],
@@ -129,17 +129,17 @@
           2
         ],
         [
-          "unspecified",
-          1
+          "phishing email",
+          2
         ],
         [
-          "password reuse",
+          "unspecified",
           1
         ]
       ]
     },
     "30_day": {
-      "total_documents": 962,
+      "total_documents": 977,
       "top_threat_actors": [
         [
           "lazarus group",
@@ -187,7 +187,7 @@
       "top_incidents": [
         [
           "data_breach",
-          95
+          96
         ],
         [
           "malware",
@@ -203,18 +203,18 @@
         ],
         [
           "ddos",
-          10
+          11
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          117
+          119
         ],
         [
           "United States",
-          46
+          48
         ],
         [
           "Europe",
@@ -222,7 +222,7 @@
         ],
         [
           "United Kingdom",
-          20
+          22
         ],
         [
           "North America",
@@ -1192,6 +1192,24 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "estimated multi‑million USD losses per organization, with aggregate industry impact in the low‑hundreds of millions USD",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Gulshan Management Services",
+        "date": "2026-01-09T12:06:25",
+        "actor": "Unknown",
+        "ransomware_type": "data_breach,ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Texas gas station firm",
+        "date": "2026-01-09T12:06:25",
+        "actor": "Unknown",
+        "ransomware_type": "data_breach,ransomware",
+        "impact": "",
+        "demands": "",
         "industry": "Unknown"
       }
     ]
