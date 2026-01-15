@@ -1,26 +1,113 @@
 // Vulnerabilities Table Component
 window.VulnerabilitiesTableComponent = {
     template: `
-        <div class="vulnerabilities-table">
+        <div class="vulnerabilities-table" role="region" aria-labelledby="vulnerabilities-heading">
             <div class="table-header">
-                <h3><i class="bi bi-shield-exclamation me-2"></i>Vulnerabilities</h3>
+                <h3 id="vulnerabilities-heading"><span aria-hidden="true"><i class="bi bi-shield-exclamation me-2"></i></span>Vulnerabilities</h3>
                 <div class="table-controls">
                     <div class="search-container">
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text">
+                            <span class="input-group-text" aria-hidden="true">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input 
-                                type="text" 
-                                v-model="searchQuery" 
+                            <input
+                                type="text"
+                                v-model="searchQuery"
                                 @input="debouncedFilterVulnerabilities"
-                                placeholder="Search vulnerabilities..." 
+                                @keydown.enter="filterVulnerabilities"
+                                placeholder="Search vulnerabilities..."
                                 class="form-control"
+                                aria-label="Search vulnerabilities"
+                                id="vulnerabilities-search"
                             >
-                            <button v-if="searchQuery" @click="clearSearch" class="btn btn-outline-secondary" type="button">
-                                <i class="bi bi-x"></i>
+                            <button v-if="searchQuery" @click="clearSearch" class="btn btn-outline-secondary" type="button" aria-label="Clear search">
+                                <i class="bi bi-x" aria-hidden="true"></i>
                             </button>
                         </div>
+                    </div>
+                    <select v-model="severityFilter" @change="filterVulnerabilities" class="form-select form-select-sm" aria-label="Filter by severity" id="vulnerability-severity-filter">
+                        <option value="">All Severities</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <select v-model="cvssFilter" @change="filterVulnerabilities" class="form-select form-select-sm" aria-label="Filter by CVSS score" id="cvss-filter">
+                        <option value="">All CVSS Scores</option>
+                        <option value="9.0-10.0">9.0 - 10.0 (Critical)</option>
+                        <option value="7.0-8.9">7.0 - 8.9 (High)</option>
+                        <option value="4.0-6.9">4.0 - 6.9 (Medium)</option>
+                        <option value="0.1-3.9">0.1 - 3.9 (Low)</option>
+                    </select>
+                    <select v-model="exploitFilter" @change="filterVulnerabilities" class="form-select form-select-sm" aria-label="Filter by exploit status" id="exploit-filter">
+                        <option value="">All Exploit Status</option>
+                        <option value="true">Exploit Available</option>
+                        <option value="false">No Exploit</option>
+                        <option value="unknown">Unknown</option>
+                    </select>
+                    <select v-model="itemsPerPage" @change="filterVulnerabilities" class="form-select form-select-sm" aria-label="Items per page" id="items-per-page">
+                        <option :value="20">20 per page</option>
+                        <option :value="50">50 per page</option>
+                        <option :value="100">100 per page</option>
+                        <option :value="0">Show All</option>
+                    </select>
+                    <button @click="refreshVulnerabilities" class="btn btn-sm btn-outline-primary" :disabled="loading" aria-label="Refresh vulnerabilities list">
+                        <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }" aria-hidden="true"></i>
+                        <span class="visually-hidden">Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <div v-if="loading" class="text-center py-4" role="status" aria-live="polite" aria-busy="true">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading vulnerabilities...</span>
+                </div>
+                <div class="mt-2">Loading vulnerabilities...</div>
+            </div>
+
+            <div v-else-if="error" class="alert alert-danger" role="alert" aria-live="assertive">
+                <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>
+                [[ error ]]
+                <button @click="refreshVulnerabilities" class="btn btn-sm btn-outline-danger ms-2" aria-label="Retry loading vulnerabilities">Retry</button>
+            </div>
+
+            <div v-else-if="filteredVulnerabilities.length === 0" class="text-center py-4 text-muted" role="status" aria-live="polite">
+                <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+                <span v-if="vulnerabilities.length === 0">No vulnerabilities found</span>
+                <span v-else>No vulnerabilities match selected filters</span>
+            </div>
+
+            <div v-else class="vulnerabilities-container" role="list" aria-label="Vulnerabilities list">
+                <div class="vulnerability-list">
+                    <div v-for="vuln in paginatedVulnerabilities" :key="vuln.id" class="vulnerability-item" role="listitem">
+                        <div class="vulnerability-summary"
+                             @click="toggleVulnerability(vuln.id)"
+                             @keydown.enter="toggleVulnerability(vuln.id)"
+                             @keydown.space.prevent="toggleVulnerability(vuln.id)"
+                             :tabindex="0"
+                             :aria-expanded="expandedVulnerabilities.includes(vuln.id)"
+                             :aria-controls="'vulnerability-details-' + vuln.id">
+                            <div class="vulnerability-main">
+                                <div class="vulnerability-title-section">
+                                    <h5 class="vulnerability-title">[[ vuln.cve_id ]]: [[ vuln.title ]]</h5>
+                                    <div class="vulnerability-meta">
+                                        <span class="badge bg-secondary me-2">[[ vuln.source ]]</span>
+                                        <span class="text-muted">[[ formatDate(vuln.published_date) ]]</span>
+                                    </div>
+                                </div>
+                                <div class="vulnerability-badges">
+                                    <span :class="'severity-badge me-2 badge bg-' + getSeverityColor(vuln.severity)">
+                                        [[ vuln.severity?.toUpperCase() || 'UNKNOWN' ]]
+                                    </span>
+                                    <span :class="'cvss-badge me-2 badge bg-' + getCvssColor(vuln.cvss_score)">
+                                        CVSS [[ vuln.cvss_score ]]
+                                    </span>
+                                    <span v-if="vuln.exploit_available === 'true'" class="badge bg-danger me-2">
+                                        <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>EXPLOIT AVAILABLE
+                                    </span>
+                                    <i class="bi bi-chevron-down expand-icon" :class="{ 'expanded': expandedVulnerabilities.includes(vuln.id) }" aria-hidden="true"></i>
+                                </div>
+                            </div>
                     </div>
                     <select v-model="severityFilter" @change="filterVulnerabilities" class="form-select form-select-sm">
                         <option value="">All Severities</option>
@@ -127,8 +214,12 @@ window.VulnerabilitiesTableComponent = {
                                 </div>
                             </div>
                         </div>
-                        
-                        <div v-show="expandedVulnerabilities.includes(vuln.id)" class="vulnerability-details">
+
+                        <div v-show="expandedVulnerabilities.includes(vuln.id)"
+                             :id="'vulnerability-details-' + vuln.id"
+                             class="vulnerability-details"
+                             role="region"
+                             aria-label="Vulnerability details">
                             <div class="vulnerability-details-content">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -235,29 +326,40 @@ window.VulnerabilitiesTableComponent = {
                         </div>
                     </div>
                 </div>
-                
                 <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-4" v-if="totalPages > 1">
-                    <div class="text-muted">
-                        Showing [[ (currentPage - 1) * itemsPerPage + 1 ]] to [[ Math.min(currentPage * itemsPerPage, filteredVulnerabilities.length) ]] 
+                <nav class="d-flex justify-content-between align-items-center mt-4" v-if="totalPages > 1" aria-label="Pagination navigation">
+                    <div class="text-muted" aria-live="polite">
+                        Showing [[ (currentPage - 1) * itemsPerPage + 1 ]] to [[ Math.min(currentPage * itemsPerPage, filteredVulnerabilities.length) ]]
                         of [[ filteredVulnerabilities.length ]] vulnerabilities
                     </div>
-                    <div class="pagination-controls">
-                        <button @click="currentPage = 1" :disabled="currentPage === 1" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-double-left"></i>
+                    <div class="pagination-controls" role="navigation" aria-label="Page navigation">
+                        <button @click="currentPage = 1"
+                                :disabled="currentPage === 1"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to first page'">
+                            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
                         </button>
-                        <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-left"></i>
+                        <button @click="currentPage--"
+                                :disabled="currentPage === 1"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to previous page'">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
                         </button>
-                        <span class="mx-3">Page [[ currentPage ]] of [[ totalPages ]]</span>
-                        <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-right"></i>
+                        <span class="mx-3" aria-current="page">Page [[ currentPage ]] of [[ totalPages ]]</span>
+                        <button @click="currentPage++"
+                                :disabled="currentPage === totalPages"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to next page'">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </button>
-                        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-double-right"></i>
+                        <button @click="currentPage = totalPages"
+                                :disabled="currentPage === totalPages"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to last page'">
+                            <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
                         </button>
                     </div>
-                </div>
+                </nav>
             </div>
         </div>
     `,

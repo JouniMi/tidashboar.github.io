@@ -1,26 +1,110 @@
 // Threat Actors Table Component
 window.ThreatActorsTableComponent = {
     template: `
-        <div class="threat-actors-table">
+        <div class="threat-actors-table" role="region" aria-labelledby="threat-actors-heading">
             <div class="table-header">
-                <h3><i class="bi bi-person-badge me-2"></i>Threat Actors</h3>
+                <h3 id="threat-actors-heading"><span aria-hidden="true"><i class="bi bi-person-badge me-2"></i></span>Threat Actors</h3>
                 <div class="table-controls">
                     <div class="search-container">
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text">
+                            <span class="input-group-text" aria-hidden="true">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input 
-                                type="text" 
-                                v-model="searchQuery" 
+                            <input
+                                type="text"
+                                v-model="searchQuery"
                                 @input="debouncedFilterThreatActors"
-                                placeholder="Search threat actors..." 
+                                @keydown.enter="filterThreatActors"
+                                placeholder="Search threat actors..."
                                 class="form-control"
+                                aria-label="Search threat actors"
+                                id="threat-actors-search"
                             >
-                            <button v-if="searchQuery" @click="clearSearch" class="btn btn-outline-secondary" type="button">
-                                <i class="bi bi-x"></i>
+                            <button v-if="searchQuery" @click="clearSearch" class="btn btn-outline-secondary" type="button" aria-label="Clear search">
+                                <i class="bi bi-x" aria-hidden="true"></i>
                             </button>
                         </div>
+                    </div>
+                    <select v-model="typeFilter" @change="filterThreatActors" class="form-select form-select-sm" aria-label="Filter by actor type" id="actor-type-filter">
+                        <option value="">All Types</option>
+                        <option value="apt">APT</option>
+                        <option value="state-sponsored">State-Sponsored</option>
+                        <option value="cybercriminal">Cybercriminal</option>
+                        <option value="hacktivist">Hacktivist</option>
+                        <option value="terrorist">Terrorist</option>
+                    </select>
+                    <select v-model="motivationFilter" @change="filterThreatActors" class="form-select form-select-sm" aria-label="Filter by motivation" id="motivation-filter">
+                        <option value="">All Motivations</option>
+                        <option value="financial">Financial</option>
+                        <option value="espionage">Espionage</option>
+                        <option value="political">Political</option>
+                        <option value="destruction">Destruction</option>
+                        <option value="ideological">Ideological</option>
+                    </select>
+                    <select v-model="riskFilter" @change="filterThreatActors" class="form-select form-select-sm" aria-label="Filter by risk level" id="risk-filter">
+                        <option value="">All Risk Levels</option>
+                        <option value="critical">Critical</option>
+                        <option value="high">High</option>
+                        <option value="medium">Medium</option>
+                        <option value="low">Low</option>
+                    </select>
+                    <button @click="refreshThreatActors" class="btn btn-sm btn-outline-primary" :disabled="loading" aria-label="Refresh threat actors list">
+                        <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }" aria-hidden="true"></i>
+                        <span class="visually-hidden">Refresh</span>
+                    </button>
+                </div>
+            </div>
+
+            <div v-if="loading" class="text-center py-4" role="status" aria-live="polite" aria-busy="true">
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Loading threat actors...</span>
+                </div>
+                <div class="mt-2">Loading threat actors...</div>
+            </div>
+
+            <div v-else-if="error" class="alert alert-danger" role="alert" aria-live="assertive">
+                <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>
+                [[ error ]]
+                <button @click="refreshThreatActors" class="btn btn-sm btn-outline-danger ms-2" aria-label="Retry loading threat actors">Retry</button>
+            </div>
+
+            <div v-else-if="filteredThreatActors.length === 0" class="text-center py-4 text-muted" role="status" aria-live="polite">
+                <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
+                <span v-if="threatActors.length === 0">No threat actors found</span>
+                <span v-else>No threat actors match selected filters</span>
+            </div>
+
+            <div v-else class="threat-actors-container" role="list" aria-label="Threat actors list">
+                <div class="threat-actor-list">
+                    <div v-for="actor in paginatedThreatActors" :key="actor.id" class="threat-actor-item" role="listitem">
+                        <div class="threat-actor-summary"
+                             @click="toggleThreatActor(actor.id)"
+                             @keydown.enter="toggleThreatActor(actor.id)"
+                             @keydown.space.prevent="toggleThreatActor(actor.id)"
+                             :tabindex="0"
+                             :aria-expanded="expandedThreatActors.includes(actor.id)"
+                             :aria-controls="'threat-actor-details-' + actor.id">
+                            <div class="threat-actor-main">
+                                <div class="threat-actor-title-section">
+                                    <h5 class="threat-actor-title">[[ actor.name || 'Unknown' ]]</h5>
+                                    <div class="threat-actor-meta">
+                                        <span class="badge bg-secondary me-2">[[ actor.source ]]</span>
+                                        <span class="text-muted">[[ formatDate(actor.published_date) ]]</span>
+                                    </div>
+                                </div>
+                                <div class="threat-actor-badges">
+                                    <span :class="'type-badge me-2 badge bg-' + getTypeColor(actor.type)">
+                                        [[ formatType(actor.type) ]]
+                                    </span>
+                                    <span v-if="actor.motivation" class="badge bg-info me-2">
+                                        [[ actor.motivation.toUpperCase() ]]
+                                    </span>
+                                    <span v-if="actor.overall_risk" :class="'risk-badge me-2 badge bg-' + getRiskColor(actor.overall_risk)">
+                                        [[ actor.overall_risk.toUpperCase() ]]
+                                    </span>
+                                    <i class="bi bi-chevron-down expand-icon" :class="{ 'expanded': expandedThreatActors.includes(actor.id) }" aria-hidden="true"></i>
+                                </div>
+                            </div>
                     </div>
                     <select v-model="typeFilter" @change="filterThreatActors" class="form-select form-select-sm">
                         <option value="">All Types</option>
@@ -126,8 +210,12 @@ window.ThreatActorsTableComponent = {
                                 </div>
                             </div>
                         </div>
-                        
-                        <div v-show="expandedThreatActors.includes(actor.id)" class="threat-actor-details">
+
+                        <div v-show="expandedThreatActors.includes(actor.id)"
+                             :id="'threat-actor-details-' + actor.id"
+                             class="threat-actor-details"
+                             role="region"
+                             aria-label="Threat actor details">
                             <div class="threat-actor-details-content">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -285,29 +373,40 @@ window.ThreatActorsTableComponent = {
                         </div>
                     </div>
                 </div>
-                
                 <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-4" v-if="totalPages > 1">
-                    <div class="text-muted">
-                        Showing [[ (currentPage - 1) * itemsPerPage + 1 ]] to [[ Math.min(currentPage * itemsPerPage, filteredThreatActors.length) ]] 
+                <nav class="d-flex justify-content-between align-items-center mt-4" v-if="totalPages > 1" aria-label="Pagination navigation">
+                    <div class="text-muted" aria-live="polite">
+                        Showing [[ (currentPage - 1) * itemsPerPage + 1 ]] to [[ Math.min(currentPage * itemsPerPage, filteredThreatActors.length) ]]
                         of [[ filteredThreatActors.length ]] threat actors
                     </div>
-                    <div class="pagination-controls">
-                        <button @click="currentPage = 1" :disabled="currentPage === 1" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-double-left"></i>
+                    <div class="pagination-controls" role="navigation" aria-label="Page navigation">
+                        <button @click="currentPage = 1"
+                                :disabled="currentPage === 1"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to first page'">
+                            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
                         </button>
-                        <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-left"></i>
+                        <button @click="currentPage--"
+                                :disabled="currentPage === 1"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to previous page'">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
                         </button>
-                        <span class="mx-3">Page [[ currentPage ]] of [[ totalPages ]]</span>
-                        <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-right"></i>
+                        <span class="mx-3" aria-current="page">Page [[ currentPage ]] of [[ totalPages ]]</span>
+                        <button @click="currentPage++"
+                                :disabled="currentPage === totalPages"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to next page'">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </button>
-                        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-double-right"></i>
+                        <button @click="currentPage = totalPages"
+                                :disabled="currentPage === totalPages"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to last page'">
+                            <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
                         </button>
                     </div>
-                </div>
+                </nav>
             </div>
         </div>
     `,

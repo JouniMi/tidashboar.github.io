@@ -27,22 +27,23 @@
 
 </head>
 <body>
+    <a href="#main-content" class="skip-link visually-hidden-focusable">Skip to main content</a>
     <div id="app" class="main-container">
         <!-- Loading State -->
-        <div v-if="loading" class="loading-spinner">
+        <div v-if="loading" class="loading-spinner" role="status" aria-live="polite" aria-busy="true">
             <div class="spinner-border text-primary" role="status">
                 <span class="visually-hidden">Loading...</span>
             </div>
         </div>
 
         <!-- Error State -->
-        <div v-else-if="error" class="alert alert-danger" role="alert">
-            <i class="bi bi-exclamation-triangle me-2"></i>
+        <div v-else-if="error" class="alert alert-danger" role="alert" aria-live="assertive">
+            <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>
             [[ error ]]
         </div>
 
     <!-- Main Content -->
-    <div v-else>
+    <div v-else id="main-content" role="main" tabindex="-1">
             <!-- Dashboard Branding and Disclaimer -->
             <div class="row mb-4">
                 <div class="col-12">
@@ -81,30 +82,30 @@
             <stats-cards :summary-stats="summaryData" :live-stats="liveStats"></stats-cards>
 
             <!-- Navigation Tabs -->
-            <ul class="nav nav-tabs mb-4" role="tablist">
-                <li class="nav-item">
-                    <button class="nav-link" :class="{active: activeTab==='overview'}" @click="activeTab='overview'">
-                        <i class="bi bi-speedometer2 me-1"></i> Overview
+            <ul class="nav nav-tabs mb-4" role="tablist" aria-label="Dashboard navigation">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" :class="{active: activeTab==='overview'}" @click="activeTab='overview'" role="tab" :aria-selected="activeTab==='overview'" aria-controls="overview-panel" id="overview-tab">
+                        <span aria-hidden="true"><i class="bi bi-speedometer2 me-1"></i></span> Overview
                     </button>
                 </li>
-                <li class="nav-item">
-                    <button class="nav-link" :class="{active: activeTab==='incidents'}" @click="activeTab='incidents'">
-                        <i class="bi bi-exclamation-triangle me-1"></i> Incidents
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" :class="{active: activeTab==='incidents'}" @click="activeTab='incidents'" role="tab" :aria-selected="activeTab==='incidents'" aria-controls="incidents-panel" id="incidents-tab">
+                        <span aria-hidden="true"><i class="bi bi-exclamation-triangle me-1"></i></span> Incidents
                     </button>
                 </li>
-                <li class="nav-item">
-                    <button class="nav-link" :class="{active: activeTab==='vulnerabilities'}" @click="activeTab='vulnerabilities'">
-                        <i class="bi bi-bug me-1"></i> Vulnerabilities
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" :class="{active: activeTab==='vulnerabilities'}" @click="activeTab='vulnerabilities'" role="tab" :aria-selected="activeTab==='vulnerabilities'" aria-controls="vulnerabilities-panel" id="vulnerabilities-tab">
+                        <span aria-hidden="true"><i class="bi bi-bug me-1"></i></span> Vulnerabilities
                     </button>
                 </li>
-                <li class="nav-item">
-                    <button class="nav-link" :class="{active: activeTab==='threat-actors'}" @click="activeTab='threat-actors'">
-                        <i class="bi bi-person-badge me-1"></i> Threat Actors
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" :class="{active: activeTab==='threat-actors'}" @click="activeTab='threat-actors'" role="tab" :aria-selected="activeTab==='threat-actors'" aria-controls="threat-actors-panel" id="threat-actors-tab">
+                        <span aria-hidden="true"><i class="bi bi-person-badge me-1"></i></span> Threat Actors
                     </button>
                 </li>
-                <li class="nav-item">
-                    <button class="nav-link" :class="{active: activeTab==='analytics'}" @click="activeTab='analytics'">
-                        <i class="bi bi-bar-chart me-1"></i> Analytics
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" :class="{active: activeTab==='analytics'}" @click="activeTab='analytics'" role="tab" :aria-selected="activeTab==='analytics'" aria-controls="analytics-panel" id="analytics-tab">
+                        <span aria-hidden="true"><i class="bi bi-bar-chart me-1"></i></span> Analytics
                     </button>
                 </li>
             </ul>
@@ -112,10 +113,10 @@
             <!-- Tab Content -->
             <div class="tab-content">
                 <!-- Overview Tab -->
-                <div v-show="activeTab==='overview'">
-                    <charts-container 
-                        :summary-data="summaryData" 
-                        :incidents-data="incidents" 
+                <div v-show="activeTab==='overview'" id="overview-panel" role="tabpanel" aria-labelledby="overview-tab" tabindex="-1">
+                    <charts-container
+                        :summary-data="summaryData"
+                        :incidents-data="incidents"
                         :vulnerabilities-data="vulnerabilities"
                         :loading="loading"
                         :error="error"
@@ -124,22 +125,22 @@
                 </div>
 
                 <!-- Incidents Tab -->
-                <div v-show="activeTab==='incidents'">
+                <div v-show="activeTab==='incidents'" id="incidents-panel" role="tabpanel" aria-labelledby="incidents-tab" tabindex="-1">
                     <incidents-table :incidents="incidents" @refresh="loadIncidents"></incidents-table>
                 </div>
 
                 <!-- Vulnerabilities Tab -->
-                <div v-show="activeTab==='vulnerabilities'">
+                <div v-show="activeTab==='vulnerabilities'" id="vulnerabilities-panel" role="tabpanel" aria-labelledby="vulnerabilities-tab" tabindex="-1">
                     <vulnerabilities-table :vulnerabilities="vulnerabilities" @refresh="loadVulnerabilities"></vulnerabilities-table>
                 </div>
 
                 <!-- Threat Actors Tab -->
-                <div v-show="activeTab==='threat-actors'">
+                <div v-show="activeTab==='threat-actors'" id="threat-actors-panel" role="tabpanel" aria-labelledby="threat-actors-tab" tabindex="-1">
                     <threat-actors-table :threat-actors="threatActors" @refresh="loadThreatActors"></threat-actors-table>
                 </div>
 
                 <!-- Analytics Tab -->
-                <div v-show="activeTab==='analytics'">
+                <div v-show="activeTab==='analytics'" id="analytics-panel" role="tabpanel" aria-labelledby="analytics-tab" tabindex="-1">
                     <!-- Executive Summary Cards -->
                     <div class="row mb-4">
                         <div class="col-md-3">
@@ -309,7 +310,7 @@
                                     </div>
                                     <div class="card-body">
                                         <div class="recommendations">
-                                            <div v-for="rec in statisticsData?.risk_assessment?.recommendations" :key="rec" class="recommendation-item">
+                                            <div v-for="rec in statisticsData?.risk_assessment?.recommendations" :key="rec" class="rstatisticsData?.risk_assessment?.recommendations" :key="rec" class="recommendation-item">
                                                 <i class="bi bi-check-circle-fill text-success me-2"></i>
                                                 <span>[[ formatRecommendation(rec) ]]</span>
                                             </div>
@@ -327,6 +328,8 @@
     <!-- JavaScript -->
     <script src="./static/js/services/api.js"></script>
     <script src="./static/js/services/charts.js"></script>
+    <script src="./static/js/services/validator.js"></script>
+    <script src="./static/js/services/global-error-handler.js"></script>
     <script src="./static/js/services/utils.js"></script>
     <script src="./static/js/components/executive-summary.js"></script>
     <script src="./static/js/components/stats-cards.js"></script>

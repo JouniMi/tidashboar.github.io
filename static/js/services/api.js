@@ -20,12 +20,12 @@ class ApiService {
     }
 
     /**
-     * Generic file request method with caching
+     * Generic file request method with caching and validation
      */
     async request(filename, options = {}) {
         const cacheKey = `${filename}${JSON.stringify(options)}`;
         const cached = this.cache.get(cacheKey);
-        
+
         if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
             return cached.data;
         }
@@ -44,7 +44,12 @@ class ApiService {
             }
 
             const data = await response.json();
-            
+
+            // Validate response structure
+            if (window.validator && !window.validator.isSafeToRender(data)) {
+                console.warn(`Data from ${filename} may contain unsafe values, proceeding with caution`);
+            }
+
             // Cache the response
             this.cache.set(cacheKey, {
                 data,
@@ -88,7 +93,20 @@ class ApiService {
     // ============================================================================
 
     async getIncidents(params = {}) {
-        return this.request('incidents.json');
+        const response = await this.request('incidents.json');
+
+        // Validate incidents if validator available
+        if (window.validator && response.incidents) {
+            response.incidents = response.incidents.map(incident => {
+                const validation = window.validator.validateIncident(incident);
+                if (!validation.valid) {
+                    console.warn('Invalid incident detected:', incident, validation.errors);
+                }
+                return incident;
+            });
+        }
+
+        return response;
     }
 
     async getHighlightedIncident() {
@@ -97,11 +115,37 @@ class ApiService {
     }
 
     async getVulnerabilities(params = {}) {
-        return this.request('vulnerabilities.json');
+        const response = await this.request('vulnerabilities.json');
+
+        // Validate vulnerabilities if validator available
+        if (window.validator && response.vulnerabilities) {
+            response.vulnerabilities = response.vulnerabilities.map(vuln => {
+                const validation = window.validator.validateVulnerability(vuln);
+                if (!validation.valid) {
+                    console.warn('Invalid vulnerability detected:', vuln, validation.errors);
+                }
+                return vuln;
+            });
+        }
+
+        return response;
     }
 
     async getThreatActors(params = {}) {
-        return this.request('threat_actors.json');
+        const response = await this.request('threat_actors.json');
+
+        // Validate threat actors if validator available
+        if (window.validator && response.threat_actors) {
+            response.threat_actors = response.threat_actors.map(actor => {
+                const validation = window.validator.validateThreatActor(actor);
+                if (!validation.valid) {
+                    console.warn('Invalid threat actor detected:', actor, validation.errors);
+                }
+                return actor;
+            });
+        }
+
+        return response;
     }
 
     // ============================================================================
@@ -124,8 +168,19 @@ class ApiService {
     }
 
     async getOverviewStatistics() {
-        return this.request('statistics.json');
+        const response = await this.request('statistics.json');
+
+        // Validate statistics structure if validator available
+        if (window.validator) {
+            const validation = window.validator.validateStatistics(response);
+            if (!validation.valid) {
+                console.warn('Invalid statistics data detected:', validation.errors);
+            }
+        }
+
+        return response;
     }
+
 
     // ============================================================================
     // DASHBOARD DATA ENDPOINTS

@@ -1,35 +1,38 @@
 // Incidents Table Component
 window.IncidentsTableComponent = {
     template: `
-        <div class="incidents-table">
+        <div class="incidents-table" role="region" aria-labelledby="incidents-heading">
             <div class="table-header">
-                <h3><i class="bi bi-exclamation-triangle me-2"></i>Security Incidents</h3>
+                <h3 id="incidents-heading"><span aria-hidden="true"><i class="bi bi-exclamation-triangle me-2"></i></span>Security Incidents</h3>
                 <div class="table-controls">
                     <div class="search-container">
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text">
+                            <span class="input-group-text" aria-hidden="true">
                                 <i class="bi bi-search"></i>
                             </span>
-                            <input 
-                                type="text" 
-                                v-model="searchQuery" 
+                            <input
+                                type="text"
+                                v-model="searchQuery"
                                 @input="debouncedFilterIncidents"
-                                placeholder="Search incidents..." 
+                                @keydown.enter="filterIncidents"
+                                placeholder="Search incidents..."
                                 class="form-control"
+                                aria-label="Search incidents"
+                                id="incidents-search"
                             >
-                            <button v-if="searchQuery" @click="clearSearch" class="btn btn-outline-secondary" type="button">
-                                <i class="bi bi-x"></i>
+                            <button v-if="searchQuery" @click="clearSearch" class="btn btn-outline-secondary" type="button" aria-label="Clear search">
+                                <i class="bi bi-x" aria-hidden="true"></i>
                             </button>
                         </div>
                     </div>
-                    <select v-model="severityFilter" @change="filterIncidents" class="form-select form-select-sm">
+                    <select v-model="severityFilter" @change="filterIncidents" class="form-select form-select-sm" aria-label="Filter by severity" id="severity-filter">
                         <option value="">All Severities</option>
                         <option value="critical">Critical</option>
                         <option value="high">High</option>
                         <option value="medium">Medium</option>
                         <option value="low">Low</option>
                     </select>
-                    <select v-model="typeFilter" @change="filterIncidents" class="form-select form-select-sm">
+                    <select v-model="typeFilter" @change="filterIncidents" class="form-select form-select-sm" aria-label="Filter by incident type" id="type-filter">
                         <option value="">All Types</option>
                         <option value="phishing">Phishing</option>
                         <option value="data_breach">Data Breach</option>
@@ -38,36 +41,42 @@ window.IncidentsTableComponent = {
                         <option value="ddos">DDoS</option>
                         <option value="insider_threat">Insider Threat</option>
                     </select>
-                    <button @click="refreshIncidents" class="btn btn-sm btn-outline-primary" :disabled="loading">
-                        <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }"></i>
-                        Refresh
+                    <button @click="refreshIncidents" class="btn btn-sm btn-outline-primary" :disabled="loading" aria-label="Refresh incidents list">
+                        <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }" aria-hidden="true"></i>
+                        <span class="visually-hidden">Refresh</span>
                     </button>
                 </div>
             </div>
-            
-            <div v-if="loading" class="text-center py-4">
+
+            <div v-if="loading" class="text-center py-4" role="status" aria-live="polite" aria-busy="true">
                 <div class="spinner-border text-primary" role="status">
                     <span class="visually-hidden">Loading incidents...</span>
                 </div>
                 <div class="mt-2">Loading incidents...</div>
             </div>
-            
-            <div v-else-if="error" class="alert alert-danger" role="alert">
-                <i class="bi bi-exclamation-triangle me-2"></i>
+
+            <div v-else-if="error" class="alert alert-danger" role="alert" aria-live="assertive">
+                <i class="bi bi-exclamation-triangle me-2" aria-hidden="true"></i>
                 [[ error ]]
-                <button @click="refreshIncidents" class="btn btn-sm btn-outline-danger ms-2">Retry</button>
+                <button @click="refreshIncidents" class="btn btn-sm btn-outline-danger ms-2" aria-label="Retry loading incidents">Retry</button>
             </div>
-            
-            <div v-else-if="filteredIncidents.length === 0" class="text-center py-4 text-muted">
-                <i class="bi bi-info-circle me-2"></i>
+
+            <div v-else-if="filteredIncidents.length === 0" class="text-center py-4 text-muted" role="status" aria-live="polite">
+                <i class="bi bi-info-circle me-2" aria-hidden="true"></i>
                 <span v-if="incidents.length === 0">No incidents found</span>
                 <span v-else>No incidents match the selected filters</span>
             </div>
-            
-            <div v-else class="incidents-container">
+
+            <div v-else class="incidents-container" role="list" aria-label="Incidents list">
                 <div class="incident-list">
-                    <div v-for="incident in paginatedIncidents" :key="incident.id" class="incident-item">
-                        <div class="incident-summary" @click="toggleIncident(incident.id)">
+                    <div v-for="incident in paginatedIncidents" :key="incident.id" class="incident-item" role="listitem">
+                        <div class="incident-summary"
+                             @click="toggleIncident(incident.id)"
+                             @keydown.enter="toggleIncident(incident.id)"
+                             @keydown.space.prevent="toggleIncident(incident.id)"
+                             :tabindex="0"
+                             :aria-expanded="expandedIncidents.includes(incident.id)"
+                             :aria-controls="'incident-details-' + incident.id">
                             <div class="incident-main">
                                 <div class="incident-title-section">
                                     <h5 class="incident-title">[[ incident.title ]]</h5>
@@ -81,7 +90,7 @@ window.IncidentsTableComponent = {
                                         [[ incident.severity.toUpperCase() ]]
                                     </span>
                                     <span class="badge bg-info me-2">[[ incident.incident_type?.replace('_', ' ').toUpperCase() || 'UNKNOWN' ]]</span>
-                                    <i class="bi bi-chevron-down expand-icon" :class="{ 'expanded': expandedIncidents.includes(incident.id) }"></i>
+                                    <i class="bi bi-chevron-down expand-icon" :class="{ 'expanded': expandedIncidents.includes(incident.id) }" aria-hidden="true"></i>
                                 </div>
                             </div>
                             
@@ -119,8 +128,12 @@ window.IncidentsTableComponent = {
                                 </div>
                             </div>
                         </div>
-                        
-                        <div v-show="expandedIncidents.includes(incident.id)" class="incident-details">
+
+                        <div v-show="expandedIncidents.includes(incident.id)"
+                             :id="'incident-details-' + incident.id"
+                             class="incident-details"
+                             role="region"
+                             aria-label="Incident details">
                             <div class="incident-details-content">
                                 <div class="row">
                                     <div class="col-md-6">
@@ -250,29 +263,40 @@ window.IncidentsTableComponent = {
                         </div>
                     </div>
                 </div>
-                
                 <!-- Pagination -->
-                <div class="d-flex justify-content-between align-items-center mt-4" v-if="totalPages > 1">
-                    <div class="text-muted">
-                        Showing [[ (currentPage - 1) * itemsPerPage + 1 ]] to [[ Math.min(currentPage * itemsPerPage, filteredIncidents.length) ]] 
+                <nav class="d-flex justify-content-between align-items-center mt-4" v-if="totalPages > 1" aria-label="Pagination navigation">
+                    <div class="text-muted" aria-live="polite">
+                        Showing [[ (currentPage - 1) * itemsPerPage + 1 ]] to [[ Math.min(currentPage * itemsPerPage, filteredIncidents.length) ]]
                         of [[ filteredIncidents.length ]] incidents
                     </div>
-                    <div class="pagination-controls">
-                        <button @click="currentPage = 1" :disabled="currentPage === 1" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-double-left"></i>
+                    <div class="pagination-controls" role="navigation" aria-label="Page navigation">
+                        <button @click="currentPage = 1"
+                                :disabled="currentPage === 1"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to first page'">
+                            <i class="bi bi-chevron-double-left" aria-hidden="true"></i>
                         </button>
-                        <button @click="currentPage--" :disabled="currentPage === 1" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-left"></i>
+                        <button @click="currentPage--"
+                                :disabled="currentPage === 1"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to previous page'">
+                            <i class="bi bi-chevron-left" aria-hidden="true"></i>
                         </button>
-                        <span class="mx-3">Page [[ currentPage ]] of [[ totalPages ]]</span>
-                        <button @click="currentPage++" :disabled="currentPage === totalPages" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-right"></i>
+                        <span class="mx-3" aria-current="page">Page [[ currentPage ]] of [[ totalPages ]]</span>
+                        <button @click="currentPage++"
+                                :disabled="currentPage === totalPages"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to next page'">
+                            <i class="bi bi-chevron-right" aria-hidden="true"></i>
                         </button>
-                        <button @click="currentPage = totalPages" :disabled="currentPage === totalPages" class="btn btn-sm btn-outline-secondary">
-                            <i class="bi bi-chevron-double-right"></i>
+                        <button @click="currentPage = totalPages"
+                                :disabled="currentPage === totalPages"
+                                class="btn btn-sm btn-outline-secondary"
+                                :aria-label="'Go to last page'">
+                            <i class="bi bi-chevron-double-right" aria-hidden="true"></i>
                         </button>
                     </div>
-                </div>
+                </nav>
             </div>
         </div>
     `,
