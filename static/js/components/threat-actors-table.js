@@ -13,7 +13,7 @@ window.ThreatActorsTableComponent = {
                             <input 
                                 type="text" 
                                 v-model="searchQuery" 
-                                @input="filterThreatActors"
+                                @input="debouncedFilterThreatActors"
                                 placeholder="Search threat actors..." 
                                 class="form-control"
                             >
@@ -362,7 +362,11 @@ window.ThreatActorsTableComponent = {
             immediate: true
         }
     },
-    
+
+    created() {
+        this.debouncedFilterThreatActors = Utils.debounce(this.filterThreatActors, 300);
+    },
+
     methods: {
         filterThreatActors() {
             let filtered = [...(this.threatActors || [])];

@@ -13,7 +13,7 @@ window.VulnerabilitiesTableComponent = {
                             <input 
                                 type="text" 
                                 v-model="searchQuery" 
-                                @input="filterVulnerabilities"
+                                @input="debouncedFilterVulnerabilities"
                                 placeholder="Search vulnerabilities..." 
                                 class="form-control"
                             >
@@ -312,7 +312,11 @@ window.VulnerabilitiesTableComponent = {
             immediate: true
         }
     },
-    
+
+    created() {
+        this.debouncedFilterVulnerabilities = Utils.debounce(this.filterVulnerabilities, 300);
+    },
+
     methods: {
         filterVulnerabilities() {
             let filtered = [...(this.vulnerabilities || [])];
