@@ -7,18 +7,16 @@ window.ExecutiveSummaryComponent = {
         summary: {
             type: String,
             required: true
+        },
+        industry: {
+            type: String,
+            default: ''
         }
     },
-    template: `
-        <div class="executive-summary">
-            <div class="d-flex align-items-center mb-3">
-                <i class="bi bi-file-text me-2"></i>
-                <h3 class="mb-0">Executive Summary</h3>
-            </div>
-            <div class="executive-summary-content" ref="content" v-html="formattedSummary"></div>
-        </div>
-    `,
     computed: {
+        title() {
+            return this.industry ? `${this.industry} - Executive Summary` : 'Executive Summary';
+        },
         formattedSummary() {
             let html = Utils.formatMarkdown(this.summary);
             // Wrap tables in responsive containers
@@ -27,6 +25,15 @@ window.ExecutiveSummaryComponent = {
             return html;
         }
     },
+    template: `
+        <div class="executive-summary">
+            <div class="d-flex align-items-center mb-3">
+                <i class="bi bi-file-text me-2"></i>
+                <h3 class="mb-0">[[ title ]]</h3>
+            </div>
+            <div class="executive-summary-content" ref="content" v-html="formattedSummary"></div>
+        </div>
+    `,
     mounted() {
         this.$nextTick(() => {
             this.checkTableOverflow();
