@@ -13,7 +13,7 @@ window.IncidentsTableComponent = {
                             <input 
                                 type="text" 
                                 v-model="searchQuery" 
-                                @input="filterIncidents"
+                                @input="debouncedFilterIncidents"
                                 placeholder="Search incidents..." 
                                 class="form-control"
                             >
@@ -326,7 +326,11 @@ window.IncidentsTableComponent = {
             immediate: true
         }
     },
-    
+
+    created() {
+        this.debouncedFilterIncidents = Utils.debounce(this.filterIncidents, 300);
+    },
+
     methods: {
         filterIncidents() {
             let filtered = [...(this.incidents || [])];

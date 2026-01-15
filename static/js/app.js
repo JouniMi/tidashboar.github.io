@@ -35,7 +35,6 @@ const app = createApp({
     },
     
     mounted() {
-        console.log('Vue app mounted, loading data...');
         this.refreshData();
         this.initializeAnalytics();
     },
@@ -128,7 +127,6 @@ const app = createApp({
         async loadStatisticsData() {
             try {
                 this.statisticsData = await apiService.getOverviewStatistics();
-                console.log('Statistics data loaded:', this.statisticsData);
             } catch (error) {
                 console.error('Failed to load statistics data:', error);
                 this.statisticsData = {};
@@ -171,15 +169,9 @@ const app = createApp({
         
         // Analytics chart methods
         initializeAnalytics() {
-            console.log('Initializing analytics...');
-            
             // Watch for tab changes
             this.$watch('activeTab', (newTab) => {
-                console.log('Tab changed to:', newTab);
-                console.log('Statistics data available:', !!this.statisticsData);
-                
                 if (newTab === 'analytics' && this.statisticsData) {
-                    console.log('Analytics tab activated, creating charts...');
                     this.$nextTick(() => {
                         setTimeout(() => {
                             this.createAllCharts();
@@ -190,17 +182,13 @@ const app = createApp({
         },
         
         createAllCharts() {
-            console.log('Creating all charts...');
-            console.log('Statistics data available:', !!this.statisticsData);
-            
             if (!this.statisticsData) {
-                console.log('No statistics data available');
                 return;
             }
-            
+
             // Destroy existing charts
             this.destroyAllCharts();
-            
+
             // Create new charts
             this.createIncidentTypesChart();
             this.createIncidentSeverityChart();
@@ -211,8 +199,6 @@ const app = createApp({
             this.createCountriesChart();
             this.createMalwareFamiliesChart();
             this.createRiskGauge();
-            
-            console.log('All charts creation attempted');
         },
         
         destroyAllCharts() {
@@ -234,18 +220,15 @@ const app = createApp({
                 console.log('No canvas context found');
                 return;
             }
-            
+
             if (!this.statisticsData.incidents?.incident_types) {
-                console.log('No incident types data found');
                 return;
             }
-            
+
             const data = this.statisticsData.incidents.incident_types;
             const labels = data.map(item => item[0].replace(/\|/g, ' + '));
             const values = data.map(item => item[1]);
-            
-            console.log('Chart data:', { labels, values });
-            
+
             this.charts = this.charts || {};
             this.charts.incidentTypes = new Chart(ctx, {
                 type: 'doughnut',
@@ -262,8 +245,6 @@ const app = createApp({
                     maintainAspectRatio: false
                 }
             });
-            
-            console.log('Incident types chart created successfully');
         },
         
         createIncidentSeverityChart() {
@@ -509,11 +490,8 @@ window.addEventListener('unhandledrejection', (event) => {
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
         navigator.serviceWorker.register('./static/js/sw.js')
-            .then((registration) => {
-                console.log('SW registered: ', registration);
-            })
             .catch((registrationError) => {
-                console.log('SW registration failed: ', registrationError);
+                console.error('SW registration failed: ', registrationError);
             });
     });
 }
@@ -545,16 +523,13 @@ function toggleAutoRefresh() {
     if (autoRefreshEnabled) {
         clearInterval(autoRefreshInterval);
         autoRefreshEnabled = false;
-        console.log('Auto-refresh disabled');
     } else {
         autoRefreshInterval = setInterval(() => {
             if (window.app && window.app.refreshAll) {
-                console.log('Auto-refreshing dashboard...');
                 window.app.refreshAll();
             }
         }, 300000); // Refresh every 5 minutes
         autoRefreshEnabled = true;
-        console.log('Auto-refresh enabled (every 5 minutes)');
     }
 }
 
