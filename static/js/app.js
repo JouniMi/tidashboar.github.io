@@ -14,6 +14,7 @@ const app = createApp({
         return {
             // Loading states
             loading: false,
+            loadingIndustry: false,
             
             // Error states
             error: null,
@@ -27,6 +28,22 @@ const app = createApp({
             chartData: {},
             liveStats: {},
             charts: {},
+            
+            // Industry data
+            selectedIndustry: '',
+            industryData: {},
+            industries: [
+                { id: 'communication_services', name: 'Communication Services', fileName: 'communication_services.json' },
+                { id: 'consumer_goods', name: 'Consumer Goods', fileName: 'consumer_goods.json' },
+                { id: 'energy', name: 'Energy', fileName: 'energy.json' },
+                { id: 'financials', name: 'Financials', fileName: 'financials.json' },
+                { id: 'health_care', name: 'Health Care', fileName: 'health_care.json' },
+                { id: 'industrials', name: 'Industrials', fileName: 'industrials.json' },
+                { id: 'information_technology', name: 'Information Technology', fileName: 'information_technology.json' },
+                { id: 'materials', name: 'Materials', fileName: 'materials.json' },
+                { id: 'real_estate', name: 'Real Estate', fileName: 'real_estate.json' },
+                { id: 'utilities', name: 'Utilities', fileName: 'utilities.json' }
+            ],
             
             // UI state
             activeTab: 'overview',
@@ -137,6 +154,111 @@ const app = createApp({
         
         updateLastUpdated() {
             this.lastUpdated = new Date().toLocaleString();
+        },
+
+        async loadIndustryData() {
+            if (!this.selectedIndustry) {
+                this.industryData = {};
+                return;
+            }
+
+            this.loadingIndustry = true;
+            
+            try {
+                const industry = this.industries.find(i => i.id === this.selectedIndustry);
+                if (!industry) {
+                    throw new Error(`Industry not found: ${this.selectedIndustry}`);
+                }
+
+                const response = await fetch(`./gui/${industry.fileName}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to load industry data: ${response.statusText}`);
+                }
+
+                const data = await response.json();
+                this.industryData = data;
+                
+                console.log(`Loaded industry data for ${industry.name}:`, data);
+                
+                // Create industry trends chart
+                this.$nextTick(() => {
+                    this.createIndustryTrendsChart();
+                });
+            } catch (error) {
+                console.error('Failed to load industry data:', error);
+                this.industryData = {};
+            } finally {
+                this.loadingIndustry = false;
+            }
+        },
+
+        getIndustryName(industryId) {
+            const industry = this.industries.find(i => i.id === industryId);
+            return industry ? industry.name : industryId;
+        },
+
+        getTopCountry() {
+            if (!this.industryData?.stats?.['150_day']?.top_geographies || this.industryData.stats['150_day'].top_geographies.length === 0) {
+                return 'N/A';
+            }
+            return this.industryData.stats['150_day'].top_geographies[0][0];
+        },
+
+        createIndustryTrendsChart() {
+            const ctx = this.$refs.industryTrendsChart;
+            if (!ctx || !this.industryData?.stats?.industry_monthly_trends) {
+                return;
+            }
+
+            const monthlyTrends = this.industryData.stats.industry_monthly_trends;
+            const labels = Object.keys(monthlyTrends);
+            const values = Object.values(monthlyTrends).map(month => month[this.industryData.industry] || 0);
+
+            this.charts = this.charts || {};
+            
+            if (this.charts.industryTrends) {
+                this.charts.industryTrends.destroy();
+            }
+
+            this.charts.industryTrends = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Documents',
+                        data: values,
+                        borderColor: '#36A2EB',
+                        backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Number of Documents'
+                            }
+                        },
+                        x: {
+                            title: {
+                                display: true,
+                                text: 'Month'
+                            }
+                        }
+                    }
+                }
+            });
         },
         
         formatDateTime(dateString) {
