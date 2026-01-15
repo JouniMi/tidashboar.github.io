@@ -598,10 +598,19 @@ app.component('charts-container', window.ChartsContainerComponent);
 // Mount the application
 app.mount('#app');
 
-// Global error handler
-window.addEventListener('error', (event) => {
-    console.error('Global error:', event.error);
-});
+// Initialize global error handler
+if (window.GlobalErrorHandler) {
+    window.GlobalErrorHandler.init(app);
+} else {
+    // Fallback error handlers
+    window.addEventListener('error', (event) => {
+        console.error('Global error:', event.error);
+    });
+
+    window.addEventListener('unhandledrejection', (event) => {
+        console.error('Unhandled promise rejection:', event.reason);
+    });
+}
 
 // Unhandled promise rejection handler
 window.addEventListener('unhandledrejection', (event) => {
