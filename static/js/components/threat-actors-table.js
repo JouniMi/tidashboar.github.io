@@ -48,9 +48,36 @@ window.ThreatActorsTableComponent = {
                         <option value="medium">Medium</option>
                         <option value="low">Low</option>
                     </select>
+                    <select v-model="sourceFilter" @change="filterThreatActors" class="form-select form-select-sm" aria-label="Filter by source" id="source-filter">
+                        <option value="">All Sources</option>
+                        <option v-for="source in uniqueSources" :key="source" :value="source">[[ source ]]</option>
+                    </select>
+                    <input
+                        type="date"
+                        v-model="dateFrom"
+                        @change="filterThreatActors"
+                        class="form-control form-control-sm"
+                        aria-label="Filter by date from"
+                        id="date-from"
+                        placeholder="From"
+                    >
+                    <input
+                        type="date"
+                        v-model="dateTo"
+                        @change="filterThreatActors"
+                        class="form-control form-control-sm"
+                        aria-label="Filter by date to"
+                        id="date-to"
+                        placeholder="To"
+                    >
                     <button @click="refreshThreatActors" class="btn btn-sm btn-outline-primary" :disabled="loading" aria-label="Refresh threat actors list">
                         <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }" aria-hidden="true"></i>
                         <span class="visually-hidden">Refresh</span>
+                    </button>
+                </div>
+                <div v-if="searchQuery || typeFilter || motivationFilter || riskFilter || sourceFilter || dateFrom || dateTo" class="text-end mb-2">
+                    <button @click="clearAllFilters" class="btn btn-sm btn-outline-secondary" aria-label="Clear all filters">
+                        <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear All Filters
                     </button>
                 </div>
             </div>
@@ -432,6 +459,9 @@ window.ThreatActorsTableComponent = {
             typeFilter: '',
             motivationFilter: '',
             riskFilter: '',
+            sourceFilter: '',
+            dateFrom: '',
+            dateTo: '',
             sortByField: 'published_date',
             sortDirection: 'desc',
             currentPage: 1,
@@ -447,9 +477,14 @@ window.ThreatActorsTableComponent = {
             const end = start + this.itemsPerPage;
             return this.filteredThreatActors.slice(start, end);
         },
-        
+
         totalPages() {
             return Math.ceil(this.filteredThreatActors.length / this.itemsPerPage);
+        },
+
+        uniqueSources() {
+            const sources = new Set(this.threatActors.map(actor => actor.source).filter(Boolean));
+            return Array.from(sources).sort();
         }
     },
     
@@ -566,7 +601,28 @@ window.ThreatActorsTableComponent = {
             if (this.riskFilter) {
                 filtered = filtered.filter(actor => actor.overall_risk === this.riskFilter);
             }
-            
+
+            if (this.sourceFilter) {
+                filtered = filtered.filter(actor => actor.source === this.sourceFilter);
+            }
+
+            if (this.dateFrom) {
+                const fromDate = new Date(this.dateFrom);
+                filtered = filtered.filter(actor => {
+                    const actorDate = new Date(actor.published_date);
+                    return actorDate >= fromDate;
+                });
+            }
+
+            if (this.dateTo) {
+                const toDate = new Date(this.dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                filtered = filtered.filter(actor => {
+                    const actorDate = new Date(actor.published_date);
+                    return actorDate <= toDate;
+                });
+            }
+
             this.filteredThreatActors = this.sortThreatActors(filtered);
             this.currentPage = 1;
         },
@@ -595,6 +651,17 @@ window.ThreatActorsTableComponent = {
                 this.sortByField = field;
                 this.sortDirection = 'asc';
             }
+            this.filterThreatActors();
+        },
+
+        clearAllFilters() {
+            this.searchQuery = '';
+            this.typeFilter = '';
+            this.motivationFilter = '';
+            this.riskFilter = '';
+            this.sourceFilter = '';
+            this.dateFrom = '';
+            this.dateTo = '';
             this.filterThreatActors();
         },
         
