@@ -618,6 +618,31 @@ app.component('charts-container', window.ChartsContainerComponent);
 // Mount the application
 app.mount('#app');
 
+// Theme toggle button handler (outside Vue app)
+const themeToggleBtn = document.getElementById('themeToggleBtn');
+const themeToggleIcon = themeToggleBtn?.querySelector('i');
+
+function updateThemeButton() {
+    if (themeToggleBtn && themeToggleIcon) {
+        const isDark = themeService.isDarkTheme();
+        themeToggleBtn.setAttribute('aria-label', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        themeToggleBtn.setAttribute('title', isDark ? 'Switch to light mode' : 'Switch to dark mode');
+        themeToggleIcon.className = isDark ? 'bi bi-sun' : 'bi bi-moon';
+    }
+}
+
+if (themeToggleBtn) {
+    themeToggleBtn.addEventListener('click', () => {
+        if (themeService) {
+            themeService.toggleTheme();
+            updateThemeButton();
+        }
+    });
+}
+
+// Initialize theme button state
+updateThemeButton();
+
 // Initialize global error handler
 if (window.GlobalErrorHandler) {
     window.GlobalErrorHandler.init(app);
