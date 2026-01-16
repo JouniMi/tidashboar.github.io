@@ -81,13 +81,111 @@
                 </div>
             </div>
 
+            <!-- Industry Selector -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="industry-selector">
+                        <label class="form-label fw-bold">
+                            <i class="bi bi-building me-2"></i>Select Industry View:
+                        </label>
+                        <select 
+                            class="form-select form-select-lg" 
+                            v-model="selectedIndustry" 
+                            @change="loadIndustryData"
+                            :disabled="loadingIndustry"
+                        >
+                            <option value="">All Industries (General)</option>
+                            <option v-for="industry in industries" :key="industry.id" :value="industry.id">
+                                [[ industry.name ]]
+                            </option>
+                        </select>
+                        <small v-if="selectedIndustry" class="text-muted mt-1 d-block">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Viewing data for [[ getIndustryName(selectedIndustry) ]]. Last updated: [[ industryData?.generated_at || 'Loading...' ]]
+                        </small>
+                        <small v-else class="text-muted mt-1 d-block">
+                            <i class="bi bi-info-circle me-1"></i>
+                            Viewing aggregated data across all industries.
+                        </small>
+                    </div>
+                </div>
+            </div>
+
             <!-- Executive Summary -->
-            <executive-summary v-if="summaryData.executiveSummary" :summary="summaryData.executiveSummary"></executive-summary>
+            <executive-summary 
+                v-if="selectedIndustry && industryData?.summary" 
+                :summary="industryData.summary"
+                :industry="getIndustryName(selectedIndustry)">
+            </executive-summary>
+            <executive-summary 
+                v-else-if="summaryData.executiveSummary" 
+                :summary="summaryData.executiveSummary">
+            </executive-summary>
 
+            <!-- Industry Stats Cards (when industry selected) -->
+            <div v-if="selectedIndustry && industryData?.stats" class="row mb-4">
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="card-body text-center">
+                            <div class="stats-icon">
+                                <i class="bi bi-file-earmark-text"></i>
+                            </div>
+                            <div class="stats-value">[[ industryData.stats['7_day']?.total_documents || 0 ]]</div>
+                            <div class="stats-label">7-Day Documents</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="card-body text-center">
+                            <div class="stats-icon">
+                                <i class="bi bi-calendar-month"></i>
+                            </div>
+                            <div class="stats-value">[[ industryData.stats['30_day']?.total_documents || 0 ]]</div>
+                            <div class="stats-label">30-Day Documents</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="card-body text-center">
+                            <div class="stats-icon">
+                                <i class="bi bi-calendar3"></i>
+                            </div>
+                            <div class="stats-value">[[ industryData.stats['150_day']?.total_documents || 0 ]]</div>
+                            <div class="stats-label">150-Day Documents</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="stats-card">
+                        <div class="card-body text-center">
+                            <div class="stats-icon">
+                                <i class="bi bi-globe"></i>
+                            </div>
+                            <div class="stats-value">[[ getTopCountry() ]]</div>
+                            <div class="stats-label">Top Region</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
-            
-            <!-- Stats Cards -->
-            <stats-cards :summary-stats="summaryData" :live-stats="liveStats"></stats-cards>
+            <!-- Stats Cards (general view) -->
+            <stats-cards v-else :summary-stats="summaryData" :live-stats="liveStats"></stats-cards>
+
+            <!-- Industry Monthly Trends Chart -->
+            <div v-if="selectedIndustry && industryData?.stats?.industry_monthly_trends" class="row mb-4">
+                <div class="col-12">
+                    <div class="card dashboard-card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="mb-0"><i class="bi bi-graph-up me-2"></i>Industry Monthly Trends</h5>
+                        </div>
+                        <div class="card-body">
+                            <canvas ref="industryTrendsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
 
             <!-- Navigation Tabs -->
             <ul class="nav nav-tabs mb-4" role="tablist" aria-label="Dashboard navigation">
