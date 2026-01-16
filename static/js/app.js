@@ -7,6 +7,9 @@ const apiService = window.apiService;
 // Chart Service
 const chartService = window.chartsService;
 
+// Theme Service
+const themeService = window.themeService;
+
 // Main Application
 const app = createApp({
     
@@ -47,13 +50,15 @@ const app = createApp({
             
             // UI state
             activeTab: 'overview',
-            lastUpdated: 'Never'
+            lastUpdated: 'Never',
+            isDarkTheme: false
         };
     },
     
     mounted() {
         this.refreshData();
         this.initializeAnalytics();
+        this.initializeTheme();
     },
     
     methods: {
@@ -287,6 +292,21 @@ const app = createApp({
         
         formatRecommendation(rec) {
             return rec.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+        },
+        
+        // Theme methods
+        initializeTheme() {
+            if (themeService) {
+                this.isDarkTheme = themeService.isDarkTheme();
+                themeService.init();
+            }
+        },
+        
+        toggleTheme() {
+            if (themeService) {
+                themeService.toggleTheme();
+                this.isDarkTheme = themeService.isDarkTheme();
+            }
         },
         
         // Analytics chart methods
