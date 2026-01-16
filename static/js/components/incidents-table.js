@@ -41,10 +41,96 @@ window.IncidentsTableComponent = {
                         <option value="ddos">DDoS</option>
                         <option value="insider_threat">Insider Threat</option>
                     </select>
+                    <select v-model="sourceFilter" @change="filterIncidents" class="form-select form-select-sm" aria-label="Filter by source" id="source-filter">
+                        <option value="">All Sources</option>
+                        <option v-for="source in uniqueSources" :key="source" :value="source">[[ source ]]</option>
+                    </select>
+                    <input
+                        type="date"
+                        v-model="dateFrom"
+                        @change="filterIncidents"
+                        class="form-control form-control-sm"
+                        aria-label="Filter by date from"
+                        id="date-from"
+                        placeholder="From"
+                    >
+                    <input
+                        type="date"
+                        v-model="dateTo"
+                        @change="filterIncidents"
+                        class="form-control form-control-sm"
+                        aria-label="Filter by date to"
+                        id="date-to"
+                        placeholder="To"
+                    >
                     <button @click="refreshIncidents" class="btn btn-sm btn-outline-primary" :disabled="loading" aria-label="Refresh incidents list">
                         <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }" aria-hidden="true"></i>
                         <span class="visually-hidden">Refresh</span>
                     </button>
+                </div>
+                <div v-if="searchQuery || severityFilter || typeFilter || sourceFilter || dateFrom || dateTo" class="text-end mb-2">
+                    <button @click="saveSearch" class="btn btn-sm btn-outline-success me-2" aria-label="Save current search">
+                        <i class="bi bi-bookmark me-1" aria-hidden="true"></i>Save Search
+                    </button>
+                    <button @click="showSavedSearches = !showSavedSearches" class="btn btn-sm btn-outline-secondary me-2" aria-label="Toggle saved searches">
+                        <i class="bi bi-bookmarks me-1" aria-hidden="true"></i>Saved Searches ([[ savedSearches.length ]])
+                    </button>
+                    <button @click="showSearchHistory = !showSearchHistory" class="btn btn-sm btn-outline-secondary me-2" aria-label="Toggle search history">
+                        <i class="bi bi-clock-history me-1" aria-hidden="true"></i>History ([[ searchHistory.length ]])
+                    </button>
+                    <button @click="clearAllFilters" class="btn btn-sm btn-outline-secondary" aria-label="Clear all filters">
+                        <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear All Filters
+                    </button>
+                </div>
+                <div v-if="showSavedSearches && savedSearches.length > 0" class="mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title"><i class="bi bi-bookmarks me-2" aria-hidden="true"></i>Saved Searches</h6>
+                            <ul class="list-group list-group-flush">
+                                <li v-for="(search, index) in savedSearches" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <strong>[[ search.name ]]</strong>
+                                        <small class="text-muted d-block">
+                                            Query: [[ search.query.searchQuery || 'All' ]] |
+                                            Severity: [[ search.query.severityFilter || 'All' ]] |
+                                            Type: [[ search.query.typeFilter || 'All' ]] |
+                                            Date: [[ search.query.dateFrom || 'Any' ]] to [[ search.query.dateTo || 'Any' ]]
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <button @click="loadSearch(search.query)" class="btn btn-sm btn-primary me-1" aria-label="Load this search">
+                                            <i class="bi bi-box-arrow-in-down-right" aria-hidden="true"></i>
+                                        </button>
+                                        <button @click="deleteSearch(index)" class="btn btn-sm btn-danger" aria-label="Delete this saved search">
+                                            <i class="bi bi-trash" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div v-if="showSearchHistory && searchHistory.length > 0" class="mb-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <h6 class="card-title"><i class="bi bi-clock-history me-2" aria-hidden="true"></i>Search History</h6>
+                            <ul class="list-group list-group-flush">
+                                <li v-for="(item, index) in searchHistory" :key="index" class="list-group-item d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <span v-if="item.query" class="me-2">Query: <strong>[[ item.query ]]</strong></span>
+                                        <small class="text-muted">
+                                            [[ formatDate(item.timestamp) ]]
+                                        </small>
+                                    </div>
+                                    <div>
+                                        <button @click="loadSearch(item)" class="btn btn-sm btn-primary me-1" aria-label="Load this search">
+                                            <i class="bi bi-box-arrow-in-down-right" aria-hidden="true"></i>
+                                        </button>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -321,12 +407,19 @@ window.IncidentsTableComponent = {
             searchQuery: '',
             severityFilter: '',
             typeFilter: '',
+            sourceFilter: '',
+            dateFrom: '',
+            dateTo: '',
             sortByField: 'published_date',
             sortDirection: 'desc',
             currentPage: 1,
             itemsPerPage: 20,
             expandedIncidents: [],
-            filteredIncidents: []
+            filteredIncidents: [],
+            savedSearches: [],
+            showSavedSearches: false,
+            searchHistory: [],
+            showSearchHistory: false
         };
     },
     
@@ -336,9 +429,14 @@ window.IncidentsTableComponent = {
             const end = start + this.itemsPerPage;
             return this.filteredIncidents.slice(start, end);
         },
-        
+
         totalPages() {
             return Math.ceil(this.filteredIncidents.length / this.itemsPerPage);
+        },
+
+        uniqueSources() {
+            const sources = new Set(this.incidents.map(incident => incident.source).filter(Boolean));
+            return Array.from(sources).sort();
         }
     },
     
@@ -353,6 +451,12 @@ window.IncidentsTableComponent = {
 
     created() {
         this.debouncedFilterIncidents = Utils.debounce(this.filterIncidents, 300);
+        this.loadSavedSearches();
+    },
+
+    mounted() {
+        this.loadSavedSearches();
+        this.loadSearchHistory();
     },
 
     methods: {
@@ -468,13 +572,35 @@ window.IncidentsTableComponent = {
             if (this.severityFilter) {
                 filtered = filtered.filter(incident => incident.severity === this.severityFilter);
             }
-            
+
             if (this.typeFilter) {
                 filtered = filtered.filter(incident => incident.incident_type === this.typeFilter);
+            }
+
+            if (this.sourceFilter) {
+                filtered = filtered.filter(incident => incident.source === this.sourceFilter);
+            }
+
+            if (this.dateFrom) {
+                const fromDate = new Date(this.dateFrom);
+                filtered = filtered.filter(incident => {
+                    const incidentDate = new Date(incident.published_date);
+                    return incidentDate >= fromDate;
+                });
+            }
+
+            if (this.dateTo) {
+                const toDate = new Date(this.dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                filtered = filtered.filter(incident => {
+                    const incidentDate = new Date(incident.published_date);
+                    return incidentDate <= toDate;
+                });
             }
             
             this.filteredIncidents = this.sortIncidents(filtered);
             this.currentPage = 1;
+            this.addToSearchHistory();
         },
         
         sortIncidents(incidents) {
@@ -503,6 +629,106 @@ window.IncidentsTableComponent = {
             }
             this.filterIncidents();
         },
+
+        clearAllFilters() {
+            this.searchQuery = '';
+            this.severityFilter = '';
+            this.typeFilter = '';
+            this.sourceFilter = '';
+            this.dateFrom = '';
+            this.dateTo = '';
+            this.filterIncidents();
+        },
+
+        saveSearch() {
+            const search = {
+                name: `Search ${this.savedSearches.length + 1}`,
+                query: {
+                    searchQuery: this.searchQuery,
+                    severityFilter: this.severityFilter,
+                    typeFilter: this.typeFilter,
+                    sourceFilter: this.sourceFilter,
+                    dateFrom: this.dateFrom,
+                    dateTo: this.dateTo
+                },
+                timestamp: new Date().toISOString()
+            };
+
+            this.savedSearches.push(search);
+            localStorage.setItem('incidentsSavedSearches', JSON.stringify(this.savedSearches));
+        },
+
+        loadSearch(savedQuery) {
+            this.searchQuery = savedQuery.searchQuery;
+            this.severityFilter = savedQuery.severityFilter;
+            this.typeFilter = savedQuery.typeFilter;
+            this.sourceFilter = savedQuery.sourceFilter;
+            this.dateFrom = savedQuery.dateFrom;
+            this.dateTo = savedQuery.dateTo;
+            this.filterIncidents();
+            this.showSavedSearches = false;
+        },
+
+        deleteSearch(index) {
+            this.savedSearches.splice(index, 1);
+            localStorage.setItem('incidentsSavedSearches', JSON.stringify(this.savedSearches));
+        },
+
+        loadSavedSearches() {
+            try {
+                const saved = localStorage.getItem('incidentsSavedSearches');
+                if (saved) {
+                    this.savedSearches = JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('Failed to load saved searches:', error);
+            }
+        },
+
+        addToSearchHistory() {
+            if (!this.searchQuery && !this.severityFilter && !this.typeFilter && !this.sourceFilter && !this.dateFrom && !this.dateTo) {
+                return;
+            }
+
+            const historyItem = {
+                query: this.searchQuery,
+                severityFilter: this.severityFilter,
+                typeFilter: this.typeFilter,
+                sourceFilter: this.sourceFilter,
+                dateFrom: this.dateFrom,
+                dateTo: this.dateTo,
+                timestamp: new Date().toISOString()
+            };
+
+            this.searchHistory = this.searchHistory.filter(item => {
+                return !(item.query === historyItem.query &&
+                       item.severityFilter === historyItem.severityFilter &&
+                       item.typeFilter === historyItem.typeFilter &&
+                       item.sourceFilter === historyItem.sourceFilter &&
+                       item.dateFrom === historyItem.dateFrom &&
+                       item.dateTo === historyItem.dateTo);
+            });
+
+            this.searchHistory.unshift(historyItem);
+
+            if (this.searchHistory.length > 10) {
+                this.searchHistory = this.searchHistory.slice(0, 10);
+            }
+
+            localStorage.setItem('incidentsSearchHistory', JSON.stringify(this.searchHistory));
+        },
+
+        loadSearchHistory() {
+            try {
+                const saved = localStorage.getItem('incidentsSearchHistory');
+                if (saved) {
+                    this.searchHistory = JSON.parse(saved);
+                }
+            } catch (error) {
+                console.error('Failed to load search history:', error);
+            }
+        },
+
         
         getSortIcon(field) {
             if (this.sortByField !== field) return 'fa-sort';

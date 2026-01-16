@@ -45,6 +45,28 @@ window.VulnerabilitiesTableComponent = {
                         <option value="false">No Exploit</option>
                         <option value="unknown">Unknown</option>
                     </select>
+                    <select v-model="sourceFilter" @change="filterVulnerabilities" class="form-select form-select-sm" aria-label="Filter by source" id="source-filter">
+                        <option value="">All Sources</option>
+                        <option v-for="source in uniqueSources" :key="source" :value="source">[[ source ]]</option>
+                    </select>
+                    <input
+                        type="date"
+                        v-model="dateFrom"
+                        @change="filterVulnerabilities"
+                        class="form-control form-control-sm"
+                        aria-label="Filter by date from"
+                        id="date-from"
+                        placeholder="From"
+                    >
+                    <input
+                        type="date"
+                        v-model="dateTo"
+                        @change="filterVulnerabilities"
+                        class="form-control form-control-sm"
+                        aria-label="Filter by date to"
+                        id="date-to"
+                        placeholder="To"
+                    >
                     <select v-model="itemsPerPage" @change="filterVulnerabilities" class="form-select form-select-sm" aria-label="Items per page" id="items-per-page">
                         <option :value="20">20 per page</option>
                         <option :value="50">50 per page</option>
@@ -54,6 +76,11 @@ window.VulnerabilitiesTableComponent = {
                     <button @click="refreshVulnerabilities" class="btn btn-sm btn-outline-primary" :disabled="loading" aria-label="Refresh vulnerabilities list">
                         <i class="bi bi-arrow-clockwise" :class="{ 'spin-icon': loading }" aria-hidden="true"></i>
                         <span class="visually-hidden">Refresh</span>
+                    </button>
+                </div>
+                <div v-if="searchQuery || severityFilter || cvssFilter || exploitFilter || sourceFilter || dateFrom || dateTo" class="text-end mb-2">
+                    <button @click="clearAllFilters" class="btn btn-sm btn-outline-secondary" aria-label="Clear all filters">
+                        <i class="bi bi-x-circle me-1" aria-hidden="true"></i>Clear All Filters
                     </button>
                 </div>
             </div>
@@ -385,6 +412,9 @@ window.VulnerabilitiesTableComponent = {
             severityFilter: '',
             cvssFilter: '',
             exploitFilter: '',
+            sourceFilter: '',
+            dateFrom: '',
+            dateTo: '',
             sortByField: 'cvss_score',
             sortDirection: 'desc',
             currentPage: 1,
@@ -400,9 +430,14 @@ window.VulnerabilitiesTableComponent = {
             const end = start + this.itemsPerPage;
             return this.filteredVulnerabilities.slice(start, end);
         },
-        
+
         totalPages() {
             return Math.ceil(this.filteredVulnerabilities.length / this.itemsPerPage);
+        },
+
+        uniqueSources() {
+            const sources = new Set(this.vulnerabilities.map(vuln => vuln.source).filter(Boolean));
+            return Array.from(sources).sort();
         }
     },
     
@@ -502,7 +537,28 @@ window.VulnerabilitiesTableComponent = {
                     return vuln.exploit_available === this.exploitFilter;
                 });
             }
-            
+
+            if (this.sourceFilter) {
+                filtered = filtered.filter(vuln => vuln.source === this.sourceFilter);
+            }
+
+            if (this.dateFrom) {
+                const fromDate = new Date(this.dateFrom);
+                filtered = filtered.filter(vuln => {
+                    const vulnDate = new Date(vuln.published_date);
+                    return vulnDate >= fromDate;
+                });
+            }
+
+            if (this.dateTo) {
+                const toDate = new Date(this.dateTo);
+                toDate.setHours(23, 59, 59, 999);
+                filtered = filtered.filter(vuln => {
+                    const vulnDate = new Date(vuln.published_date);
+                    return vulnDate <= toDate;
+                });
+            }
+
             this.filteredVulnerabilities = this.sortVulnerabilities(filtered);
             this.currentPage = 1;
         },
@@ -534,6 +590,17 @@ window.VulnerabilitiesTableComponent = {
                 this.sortByField = field;
                 this.sortDirection = 'asc';
             }
+            this.filterVulnerabilities();
+        },
+
+        clearAllFilters() {
+            this.searchQuery = '';
+            this.severityFilter = '';
+            this.cvssFilter = '';
+            this.exploitFilter = '';
+            this.sourceFilter = '';
+            this.dateFrom = '';
+            this.dateTo = '';
             this.filterVulnerabilities();
         },
         
