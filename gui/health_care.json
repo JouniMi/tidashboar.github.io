@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-01-19T11:50:09Z",
+  "generated_at": "2026-01-21T07:20:31Z",
   "industry": "Healthcare",
-  "summary": "**Healthcare‑Focused Cyber Threat Intelligence Report**  \n*Coverage period: 30 days (12 Dec 2025 – 31 Dec 2025)*  \n*Prepared by: [Your Name], Senior Threat Analyst – Healthcare Sector*  \n\n---\n\n## 1. Executive Summary  \n\nThe past month has been marked by a **surge of publicly disclosed vulnerabilities in networking, VPN, and cloud‑native platforms** that are widely deployed in hospitals, health‑systems, and medical‑device manufacturers. WatchGuard firewalls (three separate CVEs), Fortinet FortiOS SSL‑VPN 2FA‑bypass, and a critical MongoDB RCE flaw (CVE‑2025‑14847) together affect **thousands of healthcare organisations** that rely on these products for perimeter defence, remote clinician access, and patient‑record databases.  \n\nAt the same time, **ransomware‑as‑a‑service (RaaS) operators such as RansomHouse** are upgrading their encryption stacks, signalling a readiness to hit high‑value targets—including the health sector—where data confidentiality and rapid service restoration are regulatory imperatives.  Supply‑chain pressure is evident: a CISA‑flagged Digiever NVR vulnerability and a “third‑party access” supply‑chain advisory highlight the exposure of hospital surveillance and IoT ecosystems.  \n\nOverall, the threat landscape for healthcare is shifting from **opportunistic ransomware** toward **targeted exploitation of widely‑used infrastructure components**.  Attackers are leveraging **multi‑vector campaigns** (e.g., DNS‑poisoning APTs, malicious npm packages, and compromised Docker images) that can infiltrate clinical environments through development pipelines, remote‑access solutions, or third‑party SaaS integrations.  The strategic implication is a **higher probability of service disruption, patient‑data exfiltration, and regulatory fallout** if these vectors are not hardened.\n\n---\n\n## 2. Threat Actor Intelligence  \n\n| Actor / Group | Relevant Activity (30‑day window) | Healthcare Relevance | Tactics, Techniques, Procedures (TTPs) |\n|---------------|-----------------------------------|----------------------|----------------------------------------|\n| **RansomHouse** | “RansomHouse upgrades encryption with multi‑layered data processing” (20 Dec) | Ransomware gangs historically target hospitals for high ransom payouts; the new encryption makes de‑cryption harder for incident responders. | Multi‑layered symmetric + asymmetric encryption, aggressive key‑rotation, anti‑forensic wiping. |\n| **Evasive Panda (APT)** | DNS‑poisoning campaign delivering MgBot (24 Dec) | APTs have previously probed health‑research networks; DNS‑poisoning can hijack internal hospital DNS to redirect traffic to malicious payloads. | DNS cache poisoning, credential‑stealing bot (MgBot), lateral movement via SMB. |\n| **Nefilim Affiliate (Ukrainian)** | Guilty plea & affiliate role (22 Dec) – part of broader ransomware ecosystem. | While not yet seen targeting health, the affiliate model lowers entry barriers for actors who may pivot to healthcare. | Ransomware distribution via phishing, exploit‑kits, RDP brute‑force. |\n| **Supply‑Chain Actors (generic)** | “Why third‑party access remains the weak link” (23 Dec) & CISA Digiever NVR alert (25 Dec) | Hospitals outsource video‑surveillance, EMR SaaS, and device firmware; compromised third‑party code can provide footholds. | Abuse of vendor credentials, malicious updates, insecure API keys. |\n| **Malware‑as‑Service (npm/ Docker)** | Multiple npm‑package compromises (16 Dec, 27 Dec) and Docker hardened‑image release (21 Dec) | Development teams in health‑tech frequently use npm and Docker; malicious packages can embed credential‑stealers or ransomware droppers. | Supply‑chain injection, post‑install scripts, container escape techniques. |\n\n**Key Take‑aways**  \n\n* RansomHouse’s encryption upgrade raises the bar for de‑cryption; health organisations must maintain immutable backups and test restoration.  \n* APT‑style DNS poisoning (Evasive Panda) is a **new vector for initial compromise** of internal hospital networks that often rely on internal DNS for device management.  \n* The **supply‑chain focus** (third‑party access, NVR firmware, npm packages) is especially acute for healthcare because of the high number of vendor‑managed devices (imaging equipment, patient‑monitoring IoT, tele‑health platforms).  \n\n---\n\n## 3. Technical Threat Analysis  \n\n### 3.1 Vulnerabilities Impacting Healthcare Infrastructure  \n\n| CVE / Advisory | Asset | Exposure in Healthcare | Exploitation Status (30 days) | Mitigation |\n|----------------|-------|------------------------|------------------------------|------------|\n| **WatchGuard Fireware OS – multiple flaws** (CISA Known Exploited, 20 Dec) | Next‑Gen firewalls used by many hospitals | >115 k firewalls globally; many health‑systems run WatchGuard for perimeter security. | Actively exploited in the wild (see 22 Dec “Critical RCE flaw”). | Apply patches released 22 Dec; enforce network segmentation; monitor for anomalous outbound traffic. |\n| **WatchGuard Firebox Zero‑Day** (22 Dec) | Same as above | Same exposure | Exploited; remote code execution. | Immediate patch; consider temporary rule‑set tightening. |\n| **Fortinet FortiOS SSL‑VPN 2FA Bypass** (25 Dec) | Remote clinician access, tele‑health VPNs | FortiGate is a top VPN for health‑systems; 2FA bypass enables credential‑theft. | Active exploitation reported. | Deploy firmware update; enforce MFA at the identity‑provider layer; rotate VPN credentials. |\n| **Digiever DS‑2105 Pro NVR – Remote Code Execution** (25 Dec) | Video surveillance in hospitals, operating‑room cameras | NVRs often run on legacy OS; many health facilities use Digiever. | Actively exploited (CISA flag). | Patch firmware; isolate NVR VLAN; disable internet‑facing services. |\n| **MongoDB CVE‑2025‑14847 (RCE)** (25 Dec & 24 Dec) | Clinical data stores, research databases, EMR back‑ends | MongoDB is popular for unstructured health data (e.g., imaging metadata). | Active exploitation observed. | Upgrade to patched version; enforce authentication, network ACLs, and encryption at rest. |\n| **n8n Critical Flaw (CVSS 9.9)** (23 Dec) | Workflow‑automation platform used for patient‑onboarding, lab‑result routing | n8n is increasingly adopted for low‑code integration in health IT. | Publicly disclosed; exploitation possible. | Patch or migrate; restrict API access; audit workflow permissions. |\n| **Docker Hardened Images – Open‑Source Release** (21 Dec) | Containerised health‑apps, micro‑services | Containers are core to modern health platforms; insecure base images remain a risk. | Not an exploit but a mitigation opportunity. | Adopt hardened images; scan CI/CD pipelines. |\n\n### 3.2 Malware & Ransomware Families  \n\n| Malware / Ransomware | Delivery Vector (observed) | Healthcare Impact |\n|----------------------|----------------------------|-------------------|\n| **RansomHouse** (20 Dec) | Phishing, exploit‑kits, RDP brute‑force | High‑value patient data, potential HIPAA breach. |\n| **MgBot (delivered by Evasive Panda DNS poisoning)** (24 Dec) | DNS hijack → malicious download | Can exfiltrate credentials from EMR systems. |\n| **Nefilim** (affiliates, 22 Dec) | Ransomware‑as‑service, phishing | Potential for opportunistic attacks on health providers. |\n| **npm‑based trojans (lotusbail, fake WhatsApp API)** (16 Dec, 27 Dec) | Compromised npm packages used in health‑tech dev stacks | Credential theft, lateral movement into dev environments. |\n| **Docker‑based loader (weekly recap, 22 Dec)** | Malicious Docker images | Could compromise containerised health services. |\n\n### 3.3 Attack Surface Highlights  \n\n* **Perimeter & Remote‑Access** – WatchGuard, FortiGate, and VPN solutions are the most exposed.  \n* **Data‑Store Layer** – MongoDB and n8n are increasingly used for health data pipelines; unpatched instances provide a direct route to PHI.  \n* **IoT / Video Surveillance** – Digiever NVRs and other camera firmware are often overlooked in patch management.  \n* **Software Supply Chain** – npm and Docker ecosystems are a proven vector for inserting malicious code into health‑tech applications.  \n\n---\n\n## 4. Strategic Intelligence  \n\n### 4.1 Sub‑Sector Risk Assessment  \n\n| Sub‑Sector | Primary Threats (30 days) | Likelihood | Impact (Confidentiality, Integrity, Availability) |\n|------------|---------------------------|------------|---------------------------------------------------|\n| **Hospital & Clinical Operations** | WatchGuard & FortiGate exploits, VPN 2FA bypass, ransomware (RansomHouse) | High (critical infrastructure) | High – service outage, PHI breach, regulatory fines. |\n| **Medical‑Device & IoT** | Digiever NVR RCE, supply‑chain firmware vulnerabilities | Medium‑High (legacy devices) | Medium‑High – patient‑monitoring disruption, safety risk. |\n| **Health‑Tech SaaS / EMR Platforms** | MongoDB RCE, n8n workflow flaw, malicious npm packages | High (rapid dev cycles) | High – data loss, credential theft, compliance breach. |\n| **Pharmaceutical R&D** | Supply‑chain third‑party access, APT DNS poisoning | Medium | Medium – intellectual‑property theft, research data loss. |\n| **Tele‑health / Remote Care** | VPN/SSL‑VPN bypass, ransomware, Docker image compromise | High | High – loss of patient access, privacy breach. |\n\n### 4.2 High‑Impact Incidents (observed)  \n\n* **WatchGuard RCE (22 Dec)** – could have been leveraged to pivot into hospital networks; no public health‑sector attribution yet, but the scale suggests a high‑impact scenario.  \n* **FortiOS 2FA Bypass (25 Dec)** – remote‑access breach could lead to ransomware deployment during a tele‑health surge.  \n* **MongoDB RCE (25 Dec)** – potential for mass exfiltration of unstructured patient data.  \n\n### 4.3 Lessons Learned & Incident‑Response Insights  \n\n1. **Patch Velocity Matters** – The time between vulnerability disclosure (e.g., WatchGuard CVE) and patch deployment in health organisations averaged >2 weeks in surveyed case studies, leaving a large window for exploitation.  \n2. **Zero‑Trust Network Segmentation** – Segregating clinical OT (e.g., imaging devices) from IT networks mitigates lateral movement from compromised firewalls or NVRs.  \n3. **Supply‑Chain Validation** – Implement SBOM (Software Bill of Materials) checks for npm and Docker images; enforce signed‑artifact policies.  \n4. **Backup Integrity Testing** – RansomHouse’s new encryption defeats many decryption tools; regular immutable backup verification is essential.  \n\n---\n\n## 5. Forward‑Looking Assessment  \n\n| Emerging Trend | Expected Evolution (6‑12 months) | Recommended Defensive Priorities |\n|----------------|----------------------------------|---------------------------------|\n| **Infrastructure‑as‑Code (IaC) Exploits** | Attackers will embed malicious modules into Terraform/Ansible scripts used by health‑IT teams. | Harden CI/CD pipelines; integrate IaC scanning for secrets and vulnerable modules. |\n| **AI‑Driven Phishing & Deepfake Social Engineering** | Increased use of AI‑generated voice/video to impersonate clinicians for credential theft. | Deploy AI‑enhanced email/voice authentication; conduct regular phishing simulations. |\n| **Targeted APT Campaigns on Health‑Research** | Nations will focus on biotech IP; DNS‑poisoning (Evasive Panda) will be a preferred initial vector. | Deploy DNSSEC, monitor for anomalous DNS responses, isolate research networks. |\n| **Ransomware Encryption Hardening** | RansomHouse’s multi‑layered encryption will become a baseline; decryption keys will be stored off‑site only. | Maintain air‑gapped, verified backups; negotiate ransomware‑insurance policies with proven de‑cryption guarantees. |\n| **Supply‑Chain Regulation** | Governments (e.g., CISA, EU) will issue mandatory SBOM requirements for medical‑device firmware. | Begin internal SBOM inventory; engage vendors for timely firmware updates and attestations. |\n\n**Top 5 Defensive Actions for Healthcare Executives (Q1 2026)**  \n\n1. **Accelerate Patch Management** – Prioritise WatchGuard, FortiGate, MongoDB, and Digiever firmware updates; use automated patch‑testing labs to reduce lag.  \n2. **Implement Zero‑Trust Network Access (ZTNA)** – Replace legacy VPNs where possible; enforce least‑privilege for remote clinicians.  \n3. **Secure the Software Supply Chain** – Enforce signed npm packages, use hardened Docker images, and adopt SBOM verification for all third‑party components.  \n4. **Strengthen Backup & Recovery** – Deploy immutable, air‑gapped backups for EMR and research databases; test restores quarterly.  \n5. **Enhance Threat‑Hunting for APT Indicators** – Deploy DNS‑monitoring (detect poisoning), hunt for MgBot signatures, and integrate threat‑intel feeds on healthcare‑focused APT groups (e.g., Evasive Panda).  \n\n---\n\n**Conclusion** – The convergence of high‑severity infrastructure vulnerabilities, sophisticated ransomware encryption, and supply‑chain attack vectors creates a **multi‑layered risk environment** for the healthcare sector.  Immediate, coordinated action on patching, zero‑trust networking, and supply‑chain validation will materially reduce the probability of a disruptive breach and help maintain compliance with HIPAA, GDPR, and emerging health‑sector cyber‑regulations.  \n\n---  \n\n*All observations are derived exclusively from the article set provided (30 Dec 2025 – 31 Dec 2025). No external sources were consulted.*",
+  "summary": "**THREAT INTELLIGENCE REPORT – HEALTHCARE SECTOR**  \n*Coverage period: 30 days (22 Dec 2025 – 31 Dec 2025)*  \n*Prepared by: [Your Name], Senior Cyber‑Security Analyst – Healthcare*  \n\n---\n\n## 1. Executive Summary  \n\nThe past month has been dominated by **infrastructure‑level exploits** and **supply‑chain compromises** that, while reported in generic or non‑healthcare contexts, have a **high probability of impacting hospitals, health‑systems, medical‑device manufacturers, and health‑tech SaaS providers**.  Two broad patterns emerge:\n\n1. **Critical vulnerabilities in network‑security appliances and cloud‑native services** – WatchGuard Firebox, Fortinet FortiOS SSL‑VPN, Digiever NVR, MongoDB, and the workflow‑automation platform **n8n** – are being actively weaponised in the wild.  These products are core to the perimeter and internal segmentation of most modern health‑care networks, making the sector a natural target for ransomware and espionage actors.\n\n2. **Supply‑chain attacks on widely‑used development tools and open‑source components** – EmEditor, LangChain, and popular NPM packages – demonstrate a shift toward **“software‑supply‑chain as a delivery vector”**.  Health‑care organisations that rely on rapid DevOps pipelines, AI‑assisted clinical decision tools, or third‑party SaaS platforms are exposed to the same risk as any other industry.\n\nTogether, these trends raise the **overall risk rating for the health‑care sector to “High”** for the next 12 months, with ransomware, credential‑theft, and data‑exfiltration as the most likely outcomes.\n\n---\n\n## 2. Threat Actor Intelligence  \n\n| Actor / Group | Motivation | Tactics / Tools | Relevance to Healthcare |\n|---------------|------------|-----------------|------------------------|\n| **Evasive Panda (China‑linked APT)** | State‑sponsored espionage, long‑term persistence | DNS‑poisoning → MgBot malware; use of signed kernel‑mode drivers (Mustang Panda) | Hospitals are attractive for patient‑record intelligence and biotech IP. The DNS‑poisoning campaign can be leveraged against health‑care DNS infrastructure. |\n| **Mustang Panda (APT)** | Espionage, intellectual‑property theft | Kernel‑mode rootkits, ToneShell backdoor, signed drivers | Medical‑device firmware supply chains often use Windows‑based build environments; a compromised build server can inject malicious drivers into device images. |\n| **Nefilim ransomware affiliate (Ukrainian)** | Financial gain | Ransomware deployment, extortion, data‑leak threats | Ransomware continues to be the top threat to hospitals; the recent guilty pleas confirm that Nefilim affiliates are still active and may target health‑care for high‑value payouts. |\n| **Generic cyber‑crime “Affiliate” networks** (e.g., the “Ploutus” ATM malware ecosystem) | Financial theft | Malware distribution via compromised npm packages, malicious extensions | Health‑care IT staff often use the same development ecosystems (npm, Chrome extensions) – a compromised package can provide footholds for credential theft. |\n| **Supply‑chain actors (Shai‑Hulud, EmEditor supply‑chain, Red Hat/GitLab breach)** | Financial theft, credential harvesting | Malicious updates, compromised binaries, credential‑stealing implants | Health‑care organisations that rely on Red Hat Enterprise Linux, GitLab CI/CD, or EmEditor for log analysis are directly exposed. |\n\n**Key Take‑aways**\n\n* The **APT groups** are focusing on **stealthy, kernel‑level implants** and **DNS manipulation**, both of which can bypass traditional perimeter defenses common in health‑care networks.  \n* **Ransomware affiliates** remain a high‑frequency threat; the legal outcomes (pleas) do not diminish the likelihood of future attacks.  \n* **Supply‑chain compromises** are now a primary delivery mechanism, and health‑care’s rapid adoption of AI/ML tooling (LangChain, large‑language‑model APIs) expands the attack surface.\n\n---\n\n## 3. Technical Threat Analysis  \n\n### 3.1 Vulnerabilities Actively Exploited  \n\n| CVE / Vulnerability | Asset Type | Exploited? | Potential Impact on Healthcare |\n|---------------------|------------|------------|--------------------------------|\n| **CVE‑2025‑59374** – ASUS Live Update | Firmware update client | **No** (CISA advisory, low urgency) | Minimal – only affects admin workstations, not core clinical systems. |\n| **WatchGuard Firebox Zero‑Day** (multiple CVEs) | Next‑gen firewall | **Yes – exploited in the wild** | Disruption of network segmentation, possible lateral movement into EMR/EHR systems. |\n| **Critical RCE on WatchGuard firewalls** (115k devices) | Firewall | **Yes** | Same as above; could allow ransomware encryption of patient data. |\n| **FortiOS SSL‑VPN 2FA Bypass** (active exploitation) | VPN gateway | **Yes** | Remote access to clinical staff portals; credential theft, ransomware drop. |\n| **Digiever DS‑2105 Pro NVR (CISA‑added)** | Surveillance cameras (often in hospitals) | **Yes** (CISA catalog) | Potential to gain visual reconnaissance of critical areas, facilitate physical‑security attacks. |\n| **MongoDB CVE‑2025‑14847** (high‑severity RCE) | Database back‑end for many health‑apps | **Yes – actively exploited** | Full database compromise → PHI exfiltration, ransomware. |\n| **n8n CVE‑2025‑xxxx (CVSS 9.9)** | Workflow‑automation (used for patient‑record routing) | **Yes – active** | Arbitrary code execution on integration servers, possible credential theft. |\n| **Microsoft Message Queuing (MSMQ) bug** (out‑of‑band update) | Windows server messaging | **Yes** | Could be abused for privilege escalation in hospital IT environments. |\n| **LangChain Core Serialization Injection** | AI‑assisted clinical decision tools | **Yes – publicly disclosed** | Leakage of API keys, patient data, model poisoning. |\n| **Various malicious NPM packages (WhatsApp API, lotusbail, etc.)** | Development pipelines | **Yes – observed in the wild** | Supply‑chain compromise of health‑tech apps, credential theft. |\n\n### 3.2 Malware Families Observed  \n\n| Malware | Delivery Vector | Notable Capabilities | Healthcare Relevance |\n|---------|----------------|----------------------|----------------------|\n| **MgBot** (delivered via DNS poisoning by Evasive Panda) | DNS hijack → malicious payload | Remote access, data exfiltration | Can be used to infiltrate hospital DNS and redirect internal traffic. |\n| **ToneShell** (kernel‑mode rootkit, Mustang Panda) | Signed driver, stealth persistence | Full system control, credential dumping | Threat to medical‑device firmware build environments. |\n| **WebRAT** (GitHub fake exploits) | Malicious repo, social engineering | Remote admin, file theft | Could be used to compromise health‑tech open‑source projects. |\n| **MacSync** (macOS stealer) | Signed macOS app, Gatekeeper evasion | Credential theft, password manager extraction | Relevant for health‑care executives using macOS. |\n| **Ransomware (Nefilim affiliates)** | Phishing, exploit kits | Encrypts data, extorts | Direct impact on hospital operations. |\n\n### 3.3 Attack Surface Highlights  \n\n* **Perimeter devices** – WatchGuard, Fortinet, Digiever NVRs are common in health‑care facilities.  \n* **Cloud‑native services** – MongoDB Atlas, n8n SaaS, Microsoft Azure/Office 365 (Teams, BitLocker) are heavily used for patient data processing.  \n* **DevOps pipelines** – NPM, GitLab, EmEditor, LangChain, and other open‑source components are embedded in health‑tech product development.  \n* **Remote access** – VPNs and remote‑desktop services (FortiOS, Microsoft RDP) remain a primary entry point for ransomware.  \n\n---\n\n## 4. Strategic Intelligence  \n\n### 4.1 Sub‑Sector Risk Assessment  \n\n| Sub‑Sector | Primary Threats | Likelihood | Impact | Mitigation Priority |\n|------------|----------------|------------|--------|---------------------|\n| **Hospital & Clinical Networks** | Firewall/VPN exploits, ransomware, credential theft | **High** | **Critical** (patient‑care disruption) | Patch firewalls/VPNs, network segmentation, MFA enforcement. |\n| **Medical‑Device Manufacturers** | Supply‑chain attacks (EmEditor, LangChain), kernel‑mode rootkits | **Medium‑High** | **High** (device safety, recall risk) | Secure build environments, SBOM verification, code‑signing integrity. |\n| **Health‑Tech SaaS / AI Platforms** | Malicious NPM packages, LangChain injection, MongoDB RCE | **Medium** | **High** (data breach, regulatory fines) | Dependency scanning, runtime WAF, zero‑trust API gateways. |\n| **Pharmaceutical R&D** | APT espionage (Evasive/ Mustang Panda), DNS poisoning | **Medium** | **High** (IP theft) | DNSSEC, threat‑intel feeds, isolated research networks. |\n| **Health‑Insurance & Billing** | Ransomware, credential‑stealing extensions, Red Hat breach | **High** | **High** (financial loss, PII exposure) | Harden CI/CD, patch Red Hat, multi‑factor authentication. |\n\n### 4.2 High‑Impact Incidents (from the data set)  \n\n* **WatchGuard Firebox zero‑day exploitation** – could have crippled a hospital’s network segmentation, enabling ransomware spread.  \n* **FortiOS SSL‑VPN 2FA bypass** – active exploitation suggests imminent attacks on remote‑access portals used by clinicians.  \n* **MongoDB RCE (CVE‑2025‑14847)** – a single successful exploit can expose entire patient‑record databases.  \n* **n8n workflow automation flaw** – arbitrary code execution on integration servers that move PHI between systems.  \n\n### 4.3 Lessons Learned & IR Insights  \n\n1. **Patch Management is still the weakest link** – many exploits (WatchGuard, FortiOS, MongoDB) were known for weeks before active exploitation.  \n2. **Supply‑chain visibility is mandatory** – the EmEditor and NPM package incidents demonstrate that a single compromised developer tool can cascade into a health‑care breach.  \n3. **Zero‑Trust Network Access (ZTNA) reduces VPN‑related risk** – the FortiOS 2FA bypass underscores the need to move away from traditional VPNs.  \n4. **Threat‑intel integration** – real‑time feeds on APT DNS‑poisoning (Evasive Panda) and ransomware affiliate activity (Nefilim) should be ingested into SIEM/SOAR for automated blocking.  \n\n---\n\n## 5. Forward‑Looking Assessment  \n\n| Emerging Trend | Forecast (next 6‑12 months) | Recommended Defensive Priorities |\n|----------------|-----------------------------|---------------------------------|\n| **Increased weaponisation of supply‑chain compromises** (npm, LangChain, EmEditor) | Expect at least 2‑3 high‑profile health‑tech supply‑chain incidents per year. | Deploy Software‑Bill‑of‑Materials (SBOM) tracking, enforce signed‑artifact verification, and integrate SCA tools into CI pipelines. |\n| **Kernel‑mode rootkits targeting signed drivers** (Mustang Panda) | APTs will broaden targeting to medical‑device firmware and hospital‑grade imaging systems. | Harden build servers, enforce strict code‑signing policies, and perform regular integrity checks on device firmware. |\n| **Ransomware affiliates leveraging VPN/Zero‑Trust bypasses** | Ransomware groups will increasingly exploit VPN flaws before moving to ZTNA. | De‑commission legacy VPNs, adopt ZTNA with continuous authentication, and enforce MFA on all remote access. |\n| **AI‑model poisoning via LangChain/LLM supply‑chain** | Health‑care AI decision tools will become a new espionage vector. | Isolate LLM inference environments, monitor API key usage, and apply input‑validation hardening. |\n| **Targeted DNS‑poisoning campaigns** (Evasive Panda) | Hospitals with legacy DNS infrastructure will be prime targets for reconnaissance. | Deploy DNSSEC, use reputable DNS filtering services, and monitor for anomalous DNS responses. |\n\n**Top 5 Action Items for Health‑Care CISOs (Q1 2026)**  \n\n1. **Immediate patching** of WatchGuard firewalls, FortiOS SSL‑VPN, and MongoDB servers; verify patch status across all sites.  \n2. **Implement a zero‑trust remote‑access framework** (ZTNA) and retire legacy VPN accounts.  \n3. **Adopt a mandatory SBOM policy** for all third‑party software, with automated SCA scanning for npm, Python, and container images.  \n4. **Deploy DNSSEC and DNS‑traffic anomaly detection** on internal resolvers; block external DNS hijacking attempts.  \n5. **Run a tabletop exercise focused on supply‑chain compromise** (e.g., EmEditor or LangChain injection) to test detection, containment, and communication protocols.\n\n---\n\n**Prepared by:**  \n[Your Name] – Senior Cyber‑Security Analyst, Healthcare Focus  \n[Your Organization] – Threat Intelligence Division  \n\n*All observations are derived exclusively from the articles listed in the source data set (30 Dec 2025 – 31 Dec 2025). No external information has been introduced.*",
   "stats": {
     "7_day": {
-      "total_documents": 18,
+      "total_documents": 23,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -12,7 +12,7 @@
       "top_geographies": [
         [
           "Global",
-          8
+          13
         ],
         [
           "United States",
@@ -20,42 +20,11 @@
         ],
         [
           "Europe",
-          3
-        ],
-        [
-          "United Kingdom",
-          2
-        ],
-        [
-          "North America",
-          2
-        ]
-      ],
-      "top_exploit_kits": [],
-      "top_attack_vectors": []
-    },
-    "30_day": {
-      "total_documents": 38,
-      "top_threat_actors": [],
-      "top_vulnerabilities": [],
-      "top_incidents": [],
-      "top_mitre_techniques": [],
-      "top_geographies": [
-        [
-          "Global",
-          26
-        ],
-        [
-          "United States",
-          9
-        ],
-        [
-          "Europe",
           5
         ],
         [
           "North America",
-          4
+          3
         ],
         [
           "Asia-Pacific",
@@ -65,8 +34,39 @@
       "top_exploit_kits": [],
       "top_attack_vectors": []
     },
+    "30_day": {
+      "total_documents": 44,
+      "top_threat_actors": [],
+      "top_vulnerabilities": [],
+      "top_incidents": [],
+      "top_mitre_techniques": [],
+      "top_geographies": [
+        [
+          "Global",
+          29
+        ],
+        [
+          "United States",
+          10
+        ],
+        [
+          "Europe",
+          7
+        ],
+        [
+          "North America",
+          5
+        ],
+        [
+          "Asia-Pacific",
+          5
+        ]
+      ],
+      "top_exploit_kits": [],
+      "top_attack_vectors": []
+    },
     "150_day": {
-      "total_documents": 341,
+      "total_documents": 349,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -87,23 +87,23 @@
       "top_geographies": [
         [
           "Global",
-          215
+          220
         ],
         [
           "Europe",
-          75
+          77
         ],
         [
           "North America",
-          61
+          62
         ],
         [
           "Asia-Pacific",
-          55
+          57
         ],
         [
           "United States",
-          41
+          43
         ]
       ],
       "top_exploit_kits": [],
@@ -146,11 +146,11 @@
         "Manufacturing": 26
       },
       "2026-01": {
-        "Healthcare": 34,
-        "Financial Services": 25,
-        "Technology": 22,
-        "Government": 14,
-        "Education": 11
+        "Healthcare": 42,
+        "Financial Services": 33,
+        "Technology": 30,
+        "Government": 18,
+        "Education": 13
       }
     },
     "highlighted_incident": {},
