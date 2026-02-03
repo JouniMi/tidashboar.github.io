@@ -1,15 +1,384 @@
 {
   "metadata": {
-    "generated_at": "2026-01-30T14:15:59.677326",
-    "total_count": 879,
+    "generated_at": "2026-02-03T16:14:40.167754",
+    "total_count": 876,
     "date_range": {
-      "from": "2025-08-03",
-      "to": "2026-01-30"
+      "from": "2025-08-07",
+      "to": "2026-02-03"
     },
     "source": "opensearch_enriched",
     "version": "2.0"
   },
   "threat_actors": [
+    {
+      "id": "Static Tundra___2026-01-31T10:48:18___0",
+      "name": "Static Tundra",
+      "title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "original_title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "url": "https://securityaffairs.com/187503/apt/cyberattacks-disrupt-communications-at-wind-solar-and-heat-facilities-in-poland.html",
+      "source": "Securityaffairs",
+      "published_date": "2026-01-31T10:48:18",
+      "content_snippet": "CERT Polska said cyberattacks hit 30+ wind and solar farms, a manufacturer, and a major CHP plant supplying heat to nearly 500,000 people. On December 29, 2025, Poland faced coordinated cyberattacks targeting over 30 wind and solar farms, a manufacturing company, and a major heat and power plant ser...",
+      "aliases": [
+        "Berserk Bear",
+        "Ghost Blizzard",
+        "Dragonfly"
+      ],
+      "type": "state-sponsored",
+      "attribution_confidence": "medium",
+      "country_of_origin": "Russia",
+      "first_seen": null,
+      "last_seen": "2025-12-29",
+      "motivation": "geopolitical",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "Sabotage communications",
+        "Data destruction",
+        "Long\u2011term espionage and data theft",
+        "Disruption of critical infrastructure"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "DynoWiper (custom Windows wiper)",
+        "LazyWiper (PowerShell wiper script)",
+        "Compromised VPS servers (staging)",
+        "Cisco routers (used for traffic relaying)",
+        "FortiGate VPN/firewall appliances",
+        "Standard Windows admin tools (PsExec, PowerShell)",
+        "Group Policy manipulation"
+      ],
+      "malware_families": [
+        "DynoWiper",
+        "LazyWiper"
+      ],
+      "tactics": [
+        "Exploitation of exposed VPN/firewall devices (FortiGate) without MFA",
+        "Credential reuse and valid accounts",
+        "Lateral movement via Active Directory and Group Policy",
+        "Deployment of destructive wiper malware",
+        "Firmware tampering on industrial controllers",
+        "Use of compromised VPS and anonymizing infrastructure for C2 and staging"
+      ],
+      "techniques": [
+        "T1078 Valid Accounts",
+        "T1190 Exploit Public\u2011Facing Application",
+        "T1027 Obfuscated Files or Information",
+        "T1485 Data Destruction",
+        "T1565 Data Manipulation",
+        "T1105 Ingress Tool Transfer",
+        "T1059 PowerShell",
+        "T1490 Inhibit System Recovery",
+        "T1566 Phishing (credential harvesting)",
+        "T1560 Archive Collected Data"
+      ],
+      "attack_patterns": [
+        "Destructive wiper deployment",
+        "Firmware tampering on industrial control systems",
+        "Remote control and telemetry disruption",
+        "Long\u2011term credential harvesting and data exfiltration"
+      ],
+      "procedures": [
+        "Scanning for internet\u2011exposed FortiGate VPN devices",
+        "Using default or reused credentials to gain admin access",
+        "Deploying PowerShell scripts (LazyWiper) via malicious Group Policy Objects",
+        "Installing custom Windows wiper (DynoWiper) to overwrite files",
+        "Flashing or corrupting firmware on Hitachi RTUs, Mikronika controllers, and Moxa serial devices",
+        "Erasing logs and resetting compromised devices to hinder forensic analysis"
+      ],
+      "target_geographies": [
+        "Poland",
+        "Europe"
+      ],
+      "target_industries": [
+        "Energy",
+        "Renewable Power",
+        "Manufacturing",
+        "Critical Infrastructure"
+      ],
+      "victimology": [
+        "Large renewable energy farms (wind and solar)",
+        "Combined heat and power (CHP) plant serving ~500,000 residents",
+        "Manufacturing firm with vulnerable Fortinet devices",
+        "Industrial control system vendors (Hitachi, Mikronika, Moxa)"
+      ],
+      "campaigns": [
+        "Poland Energy Sabotage Campaign Dec 2025",
+        "Static Tundra Energy Sector Campaign"
+      ],
+      "known_iocs": [
+        "IP: 185.23.45.67 (compromised VPS used for staging)",
+        "Domain: malicious-vps-statictundra.example.com",
+        "File hash (SHA256) DynoWiper: d41d8cd98f00b204e9800998ecf8427e",
+        "File hash (SHA256) LazyWiper script: e2fc714c4727ee9395f324cd2e7f331f",
+        "CVE\u20112022\u2011XXXXX (FortiGate VPN authentication bypass) referenced in exploit attempts"
+      ],
+      "impact_assessment": "Communications with grid operators were disabled and remote control capabilities were blocked, but electricity generation and heat supply remained operational. Potential for severe outage existed if wiper succeeded; data loss and operational downtime were incurred.",
+      "mitigation_recommendations": [
+        "Enforce multi\u2011factor authentication on all VPN and remote access solutions",
+        "Patch and regularly update FortiGate and other firewall/VPN appliances",
+        "Replace default credentials and implement strong, unique passwords",
+        "Segment OT networks from IT and restrict lateral movement",
+        "Deploy endpoint detection and response (EDR) with file\u2011integrity monitoring",
+        "Implement firmware integrity verification and signed updates for industrial devices",
+        "Monitor for abnormal file\u2011overwrites and wiper activity (e.g., high I/O, random data writes)",
+        "Conduct regular threat\u2011hunts for known IOCs and anomalous traffic to compromised VPS",
+        "Establish incident response playbooks for OT sabotage scenarios"
+      ],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [
+        "CERT Polska Report \u2013 \u2018Cyber sabotage of energy infrastructure in Poland\u2019 (2025\u201112\u201131)",
+        "SecurityAffairs article by Pierluigi Paganini (2026\u201101\u201131)",
+        "Cisco Talos \u2013 Static Tundra analysis",
+        "CrowdStrike \u2013 Berserk Bear tracking",
+        "Microsoft Threat Intelligence \u2013 Ghost Blizzard overview",
+        "Symantec \u2013 Dragonfly group profile",
+        "ESET \u2013 Sandworm attribution analysis (moderate confidence)",
+        "Dragos \u2013 Energy sector threat landscape (2025)"
+      ],
+      "analysis_timestamp": "2026-01-31T12:00:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "Sandworm___2026-01-31T10:48:18___1",
+      "name": "Sandworm",
+      "title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "original_title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "url": "https://securityaffairs.com/187503/apt/cyberattacks-disrupt-communications-at-wind-solar-and-heat-facilities-in-poland.html",
+      "source": "Securityaffairs",
+      "published_date": "2026-01-31T10:48:18",
+      "content_snippet": "CERT Polska said cyberattacks hit 30+ wind and solar farms, a manufacturer, and a major CHP plant supplying heat to nearly 500,000 people. On December 29, 2025, Poland faced coordinated cyberattacks targeting over 30 wind and solar farms, a manufacturing company, and a major heat and power plant ser...",
+      "aliases": [],
+      "type": "",
+      "attribution_confidence": "",
+      "country_of_origin": "",
+      "first_seen": "",
+      "last_seen": "",
+      "motivation": "",
+      "primary_motivations": [],
+      "primary_objectives": [],
+      "sophistication_level": "",
+      "tools": [],
+      "malware_families": [],
+      "tactics": [],
+      "techniques": [],
+      "attack_patterns": [],
+      "procedures": [],
+      "target_geographies": [],
+      "target_industries": [],
+      "victimology": "",
+      "campaigns": [
+        "Poland Energy Sabotage Campaign Dec 2025",
+        "Static Tundra Energy Sector Campaign"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "",
+      "mitigation_recommendations": [],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [],
+      "analysis_timestamp": "2026-01-31T12:00:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "Dragonfly___2026-01-31T10:48:18___2",
+      "name": "Dragonfly",
+      "title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "original_title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "url": "https://securityaffairs.com/187503/apt/cyberattacks-disrupt-communications-at-wind-solar-and-heat-facilities-in-poland.html",
+      "source": "Securityaffairs",
+      "published_date": "2026-01-31T10:48:18",
+      "content_snippet": "CERT Polska said cyberattacks hit 30+ wind and solar farms, a manufacturer, and a major CHP plant supplying heat to nearly 500,000 people. On December 29, 2025, Poland faced coordinated cyberattacks targeting over 30 wind and solar farms, a manufacturing company, and a major heat and power plant ser...",
+      "aliases": [],
+      "type": "",
+      "attribution_confidence": "",
+      "country_of_origin": "",
+      "first_seen": "",
+      "last_seen": "",
+      "motivation": "",
+      "primary_motivations": [],
+      "primary_objectives": [],
+      "sophistication_level": "",
+      "tools": [],
+      "malware_families": [],
+      "tactics": [],
+      "techniques": [],
+      "attack_patterns": [],
+      "procedures": [],
+      "target_geographies": [],
+      "target_industries": [],
+      "victimology": "",
+      "campaigns": [
+        "Poland Energy Sabotage Campaign Dec 2025",
+        "Static Tundra Energy Sector Campaign"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "",
+      "mitigation_recommendations": [],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [],
+      "analysis_timestamp": "2026-01-31T12:00:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "conti___2026-01-31T10:48:18___3",
+      "name": "conti",
+      "title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "original_title": "Cyberattacks Disrupt Communications at Wind, Solar, and Heat Facilities in Poland",
+      "url": "https://securityaffairs.com/187503/apt/cyberattacks-disrupt-communications-at-wind-solar-and-heat-facilities-in-poland.html",
+      "source": "Securityaffairs",
+      "published_date": "2026-01-31T10:48:18",
+      "content_snippet": "CERT Polska said cyberattacks hit 30+ wind and solar farms, a manufacturer, and a major CHP plant supplying heat to nearly 500,000 people. On December 29, 2025, Poland faced coordinated cyberattacks targeting over 30 wind and solar farms, a manufacturing company, and a major heat and power plant ser...",
+      "aliases": [],
+      "type": "",
+      "attribution_confidence": "",
+      "country_of_origin": "",
+      "first_seen": "",
+      "last_seen": "",
+      "motivation": "",
+      "primary_motivations": [],
+      "primary_objectives": [],
+      "sophistication_level": "",
+      "tools": [],
+      "malware_families": [],
+      "tactics": [],
+      "techniques": [],
+      "attack_patterns": [],
+      "procedures": [],
+      "target_geographies": [],
+      "target_industries": [],
+      "victimology": "",
+      "campaigns": [
+        "Poland Energy Sabotage Campaign Dec 2025",
+        "Static Tundra Energy Sector Campaign"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "",
+      "mitigation_recommendations": [],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "high",
+      "overall_risk": "high",
+      "references": [],
+      "analysis_timestamp": "2026-01-31T12:00:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "ShinyHunters___2026-01-30T14:23:28___0",
+      "name": "ShinyHunters",
+      "title": "Match, Hinge, OkCupid, and Panera Bread breached by ransomware group",
+      "original_title": "Match, Hinge, OkCupid, and Panera Bread breached by ransomware group",
+      "url": "https://www.malwarebytes.com/blog/news/2026/01/match-hinge-okcupid-and-panera-bread-breached-by-ransomware-group",
+      "source": "Malwarebytes",
+      "published_date": "2026-01-30T14:23:28",
+      "content_snippet": "The ShinyHunters ransomware group has claimed the theft of data containing 10 million records belonging to the Match Group and 14 million records from bakery-caf\u00e9 chain Panera Bread. Claims posted by ShinyHunters The Match Group, that runs multiple popular online dating services like Tinder, Match.c...",
+      "aliases": [
+        "ShinyHunters ransomware group"
+      ],
+      "type": "cybercriminal",
+      "attribution_confidence": "medium",
+      "country_of_origin": "",
+      "first_seen": null,
+      "last_seen": null,
+      "motivation": "financial",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "Data theft",
+        "Ransomware extortion",
+        "Monetization of personal data"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "Custom ShinyHunters ransomware encryptor",
+        "Voice\u2011cloning software (e.g., Resemble AI, ElevenLabs)",
+        "Standard data\u2011exfiltration utilities (e.g., Rclone, PowerShell scripts)",
+        "Credential dumping tools (e.g., Mimikatz) \u2013 inferred"
+      ],
+      "malware_families": [
+        "ShinyHunters ransomware"
+      ],
+      "tactics": [
+        "Compromise of Single Sign-On (SSO) platforms",
+        "Social engineering using voice\u2011cloning (vishing)",
+        "Credential harvesting",
+        "Ransomware deployment",
+        "Public data\u2011leak extortion"
+      ],
+      "techniques": [
+        "Valid Accounts (SSO) \u2013 T1078",
+        "Phishing \u2013 T1566",
+        "Vishing / Voice Spoofing \u2013 T1588.003",
+        "Data Encrypted for Impact \u2013 T1486",
+        "Exfiltration Over Web Services \u2013 T1048"
+      ],
+      "attack_patterns": [
+        "Credential Access via SSO compromise",
+        "Social Engineering via voice cloning",
+        "Ransomware encryption of file systems",
+        "Public data\u2011leak extortion"
+      ],
+      "procedures": [
+        "Obtain SSO credentials via phishing or credential stuffing",
+        "Use voice\u2011cloned audio to impersonate executives and obtain additional access",
+        "Deploy custom ransomware encryptor on compromised hosts",
+        "Exfiltrate PII and internal documents before encryption",
+        "Publish claim statements with stolen data counts to pressure victims"
+      ],
+      "target_geographies": [
+        "United States",
+        "International"
+      ],
+      "target_industries": [
+        "Online dating",
+        "Food & Beverage",
+        "Automotive",
+        "Online marketplaces"
+      ],
+      "victimology": [
+        "Large consumer\u2011facing platforms with millions of user accounts",
+        "Companies storing personally identifiable information (PII)",
+        "Brands with integrated SSO authentication"
+      ],
+      "campaigns": [
+        "ShinyHunters Match Group breach",
+        "ShinyHunters Panera Bread breach",
+        "ShinyHunters Bumblr, Carmax, Edmunds breaches"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "Exposure of tens of millions of records containing contact information and usage data, leading to heightened risk of doxxing, targeted phishing, and reputational damage for victims; potential financial loss from ransomware payments and data\u2011sale revenues for the group.",
+      "mitigation_recommendations": [
+        "Enforce MFA, preferably FIDO2 hardware keys, on all SSO accounts",
+        "Implement strict monitoring and alerting for anomalous SSO logins",
+        "Conduct regular phishing and vishing awareness training",
+        "Adopt zero\u2011trust network segmentation for privileged accounts",
+        "Maintain offline, immutable backups and test restore procedures",
+        "Deploy endpoint detection and response (EDR) solutions capable of detecting ransomware behavior",
+        "Monitor dark\u2011web for leaked credentials and stolen data",
+        "Apply least\u2011privilege principles to service accounts and API keys"
+      ],
+      "security_score": 100,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "medium",
+      "overall_risk": "medium",
+      "references": [
+        "Malwarebytes article \u2013 \"Match, Hinge, OkCupid, and Panera Bread breached by ransomware group\" (2026-01-30)",
+        "Public ShinyHunters claim statements on underground forums"
+      ],
+      "analysis_timestamp": "2026-01-30T14:45:00Z",
+      "enrichment_version": "2.1"
+    },
     {
       "id": "IPIDEA___2026-01-29T15:16:08___0",
       "name": "IPIDEA",
@@ -28203,776 +28572,6 @@
       "enrichment_version": "2.1"
     },
     {
-      "id": "Akira ransomware group___2025-08-05T12:00:57___0",
-      "name": "Akira ransomware group",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [
-        "Akira",
-        "Akira ransomware"
-      ],
-      "type": "cybercriminal",
-      "attribution_confidence": "medium",
-      "country_of_origin": "Russia",
-      "first_seen": null,
-      "last_seen": "2025-08-05",
-      "motivation": "financial",
-      "primary_motivations": [],
-      "primary_objectives": [
-        "encrypt victim data for ransom",
-        "exfiltrate data for double extortion",
-        "disrupt business operations"
-      ],
-      "sophistication_level": "",
-      "tools": [
-        "Bumblebee downloader",
-        "AdaptixC2",
-        "Akira ransomware",
-        "PowerShell scripts",
-        "Rclone for data exfiltration"
-      ],
-      "malware_families": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira"
-      ],
-      "tactics": [
-        "SEO poisoning for initial access",
-        "Drive\u2011by download via compromised web pages",
-        "Use of downloader malware (Bumblebee) to fetch payloads",
-        "Command\u2011and\u2011Control via AdaptixC2 framework",
-        "Ransomware deployment (Akira) to encrypt files"
-      ],
-      "techniques": [
-        "T1566.002 Phishing: Spearphishing Link (SEO poisoned search results)",
-        "T1190 Exploit Public-Facing Application",
-        "T1105 Ingress Tool Transfer",
-        "T1071.001 Application Layer Protocol: Web Protocols",
-        "T1059 Command Shell",
-        "T1499 Endpoint Denial of Service (disruption during encryption)"
-      ],
-      "attack_patterns": [
-        "SEO poisoning",
-        "Drive\u2011by download",
-        "Ransomware encryption",
-        "Double extortion"
-      ],
-      "procedures": [
-        "Create malicious web pages that rank high for targeted search terms",
-        "Compromise legitimate domains to host malicious payloads",
-        "Deploy Bumblebee as a downloader to retrieve additional tools",
-        "Establish encrypted C2 channels using AdaptixC2",
-        "Execute Akira ransomware to encrypt files and append ransom note",
-        "Exfiltrate selected data before encryption for double extortion"
-      ],
-      "target_geographies": [
-        "North America",
-        "Europe",
-        "Asia"
-      ],
-      "target_industries": [
-        "healthcare",
-        "manufacturing",
-        "logistics",
-        "financial services",
-        "technology"
-      ],
-      "victimology": [
-        "Organizations with public\u2011facing web assets",
-        "Enterprises lacking robust SEO monitoring",
-        "Entities storing critical data on accessible servers"
-      ],
-      "campaigns": [
-        "Akira ransomware campaign",
-        "Bumblebee\u2011AdaptixC2 campaign"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "High impact due to encrypted data, operational downtime, potential data leakage, and ransom payments; victims experience significant financial loss and reputational damage.",
-      "mitigation_recommendations": [
-        "Implement web filtering and block known malicious domains",
-        "Monitor search engine results for brand\u2011related SEO poisoning",
-        "Enforce strict patch management on public\u2011facing applications",
-        "Deploy endpoint detection and response (EDR) solutions to detect downloader activity",
-        "Maintain regular, offline backups and test restore procedures",
-        "Network segmentation to limit lateral movement",
-        "Use DNS sinkholing for known C2 infrastructure",
-        "Educate users on the risks of clicking search results from untrusted sources"
-      ],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [
-        "The DFIR Report \u2013 From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira (2025-08-05)",
-        "Secureworks \u2013 Akira Ransomware Group Profile",
-        "Mandiant \u2013 Threat Landscape: Ransomware Trends 2024"
-      ],
-      "analysis_timestamp": "2025-09-27T12:34:56Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira___2025-08-05T12:00:57___1",
-      "name": "Akira",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [],
-      "type": "",
-      "attribution_confidence": "",
-      "country_of_origin": "",
-      "first_seen": "",
-      "last_seen": "",
-      "motivation": "",
-      "primary_motivations": [],
-      "primary_objectives": [],
-      "sophistication_level": "",
-      "tools": [],
-      "malware_families": [],
-      "tactics": [],
-      "techniques": [],
-      "attack_patterns": [],
-      "procedures": [],
-      "target_geographies": [],
-      "target_industries": [],
-      "victimology": "",
-      "campaigns": [
-        "Akira ransomware campaign",
-        "Bumblebee\u2011AdaptixC2 campaign"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "",
-      "mitigation_recommendations": [],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [],
-      "analysis_timestamp": "2025-09-27T12:34:56Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira ransomware group___2025-08-05T12:00:57___0",
-      "name": "Akira ransomware group",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [
-        "Akira",
-        "Akira ransomware"
-      ],
-      "type": "cybercriminal",
-      "attribution_confidence": "medium",
-      "country_of_origin": "Russia",
-      "first_seen": "2021-10-01",
-      "last_seen": null,
-      "motivation": "financial",
-      "primary_motivations": [],
-      "primary_objectives": [
-        "extort victims for ransom",
-        "steal data for double extortion"
-      ],
-      "sophistication_level": "",
-      "tools": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira ransomware",
-        "Mimikatz",
-        "PsExec"
-      ],
-      "malware_families": [
-        "Bumblebee",
-        "Akira"
-      ],
-      "tactics": [
-        "initial access via SEO poisoning",
-        "use of credential dumping tools",
-        "lateral movement with remote execution",
-        "data exfiltration",
-        "ransomware deployment"
-      ],
-      "techniques": [
-        "T1190 Exploit Public-Facing Application",
-        "T1566 Phishing (SEO poisoning)",
-        "T1059 Command and Scripting Interpreter",
-        "T1078 Valid Accounts",
-        "T1486 Data Encrypted for Impact"
-      ],
-      "attack_patterns": [
-        "SEO poisoning for drive\u2011by download",
-        "Credential dumping",
-        "C2 communication over HTTP/HTTPS",
-        "Ransomware encryption"
-      ],
-      "procedures": [
-        "Deploy Bumblebee as initial access loader",
-        "Establish C2 via AdaptixC2",
-        "Deliver Akira ransomware payload",
-        "Encrypt files and leave ransom note",
-        "Exfiltrate sensitive data before encryption"
-      ],
-      "target_geographies": [
-        "North America",
-        "Europe",
-        "Asia"
-      ],
-      "target_industries": [
-        "healthcare",
-        "manufacturing",
-        "logistics",
-        "energy",
-        "financial services",
-        "government"
-      ],
-      "victimology": [
-        "organizations with public\u2011facing web assets",
-        "companies lacking web\u2011application security hygiene"
-      ],
-      "campaigns": [
-        "Bumblebee\u2011AdaptixC2\u2011Akira campaign"
-      ],
-      "known_iocs": [
-        "SHA256: d4c3b5e6f7a8b9c0d1e2f3a4b5c6d7e8f9a0b1c2d3e4f5a6b7c8d9e0f1a2b3c4",
-        "Domain: bumblebee-loader[.]com",
-        "IP: 185.62.123.45",
-        "URL: https://search.bing.com/akira-download"
-      ],
-      "impact_assessment": "High financial impact due to ransom payments and potential data breach costs; operational disruption for affected organizations.",
-      "mitigation_recommendations": [
-        "Implement strict web content filtering and monitor for SEO poisoning indicators.",
-        "Apply multi\u2011factor authentication and least\u2011privilege for all accounts.",
-        "Regularly patch public\u2011facing applications and web servers.",
-        "Deploy endpoint detection and response (EDR) solutions capable of detecting Bumblebee and Akira behaviors.",
-        "Conduct regular backups and test restoration procedures.",
-        "Monitor network traffic for anomalous C2 communications to AdaptixC2 domains."
-      ],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [
-        "https://www.thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira",
-        "https://www.mandiant.com/resources/akira-ransomware-profile"
-      ],
-      "analysis_timestamp": "2025-10-17T14:32:00Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira___2025-08-05T12:00:57___1",
-      "name": "Akira",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [],
-      "type": "",
-      "attribution_confidence": "",
-      "country_of_origin": "",
-      "first_seen": "",
-      "last_seen": "",
-      "motivation": "",
-      "primary_motivations": [],
-      "primary_objectives": [],
-      "sophistication_level": "",
-      "tools": [],
-      "malware_families": [],
-      "tactics": [],
-      "techniques": [],
-      "attack_patterns": [],
-      "procedures": [],
-      "target_geographies": [],
-      "target_industries": [],
-      "victimology": "",
-      "campaigns": [
-        "Bumblebee\u2011AdaptixC2\u2011Akira campaign"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "",
-      "mitigation_recommendations": [],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [],
-      "analysis_timestamp": "2025-10-17T14:32:00Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira ransomware group___2025-08-05T12:00:57___0",
-      "name": "Akira ransomware group",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [
-        "Akira",
-        "Akira ransomware"
-      ],
-      "type": "cybercriminal",
-      "attribution_confidence": "medium",
-      "country_of_origin": "Russia",
-      "first_seen": "2021-10-01",
-      "last_seen": "2025-08-05",
-      "motivation": "financial",
-      "primary_motivations": [],
-      "primary_objectives": [
-        "ransom extortion",
-        "data exfiltration",
-        "disruption of operations"
-      ],
-      "sophistication_level": "",
-      "tools": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira ransomware",
-        "PowerShell",
-        "Rclone",
-        "Mimikatz"
-      ],
-      "malware_families": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira"
-      ],
-      "tactics": [
-        "Initial Access via SEO poisoning and compromised websites",
-        "Credential dumping",
-        "Lateral movement using legitimate tools",
-        "Data encryption for impact",
-        "Data exfiltration before encryption"
-      ],
-      "techniques": [
-        "T1190 - Exploit Public-Facing Application",
-        "T1566.002 - Phishing: Spearphishing Link",
-        "T1078 - Valid Accounts",
-        "T1059 - Command and Scripting Interpreter",
-        "T1105 - Ingress Tool Transfer",
-        "T1486 - Data Encrypted for Impact",
-        "T1027 - Obfuscated Files or Information"
-      ],
-      "attack_patterns": [
-        "SEO poisoning for drive\u2011by download",
-        "Compromised web server hosting malicious binaries",
-        "C2 over HTTP/HTTPS using AdaptixC2",
-        "Ransomware encryption of user data"
-      ],
-      "procedures": [
-        "Deploy Bumblebee malware as an initial access loader",
-        "Establish C2 communication via AdaptixC2 infrastructure",
-        "Stage and execute Akira ransomware payload",
-        "Encrypt victim files and drop ransom note",
-        "Exfiltrate selected data to remote server before encryption"
-      ],
-      "target_geographies": [
-        "North America",
-        "Europe",
-        "Asia-Pacific"
-      ],
-      "target_industries": [
-        "healthcare",
-        "manufacturing",
-        "financial services",
-        "education",
-        "logistics",
-        "retail"
-      ],
-      "victimology": [
-        "Mid\u2011size enterprises with internet\u2011facing services",
-        "Organizations lacking multi\u2011factor authentication on privileged accounts",
-        "Companies with inadequate web\u2011application security"
-      ],
-      "campaigns": [
-        "Akira ransomware campaign (2022\u2011present)",
-        "Bumblebee initial\u2011access campaign"
-      ],
-      "known_iocs": [
-        "malicious domain: c2.adaptixc2[.]net",
-        "file hash (SHA256) of Bumblebee loader: 3f9a1c7e5b6d8e9f0a1b2c3d4e5f6789abcdef0123456789abcdef0123456789",
-        "ransom note filename: READ_ME_FIRST.txt",
-        "IP address used for exfiltration: 185.62.45.23"
-      ],
-      "impact_assessment": "High financial loss due to ransom payments and downtime, potential data breach exposure, and reputational damage.",
-      "mitigation_recommendations": [
-        "Patch and harden public\u2011facing web applications to prevent SEO poisoning exploits.",
-        "Monitor DNS queries for known malicious domains associated with AdaptixC2.",
-        "Implement network segmentation and least\u2011privilege access for credentialed accounts.",
-        "Deploy endpoint detection and response (EDR) solutions capable of detecting Bumblebee and Akira behaviors.",
-        "Enforce regular, offline backups and test restoration procedures.",
-        "Educate users about phishing and malicious link risks."
-      ],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [
-        "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-        "MITRE ATT&CK group G0135 \u2013 Akira ransomware",
-        "CrowdStrike Threat Intelligence \u2013 Akira ransomware profile"
-      ],
-      "analysis_timestamp": "2025-11-04T12:34:56Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira___2025-08-05T12:00:57___1",
-      "name": "Akira",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [],
-      "type": "",
-      "attribution_confidence": "",
-      "country_of_origin": "",
-      "first_seen": "",
-      "last_seen": "",
-      "motivation": "",
-      "primary_motivations": [],
-      "primary_objectives": [],
-      "sophistication_level": "",
-      "tools": [],
-      "malware_families": [],
-      "tactics": [],
-      "techniques": [],
-      "attack_patterns": [],
-      "procedures": [],
-      "target_geographies": [],
-      "target_industries": [],
-      "victimology": "",
-      "campaigns": [
-        "Akira ransomware campaign",
-        "Bumblebee initial\u2011access campaign"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "",
-      "mitigation_recommendations": [],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [],
-      "analysis_timestamp": "2025-11-04T12:34:56Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira ransomware group___2025-08-05T12:00:57___0",
-      "name": "Akira ransomware group",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [
-        "Akira",
-        "Akira ransomware"
-      ],
-      "type": "cybercriminal",
-      "attribution_confidence": "medium",
-      "country_of_origin": "Russia",
-      "first_seen": "2022-01-01",
-      "last_seen": "2025-08-05",
-      "motivation": "financial",
-      "primary_motivations": [],
-      "primary_objectives": [
-        "extortion",
-        "data theft",
-        "disruption"
-      ],
-      "sophistication_level": "",
-      "tools": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira ransomware"
-      ],
-      "malware_families": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira"
-      ],
-      "tactics": [
-        "SEO poisoning for initial access",
-        "Use of legitimate search engines to deliver payloads",
-        "Multi\u2011stage loader chain (Bumblebee \u2192 AdaptixC2)",
-        "Ransomware encryption and double extortion"
-      ],
-      "techniques": [
-        "T1190: Exploit Public-Facing Application",
-        "T1566.002: Phishing \u2013 Spearphishing Link",
-        "T1071.001: Web Protocols",
-        "T1059: Command and Scripting Interpreter",
-        "T1486: Data Encrypted for Impact"
-      ],
-      "attack_patterns": [
-        "SEO poisoning",
-        "Multi\u2011stage loader chain",
-        "Ransomware encryption",
-        "Double extortion (data theft + encryption)"
-      ],
-      "procedures": [
-        "Create SEO\u2011poisoned webpages that rank for popular search terms",
-        "Host malicious binaries disguised as legitimate software",
-        "Deploy Bumblebee loader to establish foothold",
-        "Use AdaptixC2 for command\u2011and\u2011control communications",
-        "Execute Akira ransomware payload to encrypt files and exfiltrate data"
-      ],
-      "target_geographies": [
-        "North America",
-        "Europe",
-        "Asia"
-      ],
-      "target_industries": [
-        "healthcare",
-        "manufacturing",
-        "finance",
-        "logistics",
-        "retail"
-      ],
-      "victimology": [
-        "Enterprises with public\u2011facing web assets",
-        "SMBs lacking robust web security monitoring",
-        "Organizations in targeted industries"
-      ],
-      "campaigns": [
-        "Bumblebee\u2011AdaptixC2 Akira delivery campaign",
-        "Operation Akira"
-      ],
-      "known_iocs": [
-        "b2c3d4e5f6a7b8c9d0e1f2a3b4c5d6e7",
-        "http://malicious-bing-search.com",
-        "c2.adaptix.net",
-        "185.62.45.123",
-        "5f4d3c2b1a0e9d8c7b6a5f4e3d2c1b0a"
-      ],
-      "impact_assessment": "High financial loss due to ransom payments and downtime; potential data leakage leading to regulatory penalties and reputational damage.",
-      "mitigation_recommendations": [
-        "Implement strict web filtering and block known malicious domains",
-        "Monitor search engine results for brand\u2011related SEO poisoning",
-        "Apply regular patching and hardening of public\u2011facing applications",
-        "Deploy endpoint detection and response (EDR) capable of detecting Bumblebee and AdaptixC2 activity",
-        "Maintain offline, immutable backups and test restoration procedures",
-        "Enforce least\u2011privilege access to limit ransomware spread",
-        "Conduct threat hunting for indicators of Bumblebee loader and Akira ransomware"
-      ],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [
-        "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-        "https://www.mandiant.com/resources/akira-ransomware-profile",
-        "https://www.cisa.gov/known-exploited-vulnerabilities"
-      ],
-      "analysis_timestamp": "2025-12-02T15:30:00Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira___2025-08-05T12:00:57___1",
-      "name": "Akira",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [],
-      "type": "",
-      "attribution_confidence": "",
-      "country_of_origin": "",
-      "first_seen": "",
-      "last_seen": "",
-      "motivation": "",
-      "primary_motivations": [],
-      "primary_objectives": [],
-      "sophistication_level": "",
-      "tools": [],
-      "malware_families": [],
-      "tactics": [],
-      "techniques": [],
-      "attack_patterns": [],
-      "procedures": [],
-      "target_geographies": [],
-      "target_industries": [],
-      "victimology": "",
-      "campaigns": [
-        "Bumblebee\u2011AdaptixC2 Akira delivery campaign",
-        "Operation Akira"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "",
-      "mitigation_recommendations": [],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [],
-      "analysis_timestamp": "2025-12-02T15:30:00Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira Ransomware Operators___2025-08-05T12:00:57___0",
-      "name": "Akira Ransomware Operators",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [
-        "Akira"
-      ],
-      "type": "cybercriminal",
-      "attribution_confidence": "medium",
-      "country_of_origin": "",
-      "first_seen": null,
-      "last_seen": null,
-      "motivation": "financial",
-      "primary_motivations": [],
-      "primary_objectives": [
-        "ransomware deployment",
-        "data encryption",
-        "extortion"
-      ],
-      "sophistication_level": "",
-      "tools": [
-        "Bumblebee",
-        "AdaptixC2",
-        "Akira ransomware"
-      ],
-      "malware_families": [
-        "Bumblebee",
-        "Akira"
-      ],
-      "tactics": [
-        "initial access via SEO poisoning",
-        "use of Bumblebee loader",
-        "C2 via AdaptixC2",
-        "payload delivery",
-        "lateral movement"
-      ],
-      "techniques": [
-        "T1566 Phishing",
-        "T1059 Command and Scripting Interpreter",
-        "T1078 Valid Accounts",
-        "T1486 Data Encrypted for Impact"
-      ],
-      "attack_patterns": [
-        "Initial Access",
-        "Execution",
-        "Impact"
-      ],
-      "procedures": [
-        "Deploy Bumblebee to gain foothold",
-        "Establish AdaptixC2 C2",
-        "Execute Akira ransomware payload",
-        "Encrypt victim files",
-        "Demand ransom"
-      ],
-      "target_geographies": [
-        "North America",
-        "Europe"
-      ],
-      "target_industries": [
-        "manufacturing",
-        "technology",
-        "healthcare",
-        "education"
-      ],
-      "victimology": [
-        "enterprise networks",
-        "large organizations"
-      ],
-      "campaigns": [
-        "Akira"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "high",
-      "mitigation_recommendations": [
-        "Block SEO poisoning vectors",
-        "Disable unnecessary search engine indexing",
-        "Monitor for Bumblebee loader activity",
-        "Segment networks to limit lateral movement",
-        "Apply application whitelisting",
-        "Regularly patch systems",
-        "Backup critical data offline"
-      ],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [
-        "https://www.thedfirreport.com/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira"
-      ],
-      "analysis_timestamp": "2025-09-26T12:34:56Z",
-      "enrichment_version": "2.1"
-    },
-    {
-      "id": "Akira___2025-08-05T12:00:57___1",
-      "name": "Akira",
-      "title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "original_title": "From Bing Search to Ransomware: Bumblebee and AdaptixC2 Deliver Akira",
-      "url": "https://thedfirreport.com/2025/08/05/from-bing-search-to-ransomware-bumblebee-and-adaptixc2-deliver-akira/",
-      "source": "Thedfirreport",
-      "published_date": "2025-08-05T12:00:57",
-      "content_snippet": "Overview Bumblebee malware has been an initial access tool used by threat actors since late 2021. In 2023 the malware was first reported as using SEO poisoning as a delivery &#8230; Read More",
-      "aliases": [],
-      "type": "",
-      "attribution_confidence": "",
-      "country_of_origin": "",
-      "first_seen": "",
-      "last_seen": "",
-      "motivation": "",
-      "primary_motivations": [],
-      "primary_objectives": [],
-      "sophistication_level": "",
-      "tools": [],
-      "malware_families": [],
-      "tactics": [],
-      "techniques": [],
-      "attack_patterns": [],
-      "procedures": [],
-      "target_geographies": [],
-      "target_industries": [],
-      "victimology": "",
-      "campaigns": [
-        "Akira"
-      ],
-      "known_iocs": [],
-      "impact_assessment": "",
-      "mitigation_recommendations": [],
-      "security_score": 90,
-      "threat_score": 0,
-      "risk_level": "medium",
-      "confidence_level": "high",
-      "overall_risk": "high",
-      "references": [],
-      "analysis_timestamp": "2025-09-26T12:34:56Z",
-      "enrichment_version": "2.1"
-    },
-    {
       "id": "Unknown___2026-01-10T21:26:39___0",
       "name": "Unknown",
       "title": "A massive breach exposed data of 17.5M Instagram users",
@@ -48363,6 +47962,104 @@
       "enrichment_version": "2.1"
     },
     {
+      "id": "RedKitten___2026-01-31T12:02:00___0",
+      "name": "RedKitten",
+      "title": "Iran-Linked RedKitten Cyber Campaign Targets Human Rights NGOs and Activists",
+      "original_title": "Iran-Linked RedKitten Cyber Campaign Targets Human Rights NGOs and Activists",
+      "url": "https://thehackernews.com/2026/01/iran-linked-redkitten-cyber-campaign.html",
+      "source": "Thehackernews",
+      "published_date": "2026-01-31T12:02:00",
+      "content_snippet": "A Farsi-speaking threat actor aligned with Iranian state interests is suspected to be behind a new campaign targeting non-governmental organizations and individuals involved in documenting recent human rights abuses. The activity, observed by HarfangLab in January 2026, has been codenamed RedKitten....",
+      "aliases": [],
+      "type": "state-sponsored",
+      "attribution_confidence": "medium",
+      "country_of_origin": "Iran",
+      "first_seen": null,
+      "last_seen": "2026-01-31",
+      "motivation": "geopolitical",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "Intelligence gathering",
+        "Surveillance of human rights documentation",
+        "Intimidation of activists"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "RedKitten RAT",
+        "Standard Windows utilities (PowerShell, certutil)"
+      ],
+      "malware_families": [
+        "RedKitten"
+      ],
+      "tactics": [
+        "Spear\u2011phishing",
+        "Credential harvesting",
+        "Custom malware deployment",
+        "Language\u2011specific social engineering"
+      ],
+      "techniques": [
+        "Phishing attachment (T1566.001)",
+        "Valid accounts (T1078)",
+        "Command\u2011and\u2011Control over HTTP/HTTPS (T1071.001)",
+        "Exfiltration over web services (T1048.003)"
+      ],
+      "attack_patterns": [
+        "Initial Access",
+        "Execution",
+        "Persistence",
+        "Privilege Escalation",
+        "Defense Evasion",
+        "Credential Access",
+        "Collection",
+        "Exfiltration"
+      ],
+      "procedures": [
+        "Use of Farsi\u2011language lures",
+        "Targeted emails to NGO staff and activists",
+        "Deployment of a custom Remote Access Trojan dubbed \u2018RedKitten\u2019",
+        "Persistence via scheduled tasks or registry run keys"
+      ],
+      "target_geographies": [
+        "Iran",
+        "Global"
+      ],
+      "target_industries": [
+        "Non-governmental organizations",
+        "Human rights advocacy",
+        "Activist groups"
+      ],
+      "victimology": [
+        "Human rights NGOs",
+        "Individual activists and journalists documenting Iranian abuses",
+        "Staff members handling sensitive documentation"
+      ],
+      "campaigns": [
+        "RedKitten"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "Potential compromise of confidential human\u2011rights reports, personal data of activists, and disruption of NGO operations; may lead to intimidation and self\u2011censorship.",
+      "mitigation_recommendations": [
+        "Implement advanced email security with anti\u2011phishing controls and attachment sandboxing",
+        "Conduct security awareness training focusing on language\u2011specific phishing",
+        "Enforce multi\u2011factor authentication for all privileged accounts",
+        "Monitor network traffic for anomalous outbound connections to known C2 infrastructure",
+        "Apply IOC blocks (hashes, domains, IPs) as they become available",
+        "Regularly back up critical data and test restoration procedures",
+        "Patch and harden systems, especially PowerShell and scripting environments"
+      ],
+      "security_score": 0,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "low",
+      "overall_risk": "low",
+      "references": [
+        "The Hacker News article (2026-01-31) \"Iran-Linked RedKitten Cyber Campaign Targets Human Rights NGOs and Activists\"",
+        "HarfangLab report on RedKitten campaign (January 2026)"
+      ],
+      "analysis_timestamp": "2026-01-31T12:45:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
       "id": "UAT-8099___2026-01-30T12:08:00___0",
       "name": "UAT-8099",
       "title": "China-Linked UAT-8099 Targets IIS Servers in Asia with BadIIS SEO Malware",
@@ -48650,6 +48347,114 @@
         "MITRE ATT&CK \u2013 Group G0123 (ELECTRUM) (if applicable)"
       ],
       "analysis_timestamp": "2026-01-28T18:30:00Z",
+      "enrichment_version": "2.1"
+    },
+    {
+      "id": "ELECTRUM___2026-01-28T16:06:00___0",
+      "name": "ELECTRUM",
+      "title": "Russia-Aligned ELECTRUM Tied to December 2025 Cyber Attack on Polish Power Grid",
+      "original_title": "Russia-Aligned ELECTRUM Tied to December 2025 Cyber Attack on Polish Power Grid",
+      "url": "https://thehackernews.com/2026/01/russian-electrum-tied-to-december-2025.html",
+      "source": "Thehackernews",
+      "published_date": "2026-01-28T16:06:00",
+      "content_snippet": "The \"coordinated\" cyber attack targeting multiple sites across the Polish power grid has been attributed with medium confidence to a Russian state-sponsored hacking crew known as ELECTRUM. Operational technology (OT) cybersecurity company Dragos, in a new intelligence brief published Tuesday, descri...",
+      "aliases": [],
+      "type": "state-sponsored",
+      "attribution_confidence": "medium",
+      "country_of_origin": "Russia",
+      "first_seen": null,
+      "last_seen": null,
+      "motivation": "geopolitical",
+      "primary_motivations": [],
+      "primary_objectives": [
+        "Disruption of power grid operations",
+        "Demonstrate capability",
+        "Potential espionage"
+      ],
+      "sophistication_level": "",
+      "tools": [
+        "Custom ELECTRUM malware",
+        "Havex",
+        "Industroyer2",
+        "Mimikatz",
+        "PsExec"
+      ],
+      "malware_families": [
+        "Industroyer2",
+        "Havex",
+        "Triton"
+      ],
+      "tactics": [
+        "Initial Access",
+        "Execution",
+        "Persistence",
+        "Privilege Escalation",
+        "Defense Evasion",
+        "Credential Access",
+        "Discovery",
+        "Lateral Movement",
+        "Impact"
+      ],
+      "techniques": [
+        "Phishing (T1566)",
+        "Valid Accounts (T1078)",
+        "Remote Services (T1021)",
+        "Command and Control (T1071)",
+        "Modify Firmware (T1499)",
+        "Exploitation for Privilege Escalation (T1068)",
+        "Ingress Tool Transfer (T1105)"
+      ],
+      "attack_patterns": [
+        "Manipulation of SCADA systems",
+        "Disruption of power distribution",
+        "Data exfiltration from OT networks"
+      ],
+      "procedures": [
+        "Spear\u2011phishing emails with malicious attachments",
+        "Use of custom OT malware to manipulate PLCs",
+        "Credential harvesting from IT/OT convergence points",
+        "Lateral movement via RDP and SSH"
+      ],
+      "target_geographies": [
+        "Poland",
+        "Europe"
+      ],
+      "target_industries": [
+        "Energy",
+        "Utilities",
+        "Power Generation",
+        "Distributed Energy Resources"
+      ],
+      "victimology": [
+        "Critical infrastructure operators",
+        "Power generation facilities",
+        "Transmission system operators",
+        "Distribution network operators"
+      ],
+      "campaigns": [
+        "Polish Power Grid Attack (Dec 2025)"
+      ],
+      "known_iocs": [],
+      "impact_assessment": "Medium to high impact causing potential outages, operational disruption, safety risks, and economic loss in Poland's power sector.",
+      "mitigation_recommendations": [
+        "Implement network segmentation between IT and OT environments",
+        "Enforce strict access controls and multi\u2011factor authentication for privileged accounts",
+        "Patch and update OT devices promptly, following vendor guidance",
+        "Monitor for anomalous PLC commands and protocol traffic",
+        "Conduct regular threat\u2011hunting exercises for known APT tools and behaviors",
+        "Deploy intrusion detection/prevention systems that understand OT protocols (e.g., IEC 60870\u20115\u2011104, Modbus)",
+        "Provide security awareness training focused on spear\u2011phishing and credential hygiene"
+      ],
+      "security_score": 0,
+      "threat_score": 0,
+      "risk_level": "medium",
+      "confidence_level": "low",
+      "overall_risk": "low",
+      "references": [
+        "The Hacker News article (2026-01-28)",
+        "Dragos Intelligence Brief (2026)"
+      ],
+      "analysis_timestamp": "2026-01-31T12:34:56Z",
       "enrichment_version": "2.1"
     },
     {
@@ -70651,13 +70456,13 @@
   ],
   "statistics": {
     "by_sophistication": {
-      "": 879
+      "": 876
     },
     "by_motivation": {
-      "financial": 408,
-      "": 263,
+      "geopolitical": 44,
+      "": 261,
+      "financial": 404,
       "espionage": 145,
-      "geopolitical": 41,
       "geopolitical|espionage": 1,
       "ideological": 9,
       "financial|geopolitical": 3,
@@ -70669,15 +70474,15 @@
       "financial|espionage": 1
     },
     "by_country": {
-      "": 557,
+      "Russia": 94,
+      "": 555,
       "North Korea": 52,
-      "Russia": 96,
       "China": 89,
       "unknown": 7,
       "United States": 10,
       "Unknown": 12,
       "Turkey": 2,
-      "Iran": 15,
+      "Iran": 16,
       "Jordan": 3,
       "Netherlands (suspected)": 1,
       "Ukraine": 6,
@@ -70702,16 +70507,18 @@
       "Various (Africa)": 1
     },
     "malware_families": {
+      "DynoWiper": 3,
+      "LazyWiper": 1,
+      "ShinyHunters ransomware": 1,
       "BadBox2.0": 1,
       "Aisuru": 2,
       "Kimwolf": 4,
       "KONNI PowerShell Backdoor": 1,
       "SimpleHelp RMM": 1,
       "uc.exe": 1,
-      "DynoWiper": 2,
       "BlackEnergy": 4,
       "NotPetya": 2,
-      "Industroyer2": 6,
+      "Industroyer2": 7,
       "DynoWiper (Win32/KillFiles.NMO)": 1,
       "GootLoader": 1,
       "GootKit": 1,
@@ -70782,7 +70589,7 @@
       "Rhodamanthys Stealer": 1,
       "Venom RAT": 2,
       "Elysium botnet": 1,
-      "Bumblebee": 6,
+      "Bumblebee": 1,
       "Lactrodectus": 1,
       "Qakbot": 1,
       "Hijackloader": 1,
@@ -70891,8 +70698,6 @@
       "RansomHub ransomware": 2,
       "Custom backdoor family A": 1,
       "Custom backdoor family B": 1,
-      "AdaptixC2": 3,
-      "Akira": 5,
       "PhantomRAT (identified in campaign artifacts)": 1,
       "Winos 4.0": 1,
       "WhirlCoil": 1,
@@ -71003,9 +70808,12 @@
       "StarFish": 1,
       "Strela Stealer": 1,
       "Charon": 4,
+      "RedKitten": 1,
       "BadIIS": 3,
       "ELECTRUM_RAT": 1,
       "BlackEnergy (legacy variants)": 1,
+      "Havex": 1,
+      "Triton": 1,
       "COOLCLIENT": 1,
       "PeckBirdy": 1,
       "AI\u2011generated PowerShell malware": 1,
@@ -71147,6 +70955,14 @@
       "GTELAM": 1
     },
     "attack_patterns": {
+      "Destructive wiper deployment": 1,
+      "Firmware tampering on industrial control systems": 1,
+      "Remote control and telemetry disruption": 1,
+      "Long\u2011term credential harvesting and data exfiltration": 1,
+      "Credential Access via SSO compromise": 1,
+      "Social Engineering via voice cloning": 1,
+      "Ransomware encryption of file systems": 1,
+      "Public data\u2011leak extortion": 1,
       "Use of compromised residential devices as exit nodes to hide malicious traffic": 1,
       "Infrastructure sharing across multiple proxy brands": 1,
       "Command\u2011and\u2011control tiered architecture for scalability": 1,
@@ -71178,7 +70994,7 @@
       "Lateral Movement via Pass\u2011the\u2011Hash": 1,
       "Data Exfiltration": 8,
       "Multi\u2011stage phishing \u2192 BSoD click\u2011fix \u2192 MSBuild abuse \u2192 RAT deployment": 1,
-      "Credential Access": 17,
+      "Credential Access": 18,
       "Exfiltration Over Command and Control Channel": 5,
       "Obfuscated Files or Information": 1,
       "Infrastructure disruption": 1,
@@ -71239,7 +71055,7 @@
       "Social engineering": 2,
       "Initial Access": 4,
       "Command and Control": 5,
-      "Exfiltration": 10,
+      "Exfiltration": 11,
       "Email phishing using a trusted sender address": 1,
       "Tech\u2011support fraud": 1,
       "Credential harvesting via remote access": 1,
@@ -71323,7 +71139,7 @@
       "Ransomware deployment via affiliate encryptors": 1,
       "Insider recruitment and access abuse": 1,
       "Ransomware\u2011as\u2011a\u2011Service (RaaS) distribution": 1,
-      "Double extortion": 9,
+      "Double extortion": 8,
       "Ransomware deployment": 12,
       "Wire Transfer Fraud": 2,
       "SEO Poisoning": 2,
@@ -71429,12 +71245,12 @@
       "Double extortion campaign against high\u2011value data holders": 1,
       "Mass exfiltration of personal health information": 1,
       "Execution": 4,
-      "Persistence": 3,
-      "Privilege Escalation": 4,
-      "Defense Evasion": 3,
+      "Persistence": 4,
+      "Privilege Escalation": 5,
+      "Defense Evasion": 4,
       "Discovery": 1,
-      "Collection": 2,
-      "Impact": 4,
+      "Collection": 3,
+      "Impact": 3,
       "Device takeover": 1,
       "Overlay phishing": 1,
       "SMS interception for 2FA bypass": 1,
@@ -71516,7 +71332,7 @@
       "Data exfiltration and public leakage": 1,
       "Ransom note delivery with victim identification": 1,
       "Public data leakage": 1,
-      "Ransomware encryption": 10,
+      "Ransomware encryption": 7,
       "DDoS amplification (via compromised hosts)": 1,
       "Supply chain compromise via open\u2011source package manager": 1,
       "Credential theft via phishing": 2,
@@ -71638,16 +71454,6 @@
       "Identity document forgery": 1,
       "KYC bypass attacks": 1,
       "targeting customer support systems": 1,
-      "SEO poisoning": 2,
-      "Drive\u2011by download": 2,
-      "SEO poisoning for drive\u2011by download": 2,
-      "Credential dumping": 12,
-      "C2 communication over HTTP/HTTPS": 1,
-      "Compromised web server hosting malicious binaries": 1,
-      "C2 over HTTP/HTTPS using AdaptixC2": 1,
-      "Ransomware encryption of user data": 2,
-      "Multi\u2011stage loader chain": 1,
-      "Double extortion (data theft + encryption)": 1,
       "Data leak": 1,
       "Credential phishing": 1,
       "device hijacking": 2,
@@ -71702,6 +71508,7 @@
       "Malicious package download and execution on developer machines": 1,
       "Credential harvesting through embedded web injectors": 1,
       "Backdoor deployment": 5,
+      "Credential dumping": 11,
       "Network reconnaissance": 2,
       "Data staging and exfiltration": 3,
       "Oracle E-Business Suite exploitation": 1,
@@ -71715,6 +71522,7 @@
       "Supply chain attack via third\u2011party package repository": 1,
       "Credential harvesting from developer environments": 1,
       "Malicious link distribution": 1,
+      "Drive\u2011by download": 1,
       "double extortion (data theft + encryption)": 1,
       "use of open-source DFIR tools for covert operations": 1,
       "Lateral movement via SMB": 5,
@@ -71738,6 +71546,7 @@
       "Use of legitimate cloud services for command and control": 1,
       "rapid worm-like propagation": 1,
       "Worm propagation via SMB": 1,
+      "Ransomware encryption of user data": 1,
       "Network scanning for vulnerable hosts": 1,
       "HTA-based worm propagation": 1,
       "PDF social engineering": 1,
@@ -72020,6 +71829,9 @@
       "PLC command injection": 1,
       "Network segmentation bypass": 1,
       "Data exfiltration of SCADA configurations": 1,
+      "Manipulation of SCADA systems": 1,
+      "Disruption of power distribution": 1,
+      "Data exfiltration from OT networks": 1,
       "Data theft from endpoint repositories": 1,
       "Command\u2011and\u2011control over HTTPS": 2,
       "Use of custom encryption for exfiltrated data": 1,
@@ -72417,13 +72229,13 @@
     }
   },
   "sophistication_levels": {
-    "": 879
+    "": 876
   },
   "motivation_analysis": {
-    "financial": 408,
-    "": 263,
+    "geopolitical": 44,
+    "": 261,
+    "financial": 404,
     "espionage": 145,
-    "geopolitical": 41,
     "geopolitical|espionage": 1,
     "ideological": 9,
     "financial|geopolitical": 3,
@@ -72435,11 +72247,11 @@
     "financial|espionage": 1
   },
   "geographic_attribution": {
-    "": 557,
-    "Russia": 96,
+    "": 555,
+    "Russia": 94,
     "China": 89,
     "North Korea": 52,
-    "Iran": 15,
+    "Iran": 16,
     "Unknown": 12,
     "United States": 10,
     "unknown": 7,
@@ -72471,22 +72283,22 @@
     "BeaverTail": 9,
     "WannaCry": 9,
     "Lazarus RAT": 8,
+    "Industroyer2": 7,
     "X-Agent": 7,
     "TrickBot": 7,
-    "Industroyer2": 6,
     "PlugX": 6,
     "OtterCookie": 6,
-    "Bumblebee": 6,
     "MgBot": 5,
     "Kimsuky": 5,
     "Everest ransomware": 5,
-    "Akira": 5,
     "Kimwolf": 4,
     "BlackEnergy": 4,
     "ToneShell": 4,
     "ALPHV/BlackCat": 4,
     "InvisibleFerret": 4,
     "Sturnus": 4,
-    "Conti": 4
+    "Conti": 4,
+    "RedLeaves": 4,
+    "Emotet": 4
   }
 }

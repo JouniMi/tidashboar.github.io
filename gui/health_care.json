@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-01-30T13:10:25Z",
+  "generated_at": "2026-02-03T10:19:07Z",
   "industry": "Healthcare",
-  "summary": "**THREAT INTELLIGENCE REPORT – HEALTHCARE SECTOR**  \n*Coverage period: 30 days (30 Dec 2025 – 6 Jan 2026)*  \n\n---\n\n### EXECUTIVE SUMMARY  \n\nThe past month has been dominated by **large‑scale ransomware incidents targeting health‑care providers** and a **government‑ordered review of a national health‑portal breach**.  Three distinct events – the Covenant Health ransomware breach (≈ 478 k patients), the New Zealand “ManageMyHealth” cyber‑attack, and the Sedgwick/TridentLocker incident (a health‑benefits administrator) – together exposed the sector’s continued exposure to **credential‑driven ransomware** and **supply‑chain‑adjacent malware**.  \n\nAt the same time, a wave of **high‑severity software vulnerabilities** (e.g., CVE‑2025‑14847 “MongoBleed”, CVE‑2025‑14847, CVE‑2026‑0183 “AdonisJS Body‑Parser”, CVE‑2026‑0184 “n8n command execution”, CVE‑2026‑0185 “TOTOLINK EX200”) is being actively exploited in the wild.  Because many health‑care organisations run legacy web‑applications, IoT medical devices, and third‑party SaaS platforms, these cross‑industry CVEs represent a **critical attack surface** that can be leveraged for ransomware deployment, data exfiltration, or espionage.  \n\n**Strategic implications:**  \n* Ransomware remains the highest‑impact threat to patient data confidentiality, service continuity, and regulatory compliance (HIPAA, GDPR, NZ Privacy Act).  \n* Weak credential hygiene and lack of multi‑factor authentication (MFA) continue to enable initial access – the “one criminal, 50 hacked organisations” story underscores the sector‑wide relevance.  \n* Supply‑chain compromises (npm‑registry attacks, Shai‑Hulud worm) and botnet‑driven exploitation of unpatched web frameworks (React2Shell, Adobe ColdFusion) increase the probability of “drive‑by” infection of health‑care web portals and medical‑device management consoles.  \n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor / Campaign | Target(s) | Modus Operandi | Observed in Healthcare | Notes |\n|------------------|-----------|----------------|------------------------|-------|\n| **Ransomware group (unnamed, likely ALPHV/BlackCat)** | Covenant Health (US) – > 478 k patients | Ransomware encryption, data exfiltration, extortion | ✔︎ Direct hit – multiple reports (SecurityAffairs, SecurityWeek, BleepingComputer) | Attack vector not disclosed, but typical phishing + RDP compromise. |\n| **TridentLocker ransomware** | Sedgwick (claims‑management, health‑benefits) | Ransomware deployment via compromised admin credentials | ✔︎ Indirect health‑sector impact (benefits data) | First‑party ransomware; shows that third‑party service providers are high‑value targets. |\n| **Unknown actor (likely financially‑motivated)** | ManageMyHealth (NZ health‑portal) | Data breach, possible credential harvesting | ✔︎ Government‑ordered review | No ransomware reported; focus on patient‑record exposure. |\n| **Shai‑Hulud supply‑chain worm** | npm ecosystem, crypto wallets | Modified npm package injects malicious code, later used in crypto theft | ✖︎ No direct health‑care mention, but any health‑tech that consumes npm modules is at risk. |\n| **RondoDox botnet (React2Shell exploit)** | IoT devices, web servers (including Next.js) | Botnet spreads miners/malware via unpatched React2Shell | ✖︎ No health‑specific case, but many medical‑device gateways run Node/React stacks. |\n| **APT‑UAC‑0184 (Viber espionage)** | Ukrainian military – not health | Not relevant to health‑care. | – |  |\n\n**Supply‑chain risk:** The npm‑registry compromise (Shai‑Hulud) and the widespread React2Shell exploitation illustrate that **any health‑tech stack that relies on open‑source JavaScript packages** is exposed to a “chain‑reaction” compromise.  Health‑care organisations must treat their software bill of materials (SBOM) as a critical asset.\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### 1. Malware / Ransomware Families  \n| Malware | Primary Capability | Healthcare‑relevant Impact |\n|---------|-------------------|----------------------------|\n| **ALPHV / BlackCat** (implied) | File encryption, double‑extortion (leak site) | Disruption of clinical operations, breach of PHI, regulatory fines. |\n| **TridentLocker** | Ransomware, data exfiltration | Compromise of health‑benefits data, potential identity theft of patients/employees. |\n| **Shai‑Hulud** (npm worm) | Credential theft, crypto‑wallet hijack | Could be embedded in health‑tech tooling, leading to lateral movement or ransomware dropper. |\n| **RondoDox / React2Shell** | Botnet, cryptomining, remote code execution | Potential to hijack medical‑device management consoles, create persistence. |\n| **GlassWorm** (Mac crypto‑wallet) | Trojans targeting macOS wallets | Not a direct health target, but could affect health‑care staff using macOS. |\n\n### 2. Vulnerabilities Actively Exploited (CVEs)  \n\n| CVE | CVSS | Affected Component | Exploitation Trend | Relevance to Healthcare |\n|-----|------|--------------------|--------------------|--------------------------|\n| **CVE‑2025‑14847 “MongoBleed”** | 9.8 | MongoDB server | Global exploitation spikes (US, China, EU) | Many EHR back‑ends use MongoDB; risk of data leakage. |\n| **CVE‑2025‑14847 (IBM API Connect auth bypass)** | 9.8 | IBM API Connect | Targeted attacks on API gateways | Healthcare APIs (FHIR, HL7) often sit behind IBM API Connect. |\n| **CVE‑2026‑0183 “AdonisJS Body‑Parser”** | 9.2 | Node.js framework | Exploited in the wild for arbitrary file write | Health‑tech web apps built on AdonisJS are vulnerable. |\n| **CVE‑2026‑0184 “n8n command execution”** | 9.9 | n8n workflow automation | Authenticated users can execute system commands | Automation platforms used for patient‑data pipelines. |\n| **CVE‑2026‑0185 “TOTOLINK EX200”** | Critical (unfixed) | IoT router firmware | Active exploitation reported | Medical‑device network gateways often use low‑cost routers. |\n| **Fortinet 2FA bypass** (over 10 k firewalls) | High | FortiGate VPN | Ongoing attacks bypass MFA | Many hospitals rely on FortiGate for remote access. |\n| **React2Shell (critical flaw)** | Critical | React‑based web servers | Botnet‑driven exploitation | Hospital portals built on React/Next.js are at risk. |\n| **Adobe ColdFusion** (mass exploit attempts) | High | ColdFusion server | Thousands of attempts during holidays | Legacy health‑care portals still run ColdFusion. |\n\n**Attack surface observations**  \n\n* **Web‑application stacks** (Node/React, ColdFusion, IBM API Connect) are the most frequently targeted vectors.  \n* **IoT/medical‑device gateways** (TOTOLINK, generic routers) remain unpatched, providing a foothold for ransomware droppers.  \n* **Credential‑based attacks** (weak MFA, exposed admin accounts) are the primary initial‑access technique, reinforced by the “one criminal, 50 hacked organisations” story.  \n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sub‑sector Risk Assessment  \n\n| Sub‑sector | Primary Threats | Likelihood | Impact |\n|------------|----------------|------------|--------|\n| **Hospitals & Clinical Networks** | Ransomware (ALPHV/BlackCat), unpatched web apps, IoT router exploits | High (large attack surface, legacy systems) | Severe – service outage, patient safety, regulatory fines. |\n| **Health‑Insurance / Benefits Administrators** | TridentLocker ransomware, supply‑chain compromise (npm) | Medium‑High (third‑party SaaS reliance) | High – PHI leakage, identity theft, financial loss. |\n| **Public Health Portals / Government Health Services** | ManageMyHealth breach, credential harvesting, API vulnerabilities | Medium (government oversight) | High – public trust erosion, legal liability. |\n| **Medical‑Device Manufacturers** | IoT firmware exploits (TOTOLINK), supply‑chain malware, botnet hijack | Medium (device firmware often outdated) | Critical – potential patient‑harm, recall risk. |\n| **Health‑Tech SaaS Providers** (EHR, telehealth) | npm supply‑chain (Shai‑Hulud), React2Shell, API Connect bugs | Medium‑High (heavy reliance on open‑source) | High – data breach, ransomware infection. |\n\n### High‑Impact Incidents (from data)  \n\n1. **Covenant Health ransomware breach** – > 478 k patient records exposed; multiple media outlets confirm the incident, indicating a coordinated attack with probable data‑leak extortion.  \n2. **ManageMyHealth breach (NZ)** – Government‑ordered review signals potential systemic weaknesses in national health‑portal authentication and data handling.  \n3. **Sedgwick/TridentLocker** – Shows that health‑benefits processing firms are attractive ransomware targets, expanding the threat landscape beyond traditional hospitals.  \n\n### Lessons Learned & IR Insights  \n\n* **Rapid detection of credential abuse** is essential. The “one criminal, 50 hacked organisations” case demonstrates that a single compromised credential set can cascade across sectors.  \n* **Patch management for web frameworks** must be prioritized; the speed of exploitation for React2Shell, AdonisJS, and n8n indicates attackers are scanning for unpatched versions in real time.  \n* **Supply‑chain hygiene** – health‑tech developers should enforce signed npm packages, monitor SBOM changes, and employ automated dependency scanning.  \n* **Third‑party risk assessments** – contracts with SaaS and benefits administrators must include breach‑notification clauses and regular security audits.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n| Emerging Trend | Forecast (next 6‑12 months) | Recommended Defensive Priorities |\n|----------------|-----------------------------|---------------------------------|\n| **Ransomware “double‑extortion”** targeting health‑care data repositories | Increase in ransomware groups publishing patient‑record leaks to pressure payment. | • Deploy immutable backups and offline air‑gap. <br>• Implement data‑loss‑prevention (DLP) for PHI. |\n| **Supply‑chain attacks on open‑source JavaScript ecosystems** | More npm‑registry compromises (e.g., Shai‑Hulud variants) aimed at health‑tech stacks. | • Enforce SBOM inventory, signed packages, and CI/CD security gates. |\n| **IoT/medical‑device firmware exploitation** (TOTOLINK, generic routers) | Attackers will weaponize compromised device gateways to pivot into clinical networks. | • Segment medical‑device networks, enforce strict firewall rules, and replace unsupported routers. |\n| **Credential‑driven initial access** (MFA bypass, 2FA‑bypass on Fortinet) | Continued abuse of weak MFA and default credentials across remote‑access solutions. | • Enforce MFA (hardware tokens) for all privileged accounts; monitor for anomalous VPN logins. |\n| **Regulatory scrutiny & public‑sector reviews** (NZ health‑portal) | Governments will impose stricter breach‑notification and security‑by‑design requirements for health portals. | • Conduct regular third‑party risk assessments; adopt secure‑by‑design development for patient portals. |\n| **AI‑enabled phishing & deep‑fake attacks** (Viber, Google Cloud email abuse) | Phishing campaigns will increasingly leverage AI‑generated content to target health‑care staff. | • Deploy advanced email security (DMARC, anti‑AI‑phishing tools); conduct continuous security awareness training. |\n\n---\n\n### CONCLUSION  \n\nThe healthcare sector’s **core reliance on legacy web applications, third‑party SaaS platforms, and IoT medical devices** has made it a prime target for ransomware, supply‑chain malware, and rapidly‑exploited software vulnerabilities.  The three high‑profile breaches (Covenant Health, ManageMyHealth, Sedgwick) underscore the **need for a unified, defense‑in‑depth strategy** that couples **credential hygiene, aggressive patching, supply‑chain verification, and robust incident‑response planning**.  \n\nBy prioritizing the defensive actions outlined above, health‑care organisations can reduce the probability of a disruptive breach, protect patient privacy, and maintain compliance with evolving regulatory expectations.",
+  "summary": "**THREAT INTELLIGENCE REPORT – HEALTHCARE SECTOR**  \n*Coverage period: 30 days (30 Dec 2025 – 08 Jan 2026)*  \n\n---\n\n### 1. Executive Summary  \n\nThe past month has been marked by a **confluence of supply‑chain‑style software vulnerabilities, credential‑theft campaigns, and the rapid commercialisation of generative‑AI health services**.  While no nation‑state‑backed “strategic” campaign was disclosed against hospitals, the data show that **health‑care organisations are increasingly exposed to the same attack‑vectors that dominate other verticals** – phishing, insecure third‑party extensions, and unpatched open‑source components.  \n\nTwo high‑profile incidents dominate the headline‑level risk picture:\n\n| Date | Incident | Impact on Healthcare |\n|------|----------|----------------------|\n| **5 Jan** | **ManageMyHealth breach (NZ review)** – a data‑exposure incident affecting a large patient‑portal platform. | Demonstrates that **patient‑engagement portals remain attractive, low‑hanging‑fruit for ransomware and data‑theft groups**. |\n| **8 Jan** | **OpenAI launches “ChatGPT Health” with isolated, encrypted health‑data controls**. | Signals the **emergence of AI‑driven health‑information services**, creating a new attack surface (API abuse, model‑injection, data‑exfiltration). |\n\nAcross the board, **CISA’s KEV (Known Exploited Vulnerabilities) catalog grew by 20 %**, adding more than 300 entries that include Microsoft Office, HPE OneView, Cisco ISE, and a series of critical flaws in the **n8n workflow automation platform**.  Because **most health‑care IT stacks rely on these products for electronic health records (EHR), lab information systems, and tele‑health portals**, the catalog expansion translates directly into a **significant increase in exploitable attack surface**.\n\n**Key take‑aways**\n\n* **Credential‑theft & MFA fatigue** – A single threat actor compromised > 50 organisations (including health providers) by exploiting the lack of MFA, echoing the “One criminal, 50 hacked orgs” story.  \n* **Supply‑chain and open‑source risk** – Critical RCE bugs in **n8n, Veeam, AdonisJS, Dolby Android, and Cisco ISE** are being actively weaponised; health‑care developers and DevOps teams must treat these as high‑priority patches.  \n* **AI‑driven health services** – OpenAI’s health‑focused offering and the broader use of generative‑AI assistants (Claude, ChatGPT) raise **privacy‑by‑design and data‑segregation concerns**; the Claude Chrome‑extension exposure illustrates how AI‑related tooling can inadvertently leak PHI.  \n* **Phishing & email‑routing misconfigurations** – Multiple campaigns abusing Google Cloud, Microsoft 365, and internal email routing continue to target health‑care staff, leveraging trusted domains and “fake‑BSOD” lures.  \n\nOverall, the **threat landscape for health‑care is shifting from “targeted ransomware” to a blended model of opportunistic credential attacks, supply‑chain exploitation, and AI‑service abuse**.  Defensive postures must therefore broaden from endpoint hardening to **software‑bill of materials (SBOM) governance, zero‑trust email controls, and AI‑risk management**.\n\n---\n\n### 2. Threat Actor Intelligence  \n\n| Actor / Campaign | Observed Activity (30‑day window) | Relevance to Healthcare | Tactics, Techniques, Procedures (TTPs) |\n|------------------|-----------------------------------|------------------------|----------------------------------------|\n| **TridentLocker ransomware gang** (via Sedgwick breach) | Ransomware attack on claims‑management firm Sedgwick (Jan 5). | Sedgwick processes health‑insurance claims; breach could expose PHI. | Ransomware encryption, data‑exfiltration, double‑extortion. |\n| **Unnamed credential‑theft actor** ( “One criminal, 50 hacked orgs” ) | Exploited lack of MFA across 50 global organisations (Jan 6). | Likely includes health‑care entities (MFA adoption still low). | Credential stuffing, password‑spraying, MFA bypass via social engineering. |\n| **Viber‑based espionage group (UAC‑0184)** | Used Viber to spy on Ukrainian military (Jan 5). | Viber is also used for internal communications in some clinics; technique demonstrates risk of **consumer‑messaging apps** for data exfiltration. | Malware‑laden Viber messages, command‑and‑control over encrypted channels. |\n| **ShinyHunters / Lapsus$‑style “shiny‑object” actors** | Trapped in honeypots (Jan 4‑6). | Their focus is on **software supply‑chain** (e.g., VS Code extensions) – health‑care developers using open‑source IDEs are at risk. | Credential harvesting from IDE extensions, supply‑chain compromise. |\n| **Phishing‑as‑a‑Service (PAAS) groups** | Campaigns abusing Google Cloud services to steal Microsoft 365 logins (Jan 6) and mis‑configured email routing (Jan 7). | Targeted at organisations using Microsoft 365 – a majority of hospitals and clinics. | Spear‑phishing, OAuth token theft, domain‑spoofing. |\n| **AI‑service abuse actors** | Exploiting Claude Chrome extension (Jan 5) and “ChatGPT Health” APIs (Jan 8). | Potential to harvest PHI from clinicians using AI assistants. | Browser‑extension data exfiltration, API key theft, prompt‑injection. |\n\n**Supply‑Chain Risks**  \n\n* **VS Code “recommended‑extension” attacks** – malicious extensions masquerading as legitimate recommendations (Jan 5). Health‑care developers who rely on VS Code are exposed.  \n* **n8n workflow automation platform** – multiple critical RCE flaws (CVSS 9‑10) disclosed (Jan 6‑8). Many health‑care integration pipelines (e.g., HL7‑to‑FHIR) are built on n8n; exploitation can lead to full server takeover.  \n* **Veeam backup servers** – RCE bugs (Jan 7) could allow attackers to encrypt or exfiltrate backup archives containing patient data.  \n\n---\n\n### 3. Technical Threat Analysis  \n\n#### 3.1 Malware & Ransomware Families  \n\n| Malware | Vector | Healthcare Impact |\n|---------|--------|-------------------|\n| **TridentLocker** | Ransomware delivered via phishing attachment (Sedgwick breach). | Potential encryption of claims‑processing systems, exposure of PHI. |\n| **VBS Stealer** (Python) | Targeting Discord credentials – not directly health‑care, but could be used for credential harvesting of staff who use Discord for informal communication. | Low‑to‑moderate. |\n| **Kimwolf Android Botnet** | Exploits residential proxies & ADB to hijack Android devices (Jan 5‑6). | Many clinicians use Android tablets for point‑of‑care; botnet could be leveraged for lateral movement. |\n| **ClickFix (BSOD) campaign** | Fake Windows BSOD pages delivering DCRat (targeting hospitality, but technique reusable). | Could be repurposed for health‑care staff via phishing emails. |\n| **NodeCordRAT** (npm Bitcoin‑themed packages) | Supply‑chain compromise of JavaScript packages (Jan 8). | Health‑care web applications that depend on npm may be infected. |\n\n#### 3.2 Vulnerabilities (CVE‑style)  \n\n| CVE / Vulnerability | Product | CVSS | Exploited? | Healthcare Relevance |\n|----------------------|---------|------|------------|----------------------|\n| **AdonisJS Bodyparser** | Node.js framework (critical flaw, CVSS 9.2) – Jan 6 | Yes – active exploitation reported. | Many health‑care APIs built on Node.js; risk of arbitrary file write. |\n| **Dolby Android Decoder** | Android media stack – Jan 6 | Patched, but previously exploitable. | Android health‑apps and medical‑device tablets could be compromised. |\n| **n8n RCE (multiple)** | Automation platform – CVSS 9‑10 – Jan 6, 7, 8 | Actively weaponised (e.g., “Ni8mare” exploit). | Direct impact on health‑care workflow automation (patient‑data pipelines). |\n| **Veeam Backup & Replication** | Backup server – CVSS 9.0 – Jan 7 | Actively exploited. | Backup of EHR systems at risk of ransomware or data theft. |\n| **Cisco ISE** | Identity Services Engine – Jan 8 | PoC released; active exploitation likely. | Network access control for hospitals; could allow rogue device access. |\n| **HPE OneView** | Infrastructure management – Jan 8 | Actively exploited (CISA KEV). | Data‑center hardware used by large health‑systems. |\n| **Microsoft Office PowerPoint** | Office suite – Jan 8 | Actively exploited (CISA KEV). | Clinicians frequently use Office; macro‑based attacks can deliver ransomware. |\n| **CISA KEV Catalog expansion** | 1,480 entries (incl. many enterprise products) – Jan 5 | Broadly exploited. | Health‑care environments typically run many of these products; catalog serves as a “must‑patch” list. |\n| **Chrome extensions (Claude, AI chat)** | Browser extensions – Jan 5, 7 | Data‑exposure confirmed. | Clinicians using Chrome for tele‑health portals risk PHI leakage. |\n\n#### 3.3 Attack Surface & Vectors  \n\n* **Phishing & Email Misconfiguration** – Google Cloud‑based credential‑stealing (Jan 6) and internal‑domain spoofing (Jan 7) remain the most common initial‑access technique.  \n* **Supply‑Chain / Open‑Source** – n8n, AdonisJS, VS Code extensions, npm packages (NodeCordRAT) illustrate a **software‑bill‑of‑materials (SBOM) blind spot**.  \n* **AI‑Assistants** – Claude extension and ChatGPT Health APIs expose **prompt‑injection and data‑exfiltration** risks.  \n* **IoT / Medical Devices** – WHILL wheelchair remote‑hacking (Jan 8) shows that **assistive‑technology devices are reachable via the internet** and can be weaponised for denial‑of‑service or data theft.  \n\n---\n\n### 4. Strategic Intelligence  \n\n#### 4.1 Sub‑Sector Risk Assessment  \n\n| Sub‑Sector | Primary Threats (30 days) | Notable Incidents | Risk Rating (Low/Med/High) |\n|------------|---------------------------|-------------------|----------------------------|\n| **Hospital & Clinical Operations** | Phishing, ransomware, unpatched Office/PowerPoint, MFA fatigue | TridentLocker (Sedgwick), “One criminal, 50 orgs” | **High** |\n| **Health‑Tech SaaS / Patient Portals** | Credential theft, API abuse, data‑exposure via AI extensions | ManageMyHealth breach, Claude Chrome extension | **High** |\n| **Medical Devices / Assistive Tech** | Remote code execution, IoT botnet infection | WHILL wheelchair hack, Kimwolf Android botnet | **Medium‑High** |\n| **Health‑Care Supply Chain (vendors, labs)** | Supply‑chain compromise (n8n, VS Code, npm), ransomware on backup servers | Veeam RCE, n8n “Ni8mare” | **Medium** |\n| **Research & Academic Health Institutions** | AI‑model poisoning, prompt‑injection, credential harvesting | OpenAI ChatGPT Health launch, Claude extension | **Medium** |\n\n#### 4.2 High‑Impact Incidents  \n\n1. **ManageMyHealth breach (NZ)** – exposed patient records; highlighted lack of encryption at rest and inadequate incident‑response planning.  \n2. **TridentLocker ransomware on Sedgwick** – demonstrated that third‑party claims processors are a **soft target** for ransomware that can cascade to health‑insurers.  \n3. **n8n “Ni8mare” RCE (CVSS 10)** – could give attackers full control over workflow automation that moves PHI between systems; a single compromised instance can affect an entire health‑network.  \n\n#### 4.3 Lessons Learned  \n\n* **MFA is non‑negotiable** – the “50 orgs” case shows that even large enterprises skip MFA; health‑care must enforce MFA on all privileged and remote‑access accounts.  \n* **Patch management must be risk‑based but comprehensive** – the rapid succession of critical CVEs (n8n, Veeam, Cisco ISE, HPE OneView) requires **automated vulnerability scanning tied to a KEV‑driven prioritisation**.  \n* **Supply‑chain visibility** – health‑care developers need SBOMs and **continuous monitoring of open‑source dependencies** (npm, VS Code extensions).  \n* **AI‑service governance** – any integration of generative‑AI (ChatGPT Health, Claude) must be accompanied by **data‑segregation policies, token‑rotation, and prompt‑injection testing**.  \n\n---\n\n### 5. Forward‑Looking Assessment  \n\n| Emerging Trend | Expected Development (next 6‑12 months) | Recommended Defensive Priorities |\n|----------------|------------------------------------------|---------------------------------|\n| **AI‑driven health services** (ChatGPT Health, Claude, etc.) | Wider adoption in tele‑health, clinical decision support, and patient‑engagement chatbots. | *Implement AI‑risk frameworks*: data‑isolation, model‑access controls, regular prompt‑injection testing, and vendor security assessments. |\n| **Automation‑platform exploitation (n8n, Zapier‑like tools)** | Attackers will target workflow engines to pivot between EHR, lab, and billing systems. | *Secure automation pipelines*: network segmentation, least‑privilege API tokens, continuous monitoring for anomalous workflow executions. |\n| **IoT/Assistive‑device ransomware** | More medical‑device manufacturers will ship firmware with known CVEs (e.g., Dolby, WHILL). | *Device‑level hardening*: enforce signed firmware updates, network‑level isolation (IoT VLANs), and regular vulnerability scanning of medical‑device endpoints. |\n| **Supply‑chain attacks on developer tooling** (VS Code extensions, npm packages) | Expect “shiny‑object” campaigns to increase as developers adopt AI‑assisted coding tools. | *Secure development environment*: whitelist VS Code extensions, enforce SBOM checks, and use signed packages. |\n| **Credential‑theft & MFA fatigue** | Phishing kits will embed “MFA‑bypass” modules (e.g., push‑notification flooding). | *Zero‑trust email & identity*: enforce adaptive MFA, implement email DMARC/DKIM/SPF hardening, and deploy anti‑phishing AI. |\n| **CISA KEV catalog growth** | Continued addition of high‑severity enterprise products (cloud, collaboration). | *KEV‑driven patch cadence*: automate ingestion of CISA KEV feed into patch‑management tools; prioritize for health‑care assets. |\n\n**Top‑3 Defensive Priorities for Health‑Care Executives (2026)**  \n\n1. **Zero‑Trust Identity & MFA Enforcement** – Deploy adaptive MFA, enforce MFA on all remote‑access and privileged accounts, and integrate with identity‑governance platforms.  \n2. **Rapid Patch & KEV Alignment** – Build an automated pipeline that ingests CISA KEV data, cross‑references with asset inventory (EHR, backup, network infra), and applies patches within 48 hours for CVSS ≥ 9.0.  \n3. **AI & Automation Governance** – Establish a formal AI‑risk policy covering any generative‑AI or workflow‑automation tool that processes PHI; include data‑segregation, API‑key rotation, and continuous monitoring for anomalous usage.\n\n---\n\n**Prepared by:**  \n*Healthcare Cyber‑Threat Analyst – OpenAI‑Assisted*  \n*Date: 3 Feb 2026*  \n\n*All findings are derived exclusively from the article set provided (30 Dec 2025 – 08 Jan 2026). No external sources were consulted.*",
   "stats": {
     "7_day": {
-      "total_documents": 16,
+      "total_documents": 13,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -12,7 +12,11 @@
       "top_geographies": [
         [
           "Global",
-          12
+          10
+        ],
+        [
+          "North America",
+          3
         ],
         [
           "Europe",
@@ -23,11 +27,7 @@
           3
         ],
         [
-          "United States",
-          2
-        ],
-        [
-          "North America",
+          "Latin America",
           2
         ]
       ],
@@ -35,7 +35,7 @@
       "top_attack_vectors": []
     },
     "30_day": {
-      "total_documents": 67,
+      "total_documents": 69,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -43,7 +43,7 @@
       "top_geographies": [
         [
           "Global",
-          47
+          48
         ],
         [
           "United States",
@@ -51,55 +51,42 @@
         ],
         [
           "Europe",
-          12
+          13
         ],
         [
           "North America",
-          8
+          9
         ],
         [
           "Asia-Pacific",
-          8
+          9
         ]
       ],
       "top_exploit_kits": [],
       "top_attack_vectors": []
     },
     "150_day": {
-      "total_documents": 369,
+      "total_documents": 364,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
-      "top_mitre_techniques": [
-        [
-          "T1574.001",
-          1
-        ],
-        [
-          "T1574.002",
-          1
-        ],
-        [
-          "T1129",
-          1
-        ]
-      ],
+      "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          236
+          234
         ],
         [
           "Europe",
-          81
+          80
         ],
         [
           "North America",
-          64
+          63
         ],
         [
           "Asia-Pacific",
-          59
+          58
         ],
         [
           "United States",
@@ -111,11 +98,11 @@
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Healthcare": 78,
-        "Financial Services": 76,
-        "Technology": 62,
-        "Government": 48,
-        "Manufacturing": 28
+        "Healthcare": 71,
+        "Financial Services": 69,
+        "Technology": 59,
+        "Government": 45,
+        "Education": 25
       },
       "2025-10": {
         "Healthcare": 78,
@@ -139,11 +126,11 @@
         "Manufacturing": 26
       },
       "2026-01": {
-        "Healthcare": 63,
-        "Financial Services": 55,
-        "Technology": 48,
+        "Healthcare": 64,
+        "Financial Services": 56,
+        "Technology": 49,
         "Government": 30,
-        "Education": 23
+        "Education": 24
       }
     },
     "highlighted_incident": {},
