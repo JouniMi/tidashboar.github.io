@@ -190,6 +190,10 @@ class ApiService {
         return this.request('dashboard.json');
     }
 
+    async getBreakingNews() {
+        return this.request('breaking_news.json');
+    }
+
     // ============================================================================
     // UTILITY METHODS
     // ============================================================================

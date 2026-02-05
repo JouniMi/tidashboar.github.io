@@ -31,6 +31,7 @@ const app = createApp({
             chartData: {},
             liveStats: {},
             charts: {},
+            breakingNews: {},
             
             // Industry data
             selectedIndustry: '',
@@ -73,7 +74,8 @@ const app = createApp({
                     this.loadIncidents(),
                     this.loadVulnerabilities(),
                     this.loadThreatActors(),
-                    this.loadStatisticsData()
+                    this.loadStatisticsData(),
+                    this.loadBreakingNews()
                 ]);
                 
                 this.updateLastUpdated();
@@ -152,6 +154,15 @@ const app = createApp({
             } catch (error) {
                 console.error('Failed to load statistics data:', error);
                 this.statisticsData = {};
+            }
+        },
+
+        async loadBreakingNews() {
+            try {
+                this.breakingNews = await apiService.getBreakingNews();
+            } catch (error) {
+                console.error('Failed to load breaking news:', error);
+                this.breakingNews = {};
             }
         },
         
@@ -609,6 +620,7 @@ app.config.compilerOptions.delimiters = ['[[', ']]'];
 
 // Register components
 app.component('executive-summary', window.ExecutiveSummaryComponent);
+app.component('breaking-news', window.BreakingNewsComponent);
 app.component('stats-cards', window.StatsCardsComponent);
 app.component('incidents-table', window.IncidentsTableComponent);
 app.component('vulnerabilities-table', window.VulnerabilitiesTableComponent);
