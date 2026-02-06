@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-02-06T05:47:56Z",
-  "summary": "**GLOBAL CYBER THREAT LANDSCAPE – WEEK OF 02 FEB 2026**  \n*Prepared for Executive Leadership*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nThe past seven days have been marked by a **convergence of opportunistic data‑theft operations and increasingly sophisticated ransomware‑as‑a‑Service (RaaS) campaigns**.  Data‑breach activity against cloud‑native assets (four AWS accounts compromised, exposing S3 buckets, EC2 instances and IAM roles) and a wave of **malware infections targeting high‑value government and critical‑infrastructure networks** (energy, transportation, logistics) indicate that threat actors are exploiting the same “low‑hanging fruit” – mis‑configured cloud permissions and unpatched third‑party components – at a scale that threatens operational continuity for both public and private sectors.  Simultaneously, the **ShinyHunters data‑stealer** (six detections) and the **GlassWorm group** (two detections) have resurfaced with renewed activity, suggesting a shift from pure credential harvesting to the exfiltration of proprietary source‑code and intellectual property.  \n\nFrom a strategic standpoint, **state‑aligned actors (Sandworm, Lazarus, North‑Korean groups) are maintaining a background of espionage‑focused intrusions**, while **criminal syndicates (Everest, LockBit, DeadLock, Safepay, World Leaks) are leveraging RaaS platforms to weaponize newly disclosed, high‑CVSS vulnerabilities** (e.g., CVE‑2025‑55182 in NGINX/Baota panels and React components).  The rapid adoption of these flaws – already observed in active exploit attempts – raises the probability of **large‑scale ransomware extortion against financial services, technology providers, and supply‑chain partners**.  Immediate remediation of the critical CVEs, hardening of cloud IAM policies, and accelerated threat‑hunts for known TTPs (credential‑dumping, supply‑chain compromise, malicious PowerShell scripts) are therefore imperative to prevent escalation into a multi‑sector crisis.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor | 7‑day Activity | 30‑day Trend | 150‑day Trend | Attribution Confidence* | Primary Motivation |\n|-------|----------------|--------------|---------------|--------------------------|--------------------|\n| **ShinyHunters** | 6 detections (data‑stealer, source‑code theft) | 14 detections (30 d) | – | High – consistent tooling & leak‑site fingerprints | Financial gain via data‑sale |\n| **GlassWorm** (attributed) | 2 detections (targeting government comms) | – | – | Medium – attribution to a known Russian‑linked group | Espionage & political influence |\n| **RedKitten** | 2 detections (targeting telecom & cloud) | – | – | Medium – known Iranian‑aligned APT | Intelligence collection |\n| **UAT‑8099** | 2 detections (malware delivery) | – | – | Low – limited open‑source indicators | Opportunistic crime |\n| **Sandworm** | – | 4 detections (malware, DDoS) | – | High – signature of known Russian “Energetic Bear” toolkit | Disruption of critical infrastructure |\n| **North‑Korean actors** | – | 3 detections (phishing, credential‑theft) | – | High – language & IP‑based markers | Funding regime & intel gathering |\n| **Everest ransomware** | – | 3 detections (high‑profile victims: McDonald’s India, Under Armour, HP/Polycom) | – | High – ransomware‑note patterns & encryption keys | Extortion for ransom |\n| **LockBit / Ransomware‑as‑a‑Service** | – | Multiple campaigns (Jaguar Land Rover, finance, healthcare) | 3 detections (150 d) | High – ransom notes, affiliate infrastructure | Financial extortion |\n| **Scattered Spider** | – | – | 8 detections (web‑app skimming, credential theft) | Medium – observed in prior supply‑chain attacks | Financial theft |\n| **Lazarus Group** | – | – | 4 detections (crypto‑mining, espionage) | High – code reuse & C2 patterns | State‑sponsored finance & intel |\n\n\\*Confidence levels are derived from cross‑correlation of YARA signatures, C2 infrastructure reuse, and open‑source attribution reports.\n\n### TTP HIGHLIGHTS  \n\n* **Credential Dumping & Pass‑the‑Hash** – observed in ShinyHunters and RedKitten campaigns.  \n* **Supply‑Chain Compromise** – ransomware attacks on Ingram Micro and Jaguar Land Rover illustrate a “pivot‑through‑partner” approach.  \n* **Exploitation of Web‑Framework Bugs** – CVE‑2025‑55182 (React & NGINX) and CVE‑2025‑11953 (React‑Native CLI) are being weaponized in ransomware payload delivery.  \n* **Cloud‑IAM Mis‑configuration Abuse** – AWS breach leveraged overly permissive IAM roles; similar tactics noted in multiple ransomware extortion notes.  \n* **Ransomware‑as‑a‑Service Marketplace Activity** – RAMP forum operators continue to broker affiliates, accelerating the speed of campaign launch.\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Active Exploitation)  \n\n| CVE | CVSS | Affected Products | Exploit Status | Recommended Action |\n|-----|------|-------------------|----------------|--------------------|\n| **CVE‑2025‑55182** | 10.0 | NGINX, Baota (BT) management panel, React components (any server) | Confirmed exploitation in wild (malware droppers) | Immediate patch or block public access; enforce WAF rules for NGINX; rotate secrets in affected React apps |\n| **CVE‑2026‑1281** | 9.8 | Ivanti Endpoint Manager Mobile | Exploit kits observed targeting mobile device management | Apply vendor patch; enforce MFA for admin consoles; monitor for anomalous MDM traffic |\n| **CVE‑2025‑11953** | 9.8 | React Native CLI Metro dev server | Proof‑of‑concept exploits circulating; used in ransomware loaders | Upgrade React Native CLI; restrict dev server exposure; scan code repositories for malicious commits |\n| **CVE‑2026‑24423** | 9.5* | (Not disclosed – likely third‑party libs) | Early‑stage exploitation attempts | Prioritize patching in asset inventory; monitor CVE‑specific IDS signatures |\n| **CVE‑2026‑21509** | 9.3* | (Not disclosed) | Limited evidence of active use | Apply patches; conduct vulnerability scans on exposed services |\n\n\\*CVSS scores inferred from vendor advisories.\n\n### Attack Surface & Industry Targeting  \n\n* **Financial Services** – continues to be the most targeted sector (101 incidents in Sep 2025, sustained high volume). Recent ransomware on U.S. banks (Jan 29) and credit unions underscores persistent pressure.  \n* **Technology & Cloud Providers** – AWS credential theft, exploitation of React/NGINX stacks, and supply‑chain attacks on Ingram Micro illustrate a shift toward **software‑supply‑chain compromise**.  \n* **Government & Critical Infrastructure** – Malware infections in Venezuelan communications, energy operators, and transportation logistics (Feb 5) indicate **state‑aligned actors leveraging zero‑day exploits**.  \n* **Healthcare & Education** – While lower in count, ransomware on hospitals (AZ Monica) and university research centers (University of Hawaii Cancer Center) reveal a growing appetite for high‑value data.\n\n### Malware & Exploit Trends  \n\n* **New Families** – “GlassWorm” payloads (targeting government comms) and “UAT‑8099” droppers (PowerShell‑based) have emerged with limited public indicators but show rapid adoption.  \n* **Ransomware Loaders** – Everest and LockBit are now bundling **React‑NGINX exploit modules** to gain initial footholds before encryption.  \n* **Exploit Kit Activity** – No dedicated kits reported, but **modular exploit frameworks** (e.g., “ShinyHunters‑Stealer” v3) are being updated to include CVE‑2025‑55182.\n\n### Malicious Infrastructure  \n\n* No specific malicious domains or IPs were disclosed in the source set; however, **RAMP cybercrime forum** continues to host C2 infrastructure for ransomware affiliates. Continuous monitoring of known RAMP IP ranges and associated TOR exit nodes is advised.\n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Primary Risks | Notable Recent Incidents |\n|--------|---------------|--------------------------|\n| **Financial Services** | Ransomware extortion, credential theft, supply‑chain infiltration | LockBit attacks on U.S. banks; ShinyHunters data dumps of fintech source code |\n| **Technology / Cloud** | Exploitation of web‑framework vulnerabilities, cloud‑IAM abuse | AWS IAM breach; CVE‑2025‑55182 attacks on NGINX‑based SaaS platforms |\n| **Government** | Espionage‑focused malware, DDoS against critical services | GlassWorm malware on Venezuelan comms; Sandworm DDoS on energy operators |\n| **Healthcare** | Ransomware disrupting patient care, theft of PHI | AZ Monica Hospital ransomware; data breach of University of Hawaii Cancer Center |\n| **Manufacturing / Supply Chain** | Ransomware on OEMs, downstream partner compromise | Jaguar Land Rover supply‑chain ransomware; Ingram Micro ransomware affecting payroll systems |\n\n### Geopolitical Indicators  \n\n* **Russian‑aligned groups** (Sandworm, Scattered Spider) are concentrating on energy and transportation, aligning with Moscow’s strategic interest in destabilizing regional infrastructure.  \n* **North‑Korean actors** maintain a low‑profile phishing campaign targeting cryptocurrency exchanges, consistent with regime financing objectives.  \n* **Iranian‑linked RedKitten** activity against telecom and cloud services suggests a focus on intelligence gathering on regional communications.  \n\n### Supply‑Chain Risks  \n\n* **Ingram Micro** – ransomware compromised HR/payroll data for ~42 k individuals, demonstrating the impact of a single supplier breach on downstream customers.  \n* **Jaguar Land Rover** – ransomware across corporate network, manufacturing plants, and dealerships illustrates a **horizontal spread through shared ERP/SCM systems**.  \n* **RAMP Forum** – serves as a “one‑stop shop” for ransomware affiliates, accelerating the weaponization of newly disclosed vulnerabilities across multiple victim supply chains.\n\n### Incident Response Insights  \n\n* **AWS Breach** – lack of IAM least‑privilege controls allowed lateral movement; immediate remediation includes IAM policy tightening, MFA enforcement, and continuous CloudTrail analytics.  \n* **DDoS on Empire Market** – highlighted the need for **scrubbing services and upstream traffic filtering** for services hosting illicit marketplaces; also underscores the collateral risk to legitimate customers.  \n* **Malware targeting Venezuelan Gov** – demonstrated that **encrypted command‑and‑control traffic can bypass traditional network IDS**; deployment of SSL/TLS inspection proxies and anomaly‑based detection is recommended.\n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Exploitation Surge of CVE‑2025‑55182 & CVE‑2025‑11953** – ransomware gangs will likely embed these exploits in initial‑access loaders, especially against cloud‑native SaaS providers.  \n2. **Ransomware‑as‑a‑Service Expansion** – RAMP and similar forums will onboard new affiliates, lowering the barrier to entry and increasing the frequency of “low‑skill” ransomware attacks on mid‑market firms.  \n3. **Supply‑Chain Weaponization** – Expect a rise in “pre‑infection” of third‑party software updates (e.g., npm packages, container images) leveraging the React‑NGINX bug chain.  \n4. **State‑Aligned Hybrid Campaigns** – Sandworm and Lazarus may combine espionage payloads with destructive ransomware to achieve both intelligence and financial objectives, targeting critical infrastructure in Eastern Europe and the Middle East.  \n5. **Cloud Credential Harvesting** – Attackers will continue to abuse mis‑configured IAM roles, especially in multi‑tenant environments, to exfiltrate data and stage ransomware encryption.\n\n### Defensive Priorities  \n\n| Priority | Actionable Measures |\n|----------|---------------------|\n| **Patch Management** | Deploy emergency patches for CVE‑2025‑55182, CVE‑2026‑1281, CVE‑2025‑11953 across all web‑servers, MDM solutions, and development pipelines. |\n| **Zero‑Trust Cloud Hardening** | Enforce least‑privilege IAM, MFA for all privileged accounts, and continuous credential‑access monitoring (e.g., AWS GuardDuty, Azure Sentinel). |\n| **Threat‑Hunting for Known TTPs** | Run detection rules for ShinyHunters credential‑stealer signatures, PowerShell “UAT‑8099” droppers, and GlassWorm C2 patterns. |\n| **Supply‑Chain Vetting** | Implement SBOM (Software Bill of Materials) verification, signed container images, and third‑party risk scoring for all vendors (especially ERP/SCM providers). |\n| **Network Resilience** | Deploy DDoS mitigation services, SSL/TLS inspection, and behavioral analytics for anomalous outbound traffic to known ransomware C2 infrastructure. |\n| **Intelligence Integration** | Feed RAMP forum activity, CVE exploit alerts, and actor‑specific IOCs into SIEM/SOAR platforms for automated correlation and response. |\n\n### Intelligence Gaps  \n\n* **Lack of MITRE ATT&CK Mapping** – No technique identifiers were supplied; building a technique‑to‑actor matrix will improve detection tuning.  \n* **Malicious Infrastructure Visibility** – No domain/IP indicators were reported; proactive DNS‑sinkhole and passive DNS monitoring are needed to surface hidden C2 assets.  \n* **Geographic Threat Distribution** – Absence of location data hampers regional risk modeling; augment with open‑source geolocation feeds and threat‑intel sharing platforms.  \n* **Supply‑Chain Dependency Mapping** – Detailed asset‑to‑vendor relationships are missing; a comprehensive CMDB integration will enable rapid impact assessment when a supplier is compromised.\n\n---\n\n**Bottom Line for Leadership:**  \nThe convergence of high‑severity, easily exploitable software bugs with a thriving ransomware‑as‑a‑service ecosystem creates a **critical window of opportunity for threat actors** to inflict widespread disruption across finance, technology, and critical infrastructure. Immediate, coordinated action on patching, cloud‑IAM hardening, and supply‑chain verification will dramatically reduce the attack surface and limit the potential for a cascade of ransomware incidents in the coming weeks. Continuous intelligence enrichment—particularly around attacker techniques and malicious infrastructure—will be essential to stay ahead of the evolving threat landscape.",
+  "generated_at": "2026-02-06T14:26:16Z",
+  "summary": "[LLM error] Authentication failed – check LLM_API_KEY.",
   "stats": {
     "7_day": {
-      "total_documents": 246,
+      "total_documents": 247,
       "top_threat_actors": [
         [
           "ShinyHunters",
@@ -22,7 +22,7 @@
           2
         ],
         [
-          "GlassWorm group (attributed)",
+          "apt41",
           2
         ]
       ],
@@ -50,11 +50,11 @@
       ],
       "top_incidents": [
         [
-          "malware",
+          "data_breach",
           20
         ],
         [
-          "data_breach",
+          "malware",
           20
         ],
         [
@@ -107,11 +107,11 @@
           2
         ],
         [
-          "OpenClaw Exploit Kit (public PoC released on security forums)",
+          "PeckBirdy",
           1
         ],
         [
-          "PeckBirdy",
+          "Badbox 2.0",
           1
         ]
       ],
@@ -834,6 +834,33 @@
         "industry": "Unknown"
       },
       {
+        "company": "Ingram Micro corporate network",
+        "date": "2026-01-19T12:32:09",
+        "actor": "Unattributed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "undisclosed (likely millions of dollars including remediation, legal, and notification costs)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Ingram Micro HR/payroll systems",
+        "date": "2026-01-19T12:32:09",
+        "actor": "Unattributed ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "undisclosed (likely millions of dollars including remediation, legal, and notification costs)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Ingram Micro",
+        "date": "2026-01-19T13:33:45",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
         "company": "Ingram Micro",
         "date": "2026-01-19T10:51:28",
         "actor": "Unknown",
@@ -879,51 +906,6 @@
         "industry": "Unknown"
       },
       {
-        "company": "Ingram Micro corporate network",
-        "date": "2026-01-19T12:32:09",
-        "actor": "Unattributed ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "undisclosed (likely millions of dollars including remediation, legal, and notification costs)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Ingram Micro HR/payroll systems",
-        "date": "2026-01-19T12:32:09",
-        "actor": "Unattributed ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "undisclosed (likely millions of dollars including remediation, legal, and notification costs)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Ingram Micro",
-        "date": "2026-01-19T13:33:45",
-        "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Fortune 100 finance company (Windows endpoints)",
-        "date": "2026-01-19T21:00:34",
-        "actor": "Unnamed ransomware group leveraging PDFSider",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Corporate network infrastructure",
-        "date": "2026-01-19T21:00:34",
-        "actor": "Unnamed ransomware group leveraging PDFSider",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
         "company": "Ingram Micro internal file repositories",
         "date": "2026-01-19T18:29:03",
         "actor": "Safepay ransomware group",
@@ -945,6 +927,24 @@
         "company": "Approximately 42,000 individuals (employees, job applicants, and customers)",
         "date": "2026-01-19T18:29:03",
         "actor": "Safepay ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Fortune 100 finance company (Windows endpoints)",
+        "date": "2026-01-19T21:00:34",
+        "actor": "Unnamed ransomware group leveraging PDFSider",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Corporate network infrastructure",
+        "date": "2026-01-19T21:00:34",
+        "actor": "Unnamed ransomware group leveraging PDFSider",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -987,6 +987,15 @@
         "industry": "Unknown"
       },
       {
+        "company": "Major food service franchisee operator in Southeast Asia",
+        "date": "2026-01-22T18:00:00",
+        "actor": "Osiris ransomware group (attributed)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
         "company": "Hammersmith & Fulham Council",
         "date": "2026-01-23T10:34:57",
         "actor": "Undisclosed cybercriminal group",
@@ -999,15 +1008,6 @@
         "company": "Multiple London borough councils",
         "date": "2026-01-23T10:34:57",
         "actor": "Undisclosed cybercriminal group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Major food service franchisee operator in Southeast Asia",
-        "date": "2026-01-22T18:00:00",
-        "actor": "Osiris ransomware group (attributed)",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
