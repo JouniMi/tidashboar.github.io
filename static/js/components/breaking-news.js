@@ -64,8 +64,8 @@ window.BreakingNewsComponent = {
                 </small>
             </div>
 
-            <div class="row">
-                <div v-for="(item, index) in newsItems" :key="index" class="col-md-6 mb-3">
+            <div class="row g-2">
+                <div v-for="(item, index) in newsItems" :key="index" class="col-12 col-md-6">
                     <div class="card breaking-news-card">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-start mb-2">
@@ -90,8 +90,8 @@ window.BreakingNewsComponent = {
                                 
                                 <div v-if="item.affected_entities && item.affected_entities.length > 0" class="mb-2">
                                     <strong><i class="bi bi-building me-1"></i>Affected Entities:</strong>
-                                    <div class="mt-1">
-                                        <span v-for="(entity, idx) in item.affected_entities" :key="idx" class="badge bg-secondary me-1 mb-1">
+                                    <div class="mt-1 d-flex flex-wrap">
+                                        <span v-for="(entity, idx) in item.affected_entities" :key="idx" class="badge badge-entity me-1 mb-1">
                                             [[ entity ]]
                                         </span>
                                     </div>
@@ -99,8 +99,8 @@ window.BreakingNewsComponent = {
 
                                 <div v-if="item.threat_actors && item.threat_actors.length > 0" class="mb-2">
                                     <strong><i class="bi bi-person-badge me-1"></i>Threat Actors:</strong>
-                                    <div class="mt-1">
-                                        <span v-for="(actor, idx) in item.threat_actors" :key="idx" class="badge bg-dark me-1 mb-1">
+                                    <div class="mt-1 d-flex flex-wrap">
+                                        <span v-for="(actor, idx) in item.threat_actors" :key="idx" class="badge badge-threat-actor me-1 mb-1">
                                             [[ actor ]]
                                         </span>
                                     </div>
