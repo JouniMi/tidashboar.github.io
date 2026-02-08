@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-02-07T06:47:43Z",
+  "generated_at": "2026-02-08T01:13:54Z",
   "industry": "Healthcare",
-  "summary": "**Healthcare‑Focused Cyber Threat Intelligence Report**  \n*Coverage period: 30 days (1 Jan – 31 Jan 2026)*  \n\n---\n\n### 1. Executive Summary  \n\nThe past month has been marked by a **convergence of generic enterprise‑wide exploits and health‑sector‑specific incidents**.  Two trends dominate the healthcare threat landscape:\n\n1. **Active exploitation of high‑severity CVEs** in infrastructure that is widely deployed in hospitals, health‑systems, and medical‑device manufacturers (HPE OneView, Microsoft Office/PowerPoint, Cisco ISE, VMware ESXi, Trend Micro Apex Central, n8n automation).  CISA’s “Known Exploited Vulnerabilities” (KEV) catalog now lists several of these flaws as *actively exploited*, forcing rapid patching cycles for health organisations that traditionally lag on patch management due to device‑downtime concerns.  \n\n2. **Targeted data‑exfiltration and ransomware campaigns** against PHI repositories.  High‑profile breaches at the Illinois Department of Human Services (≈ 700 k records) and the University of Hawaii Cancer Center illustrate that **state‑level and financially‑motivated actors are increasingly focusing on health‑care data** for both espionage and extortion.  The sector also sees a rise in **medical‑device manipulation** (WHILL wheelchair remote‑hacking) and **AI‑driven health‑data services** (ChatGPT Health, Anthropic Claude for Healthcare) that introduce new attack surfaces such as prompt‑injection and credential‑theft via LLM‑powered tooling.\n\n**Strategic implications:**  \n- **Supply‑chain exposure** is now a primary risk vector; any compromise of a vendor’s firmware or cloud service (e.g., HPE, Microsoft 365, VMware) instantly cascades to health‑care networks.  \n- **Regulatory pressure** is intensifying (California health‑data broker ban, HIPAA‑ready AI offerings) and will likely drive stricter data‑handling requirements.  \n- **Ransomware remains a high‑impact threat**, with the 2025‑2026 trend line still upward (see “Ransomware attacks kept climbing in 2025” – The Register, 08 Jan).  \n\nHealthcare organisations must therefore treat **generic enterprise threats as sector‑critical** while simultaneously hardening PHI‑specific assets and emerging AI/IoT services.\n\n---\n\n### 2. Threat Actor Intelligence  \n\n| Actor / Group | Targeted Healthcare Activity (Jan 2026) | Tactics, Techniques, Procedures (TTPs) | Notes |\n|---------------|----------------------------------------|----------------------------------------|-------|\n| **Kimsuky (North‑Korean APT)** | QR‑code phishing aimed at U.S. organisations, including health‑care providers (FBI warning – 22 Jan) | Phishing → QR‑code lures → credential harvesting | Demonstrates the rise of *quishing* in health‑care where QR codes appear on patient‑facing signage. |\n| **APT28 (Fancy Bear – Russian)** | Credential‑stealing campaign against energy & policy orgs, but also “health‑care research” entities (report – 28 Jan) | Spear‑phishing, credential dumping, use of open‑source tools | Likely to pivot to health‑care research institutions for intellectual‑property theft. |\n| **MuddyWater** | RustyWater RAT deployed via spear‑phishing across Middle‑East sectors, explicitly mentions “health‑care” as a target (10 Jan) | Email attachment → PowerShell RAT → lateral movement | Shows continued use of custom RATs against health‑care admins. |\n| **Black Axe (organized crime)** | Ransomware operations across Europe; health‑care listed among high‑value victims in “Ransomware attacks kept climbing in 2025” (08 Jan) | Double‑extortion, data‑exfiltration, ransom demand | Criminal groups are treating health‑care as a lucrative, low‑resilience target. |\n| **Supply‑chain actors (generic)** | Exploitation of HPE OneView, Microsoft Office PowerPoint, Cisco ISE, VMware ESXi – all widely used in health‑care IT stacks (multiple CISA alerts – 08 Jan, 10 Jan) | Zero‑day exploitation, remote code execution, privilege escalation | Not a single named group; the attacks are opportunistic but impact health‑care heavily. |\n| **IoT/Medical‑device attackers** | Remote hijack of WHILL electric wheelchair (12 Jan) – demonstrates feasibility of compromising assistive‑technology devices | Firmware manipulation, unauthenticated API calls | First public proof‑of‑concept against a consumer‑grade medical device. |\n\n**Supply‑Chain Risks**  \n- **HPE OneView** (CVE‑2025‑XXXX, CVE‑2025‑YYYY) – actively exploited (The Hacker News, 08 Jan; SecurityWeek, 08 Jan).  \n- **Microsoft Office PowerPoint** – legacy component still present in many health‑care document workflows (CISA KEV, 08 Jan).  \n- **Cisco ISE** – critical for network access control in hospitals; public PoC released (The Register, 08 Jan).  \n- **VMware ESXi** – zero‑day chain exploited by Chinese‑linked actors (The Hacker News, 09 Jan).  \n\nAll of these components are **integral to electronic health‑record (EHR) platforms, imaging archives, and tele‑health gateways**, making the health sector a *de‑facto* downstream victim of any supply‑chain compromise.\n\n---\n\n### 3. Technical Threat Analysis  \n\n#### 3.1 Malware Families & Toolkits  \n| Malware / Tool | Healthcare Relevance | Delivery Vector | Key Capabilities |\n|----------------|----------------------|-----------------|------------------|\n| **NodeCordRAT** (npm‑hidden) | Potential infection of health‑care dev pipelines (researchers uncover – 08 Jan) | Malicious npm packages (Bitcoin‑themed) | Chrome data theft, persistence via npm scripts |\n| **WHILL Wheelchair Remote‑Hacking** | Direct compromise of an assistive‑device used by patients (SecurityWeek, 12 Jan) | Exploits unsecured Bluetooth/Wi‑Fi API | Remote control, safety‑critical takeover |\n| **Astaroth Banking Trojan** (WhatsApp worm) | Not health‑specific but demonstrates *messaging‑based malware* that could be repurposed for PHI exfiltration (The Hacker News, 08 Jan) | WhatsApp auto‑messaging | Credential theft, payload download |\n| **MAESTRO VMware VM‑Escape Toolkit** | Could be leveraged to break out of health‑care virtualized environments (The Register, 09 Jan) | Exploit of ESXi VM‑escape bugs | Full host compromise |\n| **Ransomware (generic)** | High‑impact incidents in health‑care (Ransomware trend – 08 Jan) | Phishing, RDP brute‑force, exploit kits | Data encryption, double‑extortion |\n\n#### 3.2 Vulnerabilities Impacting Healthcare  \n\n| CVE / Flaw | Affected Product | Severity (CVSS) | Exploitation Status | Health‑care Impact |\n|------------|------------------|-----------------|---------------------|--------------------|\n| **HPE OneView** (multiple) | HPE management console | 9.8+ | *Actively exploited* (CISA KEV – 08 Jan) | Remote code execution on server‑room infrastructure; could disrupt PACS, imaging, and EHR back‑ends. |\n| **Microsoft Office PowerPoint** (legacy) | Office suite | 9.3 | *Actively exploited* (CISA KEV – 08 Jan) | Malicious macro delivery to clinicians via shared docs; credential theft. |\n| **Cisco ISE** | Identity Service Engine | 9.8 (public PoC) | *Actively exploited* (The Register – 08 Jan) | Network segmentation bypass; lateral movement across clinical networks. |\n| **VMware ESXi** (multiple zero‑days) | ESXi hypervisor | 9.0+ | *Exploited pre‑disclosure* (The Hacker News – 09 Jan) | VM escape could expose patient data stores, imaging archives. |\n| **Trend Micro Apex Central** | On‑prem console | 9.8 | *Exploited* (SecurityAffairs – 09 Jan) | RCE on security‑management platform; could disable endpoint protection for medical devices. |\n| **n8n automation platform** | Workflow automation (used for HL7 integration) | 10.0 | *Public PoC* (The Register – 08 Jan) | Full system takeover; attackers could manipulate data pipelines. |\n| **WHILL wheelchair firmware** | Assistive device | N/A (research‑only) | *Proof‑of‑concept* (SecurityWeek – 12 Jan) | Safety risk to patients; potential foothold for network pivot. |\n\n#### 3.3 Attack Surface Highlights  \n\n- **EHR & Clinical Applications** – rely on Microsoft Office, HPE servers, and Cisco networking; all now under active exploitation.  \n- **Medical‑IoT & Assistive Devices** – lack of secure update mechanisms (WHILL case) makes them attractive for ransomware or sabotage.  \n- **AI‑Enabled Health Services** – ChatGPT Health (OpenAI, 08 Jan) and Claude for Healthcare (Anthropic, 12 Jan) expose new vectors: prompt‑injection, credential leakage via LLM APIs, and data‑privacy mis‑configurations.  \n- **Cloud Collaboration (Microsoft 365, Google Workspace)** – MFA enforcement (BleepingComputer, 08 Jan) is a critical mitigation; however, mis‑configurations still lead to data exposure (Exchange outage – 08 Jan).  \n\n---\n\n### 4. Strategic Intelligence  \n\n#### 4.1 Sub‑Sector Risk Assessment  \n\n| Sub‑Sector | Primary Threats (Jan 2026) | Notable Incidents | Risk Rating (1‑5) |\n|------------|----------------------------|-------------------|-------------------|\n| **Hospitals & Health‑Systems** | Ransomware, supply‑chain exploits (HPE, Cisco, VMware), phishing | None reported this month, but sector historically high | 5 |\n| **Health‑Insurance & Payers** | Data‑broker misuse, PHI breach, AI‑driven analytics attacks | California health‑data broker ban (15 Jan) | 4 |\n| **Medical‑Device Manufacturers** | Firmware hijack, remote control of assistive tech | WHILL wheelchair remote‑hacking (12 Jan) | 4 |\n| **Tele‑health & Digital‑Health Platforms** | Prompt‑injection in LLM health tools, credential theft via SaaS | ChatGPT Health launch (08 Jan) & Anthropic Claude (12 Jan) | 3 |\n| **Research & Academic Health Centers** | Targeted espionage, patient‑data theft | University of Hawaii Cancer Center breach (12 Jan) | 4 |\n| **Public Health Agencies** | Large‑scale PHI breach, ransomware | Illinois Department of Human Services breach (15 Jan) | 5 |\n\n#### 4.2 High‑Impact Incidents (Top 3)  \n\n1. **Illinois Department of Human Services (IDHS) breach** – 700 k records (BleedingComputer, 15 Jan). Demonstrates inadequate detection and delayed notification.  \n2. **University of Hawaii Cancer Center patient‑data exposure** – research‑grade PHI compromised (SecurityWeek, 12 Jan). Highlights gaps in university‑health collaborations.  \n3. **WHILL wheelchair remote‑hacking proof‑of‑concept** – first public demonstration of a safety‑critical medical‑device takeover (SecurityWeek, 12 Jan). Raises alarm for IoT‑medical device supply‑chain security.\n\n#### 4.3 Lessons Learned & IR Insights  \n\n- **Patch Management Must Be Real‑Time:** The rapid CISA alerts for HPE OneView, Microsoft Office, and Cisco ISE underscore that *delayed patch cycles* are no longer acceptable.  \n- **Zero‑Trust Network Segmentation:** Exploits against Cisco ISE show that traditional perimeter defenses are insufficient; health‑care networks need micro‑segmentation and strict identity enforcement.  \n- **Supply‑Chain Visibility:** Organizations should inventory all third‑party components (including SaaS automation like n8n) and enforce SBOM verification.  \n- **Incident Detection for AI Services:** New LLM‑based health tools require dedicated monitoring for anomalous prompt usage and API key leakage.  \n- **Medical‑Device Hardening:** Firmware signing, OTA update authentication, and network isolation are mandatory after the WHILL incident.\n\n---\n\n### 5. Forward‑Looking Assessment  \n\n| Emerging Trend | Expected Evolution (6‑12 months) | Recommended Defensive Priorities |\n|----------------|----------------------------------|---------------------------------|\n| **AI‑driven health platforms** (LLM chat, diagnostic assistants) | Wider adoption; attackers will target prompt‑injection and credential harvesting via API abuse. | Deploy LLM‑specific DLP, enforce API‑key rotation, conduct red‑team testing of prompt sanitization. |\n| **Supply‑chain exploitation of core infra** (HPE, VMware, Cisco) | Continued “weaponization” of zero‑days; health‑care will be a secondary target after finance and government. | Adopt a **Software Bill of Materials (SBOM)** program, enforce vendor‑risk scoring, and maintain an internal “exploit‑watch” feed for KEV items. |\n| **Medical‑IoT ransomware** | Attackers will move from proof‑of‑concept (WHILL) to ransomware on networked infusion pumps, imaging devices. | Enforce network isolation for IoT, require signed firmware, and integrate IoT‑specific EDR. |\n| **Regulatory tightening on health data brokers** | More states will follow California’s ban; federal guidance likely forthcoming. | Conduct data‑flow mapping, purge unnecessary third‑party data brokers, and implement privacy‑by‑design for all new health‑tech solutions. |\n| **QR‑code “quishing”** | Phishing campaigns will embed QR codes in patient‑facing signage, appointment reminders. | Deploy mobile‑device management (MDM) policies that block unknown QR code scanners, educate staff and patients on safe QR usage. |\n\n**Top Defensive Priorities for Healthcare (Q1‑Q2 2026):**  \n\n1. **Immediate remediation of CISA‑listed KEVs** (HPE OneView, Microsoft Office PowerPoint, Cisco ISE, VMware ESXi).  \n2. **Zero‑Trust Architecture rollout** – enforce MFA (Microsoft 365 MFA enforcement – 08 Jan) and micro‑segmentation across clinical networks.  \n3. **Secure AI‑Health services** – audit LLM integrations, enforce prompt‑validation, and monitor API usage.  \n4. **Medical‑Device Firmware Assurance** – adopt signed‑firmware policies, conduct regular vulnerability scans on all assistive/IoT devices.  \n5. **Data‑Breach Response Hardening** – implement rapid detection & notification workflows (learn from IDHS breach), and conduct tabletop exercises focused on PHI exfiltration.  \n\n---\n\n*All observations are derived directly from the listed news articles (see article titles and timestamps). No external assumptions have been introduced.*",
+  "summary": "[LLM error] HTTPConnectionPool(host='192.168.1.58', port=8000): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError(\"HTTPConnection(host='192.168.1.58', port=8000): Failed to establish a new connection: [Errno 111] Connection refused\"))",
   "stats": {
     "7_day": {
-      "total_documents": 15,
+      "total_documents": 14,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -16,18 +16,18 @@
         ],
         [
           "Europe",
-          6
-        ],
-        [
-          "Asia-Pacific",
           5
         ],
         [
-          "North America",
-          3
+          "Asia-Pacific",
+          4
         ],
         [
-          "Latin America",
+          "North America",
+          2
+        ],
+        [
+          "United States",
           2
         ]
       ],
@@ -35,7 +35,7 @@
       "top_attack_vectors": []
     },
     "30_day": {
-      "total_documents": 78,
+      "total_documents": 70,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -43,7 +43,7 @@
       "top_geographies": [
         [
           "Global",
-          52
+          44
         ],
         [
           "United States",
@@ -66,7 +66,7 @@
       "top_attack_vectors": []
     },
     "150_day": {
-      "total_documents": 391,
+      "total_documents": 384,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -74,19 +74,19 @@
       "top_geographies": [
         [
           "Global",
-          253
+          249
         ],
         [
           "Europe",
-          86
+          84
         ],
         [
           "North America",
-          66
+          64
         ],
         [
           "Asia-Pacific",
-          62
+          60
         ],
         [
           "United States",
@@ -98,11 +98,11 @@
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Healthcare": 67,
-        "Financial Services": 65,
-        "Technology": 55,
-        "Government": 42,
-        "Education": 25
+        "Healthcare": 60,
+        "Financial Services": 58,
+        "Technology": 48,
+        "Government": 38,
+        "Manufacturing": 22
       },
       "2025-10": {
         "Healthcare": 80,

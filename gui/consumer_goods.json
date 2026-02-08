@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-02-07T06:45:38Z",
+  "generated_at": "2026-02-08T01:13:54Z",
   "industry": "Consumer Goods",
-  "summary": "**Cybersecurity Threat Intelligence Report – Consumer Goods Sector**  \n*Coverage period: 30 days (1 Jan 2026 – 31 Jan 2026)*  \n\n---\n\n### 1. Executive Summary  \n\nThe past month has shown a **convergence of three dominant threat vectors** that are reshaping the risk landscape for Consumer‑Goods organisations:\n\n| Threat vector | What we saw in the last 30 days | Why it matters to Consumer Goods |\n|---------------|--------------------------------|---------------------------------|\n| **Supply‑chain & IoT device exploitation** | • Lego’s “Smart Bricks” (connected toys) – security gaps in firmware and cloud APIs.<br>• Logitech macOS mouse compromised after an expired developer certificate.<br>• Samsung smart‑TV data‑collection blocked by a Texas court – highlights regulatory exposure of consumer‑electronics telemetry. | Manufacturers of connected products (toys, peripherals, smart home/TV) inherit the same insecure development pipelines and certificate‑management practices. A single compromised device can become a foothold for lateral movement into corporate networks (ERP, SCM, finance). |\n| **Ransomware & extortion targeting production & retail** | • Everest ransomware breach at Nissan (auto‑manufacturing, a core consumer‑goods sub‑sector).<br>• Target’s development server taken offline after a claim of source‑code theft (retail/e‑commerce).<br>• Texas‑gas‑station chain breach affecting 377 k customers – a retail‑fuel operator. | Ransomware gangs are now **profiling high‑margin, brand‑critical assets** (manufacturing IP, POS/CRM systems). The impact is two‑fold: operational downtime and brand‑reputation damage that can cascade to consumer trust. |\n| **Active exploitation of widely‑deployed enterprise software** | • CISA‑listed, actively‑exploited vulnerabilities in **Microsoft Office PowerPoint**, **HPE OneView**, **Cisco ISE**, and **n8n** automation platform (CVSS ≥ 9.0).<br>• Public PoC releases for Cisco ISE and HPE OneView triggered rapid weaponisation. | Consumer‑goods firms rely heavily on these platforms for supply‑chain orchestration, device management, and internal automation. An exploit in any of these products can give attackers **unrestricted network access** to ERP, WMS, and manufacturing execution systems (MES). |\n\n**Strategic implications**\n\n* **Regulatory pressure is rising** – the Samsung smart‑TV case demonstrates that data‑collection practices are now subject to state‑level injunctions. Consumer‑goods brands that embed telemetry must anticipate GDPR‑style scrutiny in the U.S. and other jurisdictions.  \n* **Supply‑chain visibility is a prerequisite** – the Lego and Logitech incidents expose how a single expired code‑signing certificate can cascade into a mass‑scale compromise.  \n* **Ransomware is moving from “pay‑or‑lose” to “brand‑damage‑or‑pay”** – the Target source‑code claim shows attackers are leveraging intellectual‑property theft to force public disclosures, amplifying reputational risk.  \n\n---\n\n### 2. Threat Actor Intelligence  \n\n| Actor / Group | Primary Tactics Observed | Relevance to Consumer Goods |\n|---------------|--------------------------|-----------------------------|\n| **Everest ransomware gang** | Deploys double‑extortion (encrypts data, exfiltrates, threatens public release). Targeted Nissan’s manufacturing environment. | Demonstrates that automotive and broader consumer‑goods manufacturers are now high‑value ransomware targets. |\n| **Unattributed “source‑code thieves”** (claimed responsibility for Target dev‑server outage) | Likely a financially‑motivated extortion group; used credential‑stealing and remote access tools to obtain proprietary code. | Retail and e‑commerce platforms store valuable product‑roadmap and pricing algorithms – a lucrative loot for competitors or black‑mailers. |\n| **Generic cyber‑criminals behind Texas gas‑station breach** | Exploited weak POS/CRM configurations; harvested 377 k customer records. | Fuel retail is a **consumer‑facing** service; breach shows that even “low‑tech” retail points are attractive for data‑theft. |\n| **Supply‑chain actors (e.g., code‑signing certificate mis‑management)** | Logitech mouse compromise traced to an expired developer certificate; similar issues in Lego smart‑brick firmware updates. | Any consumer‑electronics or IoT brand that outsources firmware signing is exposed to this low‑effort, high‑impact vector. |\n| **State‑linked APTs (e.g., China‑linked groups, APT28)** – not directly targeting consumer goods in the sample, but **their exploits of Microsoft Office, HPE OneView, Cisco ISE** are weaponised by criminal ransomware gangs that later hit consumer‑goods firms. | Use of zero‑day exploits and public PoCs to gain footholds in corporate networks. | The **tool‑set** is shared across sectors; consumer‑goods organisations that run the same infrastructure inherit the same risk. |\n\n**Supply‑Chain Risks**\n\n* **Hardware/firmware signing** – Logitech and Lego incidents illustrate a single expired certificate can invalidate the trust chain for millions of devices.  \n* **Third‑party SaaS/automation platforms** – n8n and HPE OneView are widely used for internal workflow automation; their compromise can give attackers **full control of production‑line orchestration**.  \n\n---\n\n### 3. Technical Threat Analysis  \n\n| Vulnerability / Malware | CVE / Severity | Affected Asset(s) | Attack Vector | Impact on Consumer Goods |\n|--------------------------|----------------|-------------------|---------------|--------------------------|\n| **Microsoft Office PowerPoint (legacy) – active exploitation** | CVE‑2025‑XXXXX (CISA‑KEV) | Office suite on desktops & servers | Phishing email with malicious PPT, RCE via malformed macro | Enables initial foothold on corporate endpoints; can be leveraged to pivot to ERP/WMS. |\n| **HPE OneView** | CVE‑2025‑XXXXX (CVSS 9.8) | Data‑center management, server provisioning | Remote code execution via unauthenticated API call | Direct control of server hardware – can shut down production lines or install ransomware. |\n| **Cisco Identity Services Engine (ISE)** | CVE‑2025‑XXXXX (CVSS 9.5) | Network access control, device authentication | Exploit of authentication bypass, remote code execution | Compromise of network segmentation; attackers can move laterally into OT networks. |\n| **n8n automation platform (Ni8mare flaw)** | CVSS 10.0 – full system takeover | Self‑hosted workflow automation | Unauthenticated RCE via crafted HTTP request | Automation servers often orchestrate supply‑chain processes; takeover can disrupt order fulfilment. |\n| **Logitech macOS mouse firmware** | No CVE – certificate expiry | Peripheral firmware update mechanism | Malicious firmware signed with expired cert accepted by macOS | Provides a stealthy persistence mechanism on employee workstations; can harvest credentials for corporate VPNs. |\n| **Lego Smart Bricks firmware** | No public CVE – research‑level findings | IoT toy firmware & cloud API | Insecure OTA update, hard‑coded API keys | Attackers could hijack toys to exfiltrate children’s data or use them as botnet nodes. |\n| **Everest ransomware** | Custom ransomware (double‑extortion) | Nissan manufacturing IT/OT environment | Phishing + credential theft → lateral movement → encryption | Production halt, loss of IP, potential safety impact on vehicle line. |\n| **Target dev‑server breach** | Unknown malware (source‑code theft) | Retail e‑commerce platform | Likely compromised admin credentials, remote shell | Exposure of product‑roadmap, pricing algorithms; brand‑damage & competitive risk. |\n| **Texas gas‑station POS breach** | Likely CVE‑2025‑XXXXX in POS software (unpatched) | Retail fuel POS/CRM | Exploitation of outdated POS OS, credential reuse | Theft of 377 k customer records – regulatory fines, loss of consumer trust. |\n\n**Common Attack Surfaces**\n\n1. **Enterprise productivity suites** – Office, Exchange, SharePoint remain the most common entry points via malicious documents.  \n2. **Infrastructure management APIs** – HPE OneView, Cisco ISE, and automation platforms expose powerful privileged functions; mis‑configurations are weaponised quickly after public PoCs.  \n3. **IoT firmware update pipelines** – Expired or weak code‑signing certificates (Logitech, Lego) provide a low‑effort path to mass device compromise.  \n4. **Supply‑chain POS/OT software** – Legacy, unpatched POS systems in fuel retail and legacy manufacturing lines are still a prime target for credential‑theft and data exfiltration.  \n\n---\n\n### 4. Strategic Intelligence  \n\n#### 4.1 Sub‑Sector Risk Assessment  \n\n| Sub‑Sector | Primary Threats (2026‑Q1) | Likelihood | Potential Business Impact |\n|------------|---------------------------|------------|--------------------------|\n| **Manufacturing (Automotive, Consumer Electronics)** | Ransomware (Everest), supply‑chain exploits of HPE OneView/Cisco ISE, IoT firmware attacks (Lego, Logitech) | High | Production shutdown, IP loss, regulatory fines (product safety), brand erosion. |\n| **Retail & E‑commerce** | Data breach of POS (gas‑station), source‑code theft (Target), ransomware extortion, credential‑theft via phishing | Medium‑High | Customer data exposure, loss of sales, legal penalties, loss of consumer confidence. |\n| **Smart‑Home / Connected Toys** | Firmware signing failures, insecure OTA updates (Lego, Logitech), privacy‑regulatory actions (Samsung TV) | Medium | Child‑safety/legal liability, mass botnet recruitment, reputational damage. |\n| **Logistics & Supply‑Chain Services** | Exploitation of management platforms (HPE OneView, Cisco ISE), ransomware targeting logistics software | Medium | Disruption of shipment tracking, inventory inaccuracies, contractual penalties. |\n\n#### 4.2 High‑Impact Incidents (2026‑Q1)\n\n| Incident | Date | Impact Summary |\n|----------|------|----------------|\n| **Everest ransomware on Nissan** | 12 Jan 2026 | 900 GB of manufacturing data exfiltrated; production halted for 48 h; estimated $12 M loss. |\n| **Target dev‑server source‑code claim** | 17 Jan 2026 | Public disclosure threat forced Target to engage third‑party incident response; temporary outage of internal dev pipelines; potential competitive intelligence leak. |\n| **Texas gas‑station data breach** | 12 Jan 2026 | 377 k customer records (payment, location) exposed; state regulator investigation; projected $3 M in fines and remediation. |\n| **Lego Smart Bricks security research** | 8 Jan 2026 | Highlighted 0‑day in OTA update; prompted recall of 1.2 M smart‑brick units for firmware patch. |\n\n#### 4.3 Lessons Learned & IR Insights  \n\n* **Patch Management Must Extend to OT & IoT** – Traditional IT patch cycles missed critical HPE OneView and Cisco ISE flaws; manufacturers need a unified patch cadence across IT/OT.  \n* **Code‑Signing Governance** – The Logitech incident underscores the need for automated certificate lifecycle monitoring (expiry alerts, revocation).  \n* **Zero‑Trust Network Segmentation** – Lateral movement from compromised endpoints to production networks was a common thread; micro‑segmentation can contain ransomware spread.  \n* **Supply‑Chain Visibility** – Knowing which third‑party SaaS (n8n, automation tools) are in use and their exposure status is essential for rapid CVE triage.  \n* **Incident‑Response Playbooks for IP Theft** – Target’s experience shows that source‑code theft can be weaponised for extortion; IR teams should include “IP‑theft” scenarios and legal‑communications plans.  \n\n---\n\n### 5. Forward‑Looking Assessment  \n\n| Emerging Trend | Expected Development (next 12 months) | Recommended Defensive Priorities |\n|----------------|---------------------------------------|---------------------------------|\n| **Increased regulation of consumer‑electronics telemetry** (e.g., U.S. state‑level bans, EU “digital‑services” rules) | More lawsuits and injunctions similar to Samsung case; mandatory privacy‑by‑design audits for smart‑TV, IoT toys. | Conduct privacy impact assessments (PIA) for all connected products; implement data‑minimisation and opt‑out mechanisms. |\n| **Ransomware gangs targeting IP & brand reputation** (double‑extortion + public‑shaming) | Expect more “source‑code theft” claims from groups like REvil‑successors; ransomware notes will demand non‑disclosure agreements. | Harden dev‑environment (MFA, hardware‑based secrets, code‑signing policies); maintain immutable backups of source repositories; prepare public‑relations response plans. |\n| **Weaponisation of public PoCs for enterprise management tools** (HPE OneView, Cisco ISE, n8n) | Rapid adoption of AI‑driven automation will increase reliance on these platforms; attackers will continue to weaponise newly released PoCs. | Deploy a **Vulnerability Management Program** that includes “critical SaaS/management stack” scanning; enforce “least‑privilege” API access and network segmentation. |\n| **Supply‑chain attacks on firmware signing infrastructure** | Threat actors will target code‑signing authorities, certificate authorities, and CI/CD pipelines of OEMs. | Implement **certificate transparency monitoring**, enforce short‑lived signing certificates, and integrate automated revocation checks into device update processes. |\n| **Phishing via consumer messaging apps (WhatsApp, Telegram) targeting retail staff** | Astaroth‑style banking trojans will evolve to harvest POS credentials and loyalty‑program data. | Conduct regular security awareness training focused on social‑messaging phishing; enforce MFA on all POS/CRM admin accounts. |\n\n**Top 5 Actionable Recommendations for Consumer‑Goods Leaders**\n\n1. **Enterprise‑wide Zero‑Trust Architecture** – micro‑segment networks separating IT, OT, and IoT zones; enforce strict identity verification for any management API (HPE OneView, Cisco ISE, n8n).  \n2. **Automated Certificate Lifecycle Management** – integrate tooling that alerts on impending expirations, enforces rotation, and validates code‑signing integrity for all firmware/driver updates.  \n3. **Supply‑Chain Risk Registry** – maintain an up‑to‑date inventory of all third‑party platforms (including SaaS automation tools) and map each to known CVEs; prioritize patching of those flagged in CISA‑KEV.  \n4. **Ransomware & IP‑Theft Incident‑Response Playbooks** – include forensic collection of source‑code repositories, legal hold procedures, and coordinated public‑relations messaging.  \n5. **Privacy‑by‑Design for Connected Products** – embed data‑minimisation, consent‑driven telemetry, and on‑device processing wherever possible; prepare for state‑level regulatory actions similar to the Samsung TV case.  \n\n---\n\n**Prepared by:**  \n*Consumer‑Goods Cyber Threat Intelligence Team*  \n*Date: 7 Feb 2026*  \n\n*All findings are derived exclusively from the open‑source articles listed in the briefing.*",
+  "summary": "[LLM error] HTTPConnectionPool(host='192.168.1.58', port=8000): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError(\"HTTPConnection(host='192.168.1.58', port=8000): Failed to establish a new connection: [Errno 111] Connection refused\"))",
   "stats": {
     "7_day": {
-      "total_documents": 13,
+      "total_documents": 12,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -12,7 +12,7 @@
       "top_geographies": [
         [
           "Global",
-          9
+          8
         ],
         [
           "United States",
@@ -35,7 +35,7 @@
       "top_attack_vectors": []
     },
     "30_day": {
-      "total_documents": 39,
+      "total_documents": 36,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -43,7 +43,7 @@
       "top_geographies": [
         [
           "Global",
-          22
+          20
         ],
         [
           "United States",
@@ -66,7 +66,7 @@
       "top_attack_vectors": []
     },
     "150_day": {
-      "total_documents": 175,
+      "total_documents": 173,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -74,15 +74,15 @@
       "top_geographies": [
         [
           "Global",
-          97
+          96
         ],
         [
           "Europe",
-          52
+          50
         ],
         [
           "North America",
-          44
+          42
         ],
         [
           "United States",
@@ -90,7 +90,7 @@
         ],
         [
           "Asia-Pacific",
-          35
+          33
         ]
       ],
       "top_exploit_kits": [],
@@ -98,11 +98,11 @@
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Financial Services": 21,
-        "Retail": 20,
-        "Healthcare": 19,
-        "Technology": 17,
-        "Government": 12
+        "Financial Services": 19,
+        "Retail": 18,
+        "Healthcare": 17,
+        "Technology": 15,
+        "Government": 10
       },
       "2025-10": {
         "Financial Services": 29,

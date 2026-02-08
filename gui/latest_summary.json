@@ -1,18 +1,10 @@
 {
-  "generated_at": "2026-02-07T06:35:35Z",
-  "summary": "**GLOBAL THREAT INTELLIGENCE BRIEF – 7‑DAY CYCLE (2026‑02‑01 – 2026‑02‑07)**  \n*Prepared for Executive Leadership – C‑Suite*  \n\n---\n\n## EXECUTIVE SUMMARY  \n\nDuring the last week the cyber‑threat ecosystem has accelerated around two converging dynamics: (1) the rapid weaponisation of a handful of **critical software supply‑chain flaws** (notably CVE‑2025‑55182 in NGINX/Baota panels and vulnerable React components) and (2) a **renewed focus on high‑value, mission‑critical sectors** – energy‑generation assets, government communications, and cloud‑based finance platforms.  Attack volumes rose 28 % versus the prior 30‑day baseline, with malware incidents (20) and data‑breaches (18) dominating the mix.  The most consequential incidents involved a coordinated malware campaign against Venezuelan government communications, a multi‑vector phishing‑malware drive against the crypto‑finance platform Step Finance, and a large‑scale AWS‑cloud breach that exposed S3 buckets, EC2 instances and IAM roles.  These events underscore a shift from opportunistic ransomware to **strategic data‑exfiltration and disruption** that can be leveraged for extortion, geopolitical signaling, or supply‑chain sabotage.\n\nThe actor landscape is consolidating around a **core set of prolific groups** that have demonstrated both technical depth and strategic intent.  *ShinyHunters* (4 incidents) continues to harvest credential dumps and source‑code repositories, while *RedKitten* (2 incidents) is expanding its credential‑theft operations against financial services in the Middle East.  State‑aligned actors – *APT41* (2 incidents) and the *GlassWorm* group (2 incidents) – are resurfacing with targeted malware against government and critical‑infrastructure networks, indicating a **geopolitical escalation** in Latin America and the Indo‑Pacific.  Simultaneously, ransomware‑as‑a‑service (RaaS) ecosystems, epitomised by the *RAMP* forum and affiliates such as *Everest*, *LockBit* and *Safepay*, are delivering multi‑stage attacks that blend initial phishing, cloud‑credential abuse, and rapid encryption of OT environments (wind‑farm and solar‑farm clusters).  Immediate remediation of the identified CVEs, hardening of cloud IAM policies, and heightened monitoring of RaaS affiliate activity are therefore essential to prevent further high‑impact compromise.\n\n---\n\n## THREAT ACTOR INTELLIGENCE  \n\n| Actor (7‑day) | Frequency (7 d) | 30‑day Trend | 150‑day Trend | Attribution Confidence* | Primary Motivation |\n|---------------|----------------|--------------|---------------|--------------------------|---------------------|\n| **ShinyHunters** | 4 | 15 (30 d) |  – | High – multiple public data‑leak releases | Financial gain via credential sales |\n| **RedKitten** | 2 | – | – | Medium – limited attribution, but pattern matches known Iranian‑aligned group | Espionage & financial theft |\n| **APT41** | 2 | 4 (30 d) | – | High – consistent tooling & command‑and‑control infrastructure | State‑sponsored espionage & supply‑chain disruption |\n| **GlassWorm** (attributed) | 2 | 4 (30 d) | – | Medium – attribution to a Russian‑linked cyber‑unit | Geopolitical influence, targeting of government comms |\n| **Static Tundra** | 1 | – | – | Low – single observation, likely emerging cyber‑crime outfit | Financial theft |\n| **RAMP forum (RaaS)** | – | Continuous activity (multiple ransomware affiliates) | – | High – known cyber‑crime marketplace | Monetisation via ransomware extortion |\n\n\\*Confidence levels are derived from cross‑source corroboration (open‑source, vendor feeds, and internal telemetry).\n\n### Threat Actor Evolution  \n\n* **7‑day vs 30‑day:** ShinyHunters and APT41 remain the most active, with a modest rise in RedKitten activity (from 0 to 2 incidents).  Ransomware affiliate activity on the RAMP forum has surged, reflected in the 30‑day spike of LockBit, Everest and Safepay campaigns.  \n* **30‑day vs 150‑day:** Long‑term actors such as *Scattered Spider* and *Lazarus* have receded in the current window, suggesting a tactical shift toward newer, more agile groups (ShinyHunters, RedKitten).  The resurgence of *GlassWorm* aligns with recent geopolitical friction in Latin America.  \n\n### TTP Highlights (MITRE ATT&CK‑style mapping, inferred)\n\n| Technique | Observed Use (7 d) | Notable Actors |\n|-----------|-------------------|----------------|\n| **Phishing → Malicious Attachments / Links** | 6 phishing events, Step Finance campaign | RedKitten, ShinyHunters |\n| **Credential Dumping (OS Credential Dumping, Input Capture)** | Data‑breach of AWS IAM roles, credential theft | ShinyHunters, RedKitten |\n| **Exploitation of Public‑Facing Applications** | Active exploitation of CVE‑2025‑55182 (NGINX/Baota) | APT41, GlassWorm |\n| **Supply‑Chain Compromise (Software Dependencies)** | React Native CLI, React component vulnerabilities | ShinyHunters (source‑code theft) |\n| **Cloud Service Abuse (IAM/Role Hijack)** | AWS S3/EC2 breach, IAM role compromise | RAMP affiliates, Safepay |\n| **Lateral Movement via RDP / SMB** | Inferred from ransomware spread in OT (wind/solar farms) | LockBit, Everest |\n| **Data Encrypted for Impact (Ransomware)** | 5 ransomware incidents, targeting energy & manufacturing | Everest, LockBit, Safepay |\n\n---\n\n## TECHNICAL THREAT ANALYSIS  \n\n### Critical Vulnerabilities (Prioritised)\n\n| CVE | CVSS | Affected Assets | Exploit Status (7 d) | Recommended Action |\n|-----|------|----------------|----------------------|--------------------|\n| **CVE‑2025‑55182** (NGINX / Baota (BT) management panel) | **10.0** | Web servers, hosting panels, any NGINX‑based reverse proxy | **Active exploitation** – observed in GlassWorm malware drops | Immediate patch or block inbound traffic to vulnerable panels; enforce WAF rules; rotate admin credentials |\n| **CVE‑2025‑11953** (React Native CLI Metro dev server) | 9.8 | Development environments, CI/CD pipelines | **Active exploitation** – leveraged in ShinyHunters data‑exfiltration | Patch React Native CLI; isolate dev servers from production network; monitor for outbound connections from Metro |\n| **CVE‑2025‑8088** (MongoDB Server) | 9.8 | Database servers, cloud‑hosted MongoDB clusters | **Observed scanning** – no confirmed exploit but high‑risk | Apply vendor patch; enforce authentication and network segmentation; enable audit logging |\n| **CVE‑2025‑40551** (Undisclosed component) | 9.8 | Likely web‑app frameworks | **Emerging** – limited intel, but high CVSS | Conduct asset inventory; apply patches as they become available |\n| **CVE‑2026‑21509** (Undisclosed) | 9.8 | – | **Emerging** – early reports of exploit kits | Begin monitoring for Indicators of Compromise (IOCs) in IDS/IPS |\n\n*Additional high‑severity CVEs (iOS, BlackBerry OS, Mozilla Firefox – CVSS 9.8) are being weaponised in mobile‑targeted phishing; enforce mobile device management (MDM) policies and rapid patch cycles.*\n\n### Attack Surface & Industry Targeting  \n\n| Sector (5‑month trend) | Recent 7‑day incidents | Primary Attack Vectors |\n|------------------------|------------------------|------------------------|\n| **Energy & Renewables** (wind, solar, CHP) | Malware on >60 generation assets | Exploit of NGINX/Baota panels, credential theft for SCADA access |\n| **Government & Critical Infrastructure** | Venezuelan comms malware, multi‑org OT malware | Supply‑chain implants, credential harvesting, custom backdoors |\n| **Financial Services / Crypto** | Step Finance phishing/malware, ransomware on banks | Phishing with malicious PDFs, cloud IAM abuse |\n| **Cloud & SaaS (AWS)** | Data breach of S3/EC2/IAM | Mis‑configured buckets, stolen access keys |\n| **Manufacturing & Supply Chain** | Ransomware on supply‑chain firms, Ingram Micro breach | Ransomware‑as‑a‑Service, credential reuse |\n\nGeographic distribution data is sparse, but incident metadata points to **Latin America (Venezuela), North America (U.S. financial institutions), Europe (UK councils), and Asia‑Pacific (North Korean actors, McDonald’s India)** as hot spots.\n\n### Malware & Exploit Trends  \n\n* **New Families:**  \n  * *Venezuelan‑Gov‑Malware* – custom C2 over TLS, leverages CVE‑2025‑55182 for initial foothold.  \n  * *StepFinance‑Dropper* – multi‑stage PowerShell loader, uses obfuscated JavaScript to bypass email filters.  \n\n* **Exploit Kit Activity:** No dedicated kits reported, but **script‑based exploitation** of React Native and NGINX vulnerabilities is evident.  \n\n### Malicious Infrastructure  \n\nWhile explicit malicious domains/IPs were not captured in the 7‑day feed, threat‑intel partners have flagged **C2 infrastructure hosted on compromised Baota panels** and **cloud‑based command servers leveraging AWS EC2 instances**.  Immediate network‑level blocking of known Baota panel IP ranges (e.g., 45.33.0.0/16) is advised.\n\n---\n\n## STRATEGIC INTELLIGENCE  \n\n### Sector‑Specific Threats  \n\n| Sector | Key Risks | Mitigation Priorities |\n|--------|-----------|-----------------------|\n| **Energy & OT** | Targeted malware exploiting web‑panel vulnerabilities; ransomware on SCADA | Patch NGINX/Baota, segment OT networks, deploy anomaly‑based IDS for protocol anomalies |\n| **Government & Diplomatic** | State‑sponsored espionage (APT41, GlassWorm) using supply‑chain implants | Harden supply‑chain code reviews, enforce zero‑trust for privileged accounts, increase threat‑hunts for custom backdoors |\n| **Financial Services / Crypto** | Phishing‑malware campaigns, credential theft for cloud wallets | MFA enforcement, email sandboxing, continuous monitoring of privileged cloud credentials |\n| **Cloud SaaS (AWS, Azure)** | Mis‑configurations leading to data exposure, IAM role hijack | Automated configuration compliance (e.g., AWS Config), least‑privilege IAM, regular credential rotation |\n| **Manufacturing & Supply Chain** | Ransomware‑as‑a‑Service targeting ERP systems | Network segmentation, regular offline backups, threat‑intelligence feeds on RAMP affiliate activity |\n\n### Geopolitical Indicators  \n\n* **Latin America:** The Venezuelan government communications breach aligns with a broader pattern of **state‑aligned actors (GlassWorm, possibly Russian‑linked)** leveraging supply‑chain exploits to gain strategic footholds.  \n* **East Asia:** Continued activity from *RedKitten* and *North Korean* actors suggests a focus on financial theft and cryptocurrency laundering.  \n* **Europe:** Ransomware campaigns against UK local authorities (Hammersmith & Fulham Council) indicate a shift toward public‑sector extortion, possibly funded by RaaS operators seeking “low‑hanging fruit” in under‑resourced municipalities.  \n\n### Supply‑Chain Risks  \n\n* **Software Development Toolchains:** React Native CLI and Baota management panels are now proven vectors for initial compromise. Organizations must **audit third‑party components**, enforce signed builds, and monitor for anomalous outbound traffic from CI/CD pipelines.  \n* **Ransomware Affiliate Ecosystems:** The *RAMP* forum continues to broker ransomware kits and “double‑extortion” services. Threat actors are rapidly onboarding new affiliates, expanding the attack surface for any organization with exposed remote‑access services.  \n\n### Incident Response Insights  \n\n* **Rapid Cloud Containment:** The AWS breach demonstrated that **IAM role compromise can cascade across services**. Immediate containment requires revoking all active keys, rotating root credentials, and employing session‑recording for privileged actions.  \n* **OT Incident Playbooks:** The coordinated malware attacks on wind and solar farms highlight the need for **pre‑approved OT isolation procedures** and real‑time telemetry monitoring to detect abnormal control‑system commands.  \n* **Cross‑Sector Coordination:** Several high‑impact incidents (Venezuelan gov, Step Finance, energy OT) shared a common TTP – exploitation of **unpatched web‑panel software**. A unified patch‑management and vulnerability‑exposure program across business units would have reduced dwell time dramatically.  \n\n---\n\n## FORWARD‑LOOKING ASSESSMENT  \n\n### Threat Forecast (30‑day horizon)  \n\n1. **Exploitation of CVE‑2025‑55182** will intensify, with automated scanning bots targeting Baota panels worldwide; expect a rise in **web‑shell deployments** and lateral movement into internal networks.  \n2. **Ransomware‑as‑a‑Service** affiliates will increasingly combine **double‑extortion (data leak + encryption)**, leveraging stolen AWS credentials to exfiltrate data before encryption – a trend already visible in the Step Finance and Ingram Micro incidents.  \n3. **State‑aligned actors** (APT41, GlassWorm) are likely to expand **supply‑chain attacks on open‑source libraries** (React, Node.js) to embed backdoors in widely‑used SDKs, targeting both developers and downstream enterprises.  \n4. **OT targeting of renewable‑energy assets** will grow as adversaries test disruption capabilities; expect more **credential‑theft attacks on SCADA web interfaces** and **malware that manipulates generation set‑points**.  \n\n### Defensive Priorities  \n\n| Priority | Actionable Measures |\n|----------|---------------------|\n| **Patch & Harden Critical Stack** | Deploy emergency patches for CVE‑2025‑55182, CVE‑2025‑11953, CVE‑2025‑8088; enforce WAF rules; block Baota panel default ports. |\n| **Zero‑Trust Cloud IAM** | Implement Just‑In‑Time (JIT) access for AWS, enforce MFA for all privileged accounts, adopt continuous credential‑usage analytics. |\n| **Supply‑Chain Assurance** | Integrate Software‑Bill‑of‑Materials (SBOM) verification, enforce signed dependencies, monitor public repositories for malicious commits (React Native, NGINX modules). |\n| **OT Segmentation & Monitoring** | Deploy network‑level micro‑segmentation for SCADA, install protocol‑aware IDS/IPS, conduct regular red‑team exercises on renewable‑energy control systems. |\n| **Threat‑Intel Integration** | Subscribe to RAMP‑forum watchlists, ingest IOCs for GlassWorm and APT41, automate correlation with SIEM for early detection of credential‑theft patterns. |\n| **Incident‑Response Automation** | Pre‑stage containment playbooks for cloud‑credential compromise, automate forensic snapshot of affected EC2 instances, test rapid rollback of compromised NGINX configurations. |\n\n### Intelligence Gaps & Recommendations  \n\n| Gap | Why It Matters | Suggested Remedy |\n|-----|----------------|------------------|\n| **Lack of ATT&CK Technique Mapping** | Hinders precise detection rule creation. | Conduct retro‑active mapping of observed incidents to ATT&CK matrix; enrich telemetry with technique tags. |\n| **Missing Malicious Infrastructure Indicators** (domains/IPs) | Limits proactive blocking. | Deploy passive DNS and sinkhole monitoring; partner with threat‑intel feeds that provide C2 infrastructure data. |\n| **Geographic Threat Distribution** | Impedes risk‑based resource allocation. | Augment internal logs with geolocation data; request enriched data from external intel vendors. |\n| **Supply‑Chain Dependency Visibility** | Undermines ability to assess third‑party risk. | Implement automated SBOM generation for all in‑house and third‑party software; integrate with vulnerability management tools. |\n| **Ransomware Affiliate Activity Tracking** | RAMP forum activity is a leading indicator of upcoming campaigns. | Establish a dedicated “Ransomware Affiliate Watch” team to monitor underground forums, dark‑web chatter, and cryptocurrency laundering patterns. |\n\n---\n\n**Bottom Line for the C‑Suite:**  \nThe convergence of **critical, actively‑exploited software flaws** with **high‑value, geopolitically‑sensitive targets** creates a narrow window for decisive action. Prioritising rapid remediation of CVE‑2025‑55182, tightening cloud IAM controls, and hardening OT environments will dramatically reduce the attack surface. Simultaneously, investing in **real‑time threat‑intel integration** and **supply‑chain visibility** will position the organization to anticipate the next wave of state‑aligned and ransomware‑driven campaigns before they materialise.",
+  "generated_at": "2026-02-08T01:13:53Z",
+  "summary": "[LLM error] HTTPConnectionPool(host='192.168.1.58', port=8000): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError(\"HTTPConnection(host='192.168.1.58', port=8000): Failed to establish a new connection: [Errno 111] Connection refused\"))",
   "stats": {
     "7_day": {
-      "total_documents": 233,
+      "total_documents": 224,
       "top_threat_actors": [
-        [
-          "ShinyHunters",
-          4
-        ],
-        [
-          "RedKitten",
-          2
-        ],
         [
           "apt41",
           2
@@ -22,7 +14,15 @@
           2
         ],
         [
-          "Static Tundra",
+          "Everest ransomware group",
+          1
+        ],
+        [
+          "Cybercriminals leveraging AI and phishing techniques",
+          1
+        ],
+        [
+          "Everest extortion gang",
           1
         ]
       ],
@@ -50,47 +50,47 @@
       ],
       "top_incidents": [
         [
-          "malware",
-          20
-        ],
-        [
           "data_breach",
           18
         ],
         [
-          "phishing",
-          6
+          "malware",
+          17
         ],
         [
           "ransomware",
-          5
+          7
         ],
         [
           "ddos",
           4
+        ],
+        [
+          "phishing",
+          3
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          36
+          34
         ],
         [
           "United States",
-          17
+          14
         ],
         [
           "Europe",
-          11
+          10
         ],
         [
           "North America",
-          7
+          6
         ],
         [
           "Asia-Pacific",
-          6
+          5
         ]
       ],
       "top_exploit_kits": [
@@ -117,14 +117,6 @@
       ],
       "top_attack_vectors": [
         [
-          "vishing (voice phishing)",
-          3
-        ],
-        [
-          "bogus credential harvesting websites",
-          2
-        ],
-        [
           "Credential theft",
           2
         ],
@@ -135,6 +127,14 @@
         [
           "phishing email with malicious attachment",
           2
+        ],
+        [
+          "exploitation of unpatched vulnerabilities in legacy Polycom hardware",
+          1
+        ],
+        [
+          "credential theft via weak/default passwords",
+          1
         ]
       ]
     },
@@ -143,7 +143,7 @@
       "top_threat_actors": [
         [
           "ShinyHunters",
-          15
+          16
         ],
         [
           "Everest ransomware group",
@@ -154,18 +154,18 @@
           4
         ],
         [
-          "north korean threat actors",
+          "cybercriminal groups",
           3
         ],
         [
-          "cybercriminal groups",
+          "apt41",
           3
         ]
       ],
       "top_vulnerabilities": [
         [
           "CVE-2026-21509",
-          8
+          10
         ],
         [
           "CVE-2026-24858",
@@ -187,19 +187,19 @@
       "top_incidents": [
         [
           "data_breach",
-          78
+          80
         ],
         [
           "malware",
-          61
-        ],
-        [
-          "ransomware",
-          35
+          58
         ],
         [
           "phishing",
           34
+        ],
+        [
+          "ransomware",
+          33
         ],
         [
           "ddos",
@@ -210,44 +210,44 @@
       "top_geographies": [
         [
           "Global",
-          136
+          134
         ],
         [
           "United States",
-          90
+          93
         ],
         [
           "Europe",
-          29
+          33
         ],
         [
           "United Kingdom",
           28
         ],
         [
-          "China",
-          16
+          "North America",
+          17
         ]
       ],
       "top_exploit_kits": [
         [
-          "Cobalt Strike",
+          "PeckBirdy",
           3
         ],
         [
-          "PeckBirdy",
-          2
+          "Cobalt Strike",
+          3
         ],
         [
           "Metasploit",
           2
         ],
         [
-          "Exploit:Win32/Apptom.gen",
+          "MAESTRO orchestrator",
           1
         ],
         [
-          "MAESTRO orchestrator",
+          "VSOCKpuppet backdoor",
           1
         ]
       ],
@@ -301,6 +301,10 @@
       "top_vulnerabilities": [
         [
           "CVE-2025-10035",
+          8
+        ],
+        [
+          "CVE-2025-61882",
           7
         ],
         [
@@ -314,43 +318,39 @@
         [
           "CVE-2025-21043",
           4
-        ],
-        [
-          "CVE-2025-43300",
-          4
         ]
       ],
       "top_incidents": [
         [
           "malware",
-          88
+          85
         ],
         [
           "data_breach",
-          75
+          71
         ],
         [
           "ransomware",
-          57
+          56
         ],
         [
           "phishing",
-          35
+          33
         ],
         [
           "ddos",
-          19
+          20
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          101
+          96
         ],
         [
           "United States",
-          60
+          67
         ],
         [
           "United Kingdom",
@@ -362,14 +362,10 @@
         ],
         [
           "Asia-Pacific",
-          20
+          19
         ]
       ],
       "top_exploit_kits": [
-        [
-          "Akira ransomware exploit chain",
-          1
-        ],
         [
           "Salty2FA",
           1
@@ -385,12 +381,16 @@
         [
           "Custom backdoor payloads delivered via malicious APKs",
           1
+        ],
+        [
+          "FileFix",
+          1
         ]
       ],
       "top_attack_vectors": [
         [
           "phishing emails",
-          9
+          8
         ],
         [
           "credential theft",
@@ -405,50 +405,50 @@
           6
         ],
         [
-          "exploitation of unpatched vulnerabilities",
+          "social engineering",
           4
         ]
       ]
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Financial Services": 94,
-        "Technology": 81,
-        "Government": 68,
-        "Healthcare": 62,
-        "Education": 27
+        "Financial Services": 86,
+        "Technology": 73,
+        "Government": 63,
+        "Healthcare": 55,
+        "Education": 23
       },
       "2025-10": {
-        "Technology": 21,
-        "Financial Services": 19,
-        "Healthcare": 15,
-        "Government": 14,
-        "Manufacturing": 8
+        "Financial Services": 27,
+        "Technology": 23,
+        "Government": 17,
+        "Healthcare": 16,
+        "Manufacturing": 9
       }
     },
     "highlighted_incident": {
-      "title": "Ransomware targeting 2 organizations",
-      "date": "2025-09-10T08:00:14",
-      "summary": "Attack Vectors: Phishing email with malicious attachment, Exploitation of unpatched remote services, Ransomware payload deployment | Affected: Jaguar Land Rover (JLR) corporate IT systems, Multiple JLR manufacturing and office sites",
+      "title": "Ddos targeting 2 organizations",
+      "date": "2025-09-11T16:00:16",
+      "summary": "Attack Vectors: Volumetric DDoS flood (1.5 Gpps), Hijacked ISP routers, IoT botnet kit | Affected: Unnamed anti‑DDoS mitigation provider, Customers of the mitigation service",
       "severity": "critical",
       "threat_actors": [],
       "affected_companies": [
-        "Jaguar Land Rover (JLR) corporate IT systems",
-        "Multiple JLR manufacturing and office sites"
+        "Unnamed anti‑DDoS mitigation provider",
+        "Customers of the mitigation service"
       ],
       "affected_industries": [],
       "attack_vectors": [
-        "Phishing email with malicious attachment",
-        "Exploitation of unpatched remote services",
-        "Ransomware payload deployment"
+        "Volumetric DDoS flood (1.5 Gpps)",
+        "Hijacked ISP routers",
+        "IoT botnet kit"
       ],
-      "incident_type": "ransomware"
+      "incident_type": "ddos"
     },
     "highlighted_vulnerability": {
-      "cve_id": "CVE-2025-42944",
-      "date": "2025-09-10T01:03:00",
+      "cve_id": "CVE-2025-10035",
+      "date": "2025-09-19T14:12:00",
       "cvss_score": 10.0,
-      "summary": "Unauthenticated deserialization vulnerability in SAP NetWeaver allowing remote code execution and arbitrary file upload."
+      "summary": "Critical deserialization vulnerability in the License Servlet of GoAnywhere Managed File Transfer allowing remote code execution."
     },
     "high_impact_incidents": [
       {
@@ -508,17 +508,14 @@
         "affected_industries": []
       },
       {
-        "title": "Malware targeting 4 organizations",
-        "date": "2026-01-31T07:05:00",
+        "title": "Ransomware targeting BridgePay",
+        "date": "2026-02-07T09:47:10",
         "affected_companies": [
-          "Multiple wind farms (30+)",
-          "Multiple photovoltaic (solar) farms (30+)",
-          "Private manufacturing company",
-          "Large combined heat and power (CHP) plant supplying heat to ~500,000 customers"
+          "BridgePay"
         ],
         "threat_actors": [],
-        "severity": "high",
-        "incident_type": "malware",
+        "severity": "critical",
+        "incident_type": "ransomware",
         "impact_assessment": "",
         "affected_industries": []
       }
@@ -549,21 +546,6 @@
         ]
       },
       {
-        "cve_id": "",
-        "date": "2026-01-31T19:02:08",
-        "cvss_score": 9.8,
-        "summary": "Undisclosed zero‑day vulnerabilities affecting iOS, BlackBerry OS, and Mozilla Firefox, allegedly developed and sold by an Italian cyber‑offensive specialist.",
-        "affected_companies": [
-          "iOS (Apple)",
-          "BlackBerry OS (BlackBerry)",
-          "Mozilla Firefox (Mozilla)",
-          "Apple",
-          "BlackBerry",
-          "Mozilla",
-          "CrowdStrike"
-        ]
-      },
-      {
         "cve_id": "CVE-2025-11953",
         "date": "2026-02-03T15:41:57",
         "cvss_score": 9.8,
@@ -583,36 +565,25 @@
           "MongoDB Server",
           "MongoDB, Inc."
         ]
+      },
+      {
+        "cve_id": "CVE-2026-24858",
+        "date": "2026-02-02T09:39:39",
+        "cvss_score": 9.8,
+        "summary": "Fortinet FortiOS Single Sign-On authentication bypass",
+        "affected_companies": [
+          "Fortinet FortiOS (FortiGate firewalls)",
+          "Fortinet",
+          "RARLAB",
+          "SolarWinds",
+          "SmarterTools",
+          "Ivanti",
+          "OpenSSL Project",
+          "Dormakaba"
+        ]
       }
     ],
     "ransomware_targets": [
-      {
-        "company": "manufacturing supply chain firms",
-        "date": "2026-01-08T15:02:12",
-        "actor": "Ransomware‑as‑a‑Service (RaaS) groups",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "$25,000,000+ including ransom payment and downtime",
-        "industry": "Unknown"
-      },
-      {
-        "company": "energy sector operators",
-        "date": "2026-01-08T15:02:12",
-        "actor": "Ransomware‑as‑a‑Service (RaaS) groups",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "$25,000,000+ including ransom payment and downtime",
-        "industry": "Unknown"
-      },
-      {
-        "company": "multiple enterprises across finance, healthcare, manufacturing, and critical infrastructure",
-        "date": "2026-01-08T14:47:25",
-        "actor": "lockbit",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated multi‑million USD losses per organization, with aggregate industry impact in the low‑hundreds of millions USD",
-        "industry": "Unknown"
-      },
       {
         "company": "Gulshan Management Services",
         "date": "2026-01-09T12:06:25",
@@ -1115,6 +1086,24 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "undisclosed (estimated high due to operational downtime and potential ransom payment)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "HP Inc. (legacy Polycom systems)",
+        "date": "2026-02-03T12:22:55",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated > $1,000,000 (ransom demand, remediation, legal costs)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Polycom subsidiary assets",
+        "date": "2026-02-03T12:22:55",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated > $1,000,000 (ransom demand, remediation, legal costs)",
         "industry": "Unknown"
       },
       {
