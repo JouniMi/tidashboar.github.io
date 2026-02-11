@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-02-10T16:19:33Z",
+  "generated_at": "2026-02-11T02:54:01Z",
   "industry": "Communication Services",
-  "summary": "**COMMUNICATION SERVICES CYBERSECURITY THREAT ASSESSMENT**  \n**Period Covered:** 30 Days (January 2026)  \n**Prepared For:** Communication Services Sector Leadership & Security Operations  \n**Classification:** Sensitive – Law Enforcement & Critical Infrastructure  \n\n---\n\n## **Executive Summary**\n\nOver the past 30 days, the Communication Services sector has faced a confluence of **targeted exploitation of consumer-facing platforms**, **AI-augmented social engineering**, and **supply chain compromises in open infrastructure tools**—all converging to erode user trust and operational integrity. While the broader threat landscape features high-profile ransomware and state-sponsored activity across energy, healthcare, and defense, Communication Services providers are increasingly exposed through **third-party SaaS integrations**, **telecom-adjacent digital platforms (e.g., WhatsApp, Telegram, Instagram)**, and **telecom-specific credential theft vectors**.\n\nKey patterns include:  \n- **Platform-level vulnerabilities** in widely used communication apps (Instagram, Telegram, WhatsApp) leading to mass credential harvesting and account takeovers—often misreported as “breaches” but functionally equivalent in impact.  \n- **AI-driven phishing and deepfake abuse** targeting both end-users and internal staff, with attackers leveraging LLMs to craft hyper-personalized, platform-native attacks (e.g., LinkedIn comment-reply phishing, fake WhatsApp groups).  \n- **Critical infrastructure overlap**: Telecom operators are indirectly exposed via shared infrastructure (e.g., SMS-based MFA, VoIP, and signaling systems), while cloud-native communication platforms (e.g., ServiceNow, n8n, Salesforce) serve as high-value attack surfaces due to their role in customer engagement and service orchestration.\n\nStrategically, the sector faces mounting regulatory pressure (e.g., Ofcom’s investigation of X/Grok, India’s geolocation mandates) and reputational risk from **data scraping masquerading as breaches**, which erode consumer confidence even without system compromise. Most critically, threat actors are shifting from broad ransomware to **precision fraud campaigns** (e.g., pig butchering, crypto scams) that rely on compromised communication channels—making telecom and internet platforms *enablers* of financial crime.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Relevant Threat Actors Targeting Communication Services**\n| Actor/Group | Affiliation | Targeting Pattern | Relevance to Comm Services |\n|-------------|-------------|-------------------|----------------------------|\n| **Black Axe** | Nigerian transnational cybercrime syndicate | Multi-stage fraud, credential theft, ransomware | Directly targeted via Instagram data scraping (Jan 11–12); leveraged for pig butchering and crypto fraud campaigns |\n| **APT28 (Fancy Bear)** | Russian SVR | Credential harvesting, PDF-based login theft | Targeted enterprise users via PDF-based credential theft (Jan 12); high risk to internal comms platforms (e.g., email, collaboration tools) |\n| **BlueDelta** | Russian APT (Fancy Bear variant) | PDF-based credential theft, logins in <2 sec | Same methodology as APT28; poses risk to internal comms infrastructure (e.g., Outlook, Teams) |\n| **PLUGGYAPE** | Ukraine-focused APT | Signal/WhatsApp malware delivery | Actively exploits encrypted messaging apps to target defense personnel—signals high risk to telecom platform integrity and SMS/MMS abuse |\n| **RedVDS** | Cybercrime-as-a-Service (CaaS) | Credential stuffing, botnet-driven attacks | Disrupted by Microsoft (Jan 14); previously used to orchestrate large-scale account takeovers across social and communication platforms |\n\n### **Supply Chain Risks Affecting Communication Services**\n- **n8n Supply Chain Attack (Jan 12)**: Attackers compromised community nodes to steal OAuth tokens—directly impacting communication platforms that integrate with n8n for workflow automation (e.g., customer support ticketing, SMS alerting).\n- **VoidLink Malware (Jan 13)**: Linux-based framework targeting cloud/container environments; high relevance to cloud-native communication services (e.g., WebRTC, SIP trunking, UCaaS).\n- **Poisoned Python Libraries (Jan 13)**: Hugging Face models used in AI-driven customer service bots; compromised metadata could enable LLM-based phishing or voice cloning.\n\n---\n\n## **Technical Threat Analysis**\n\n### **High-Impact Vulnerabilities & Exploits**\n| Vulnerability / Tool | Severity | Exploitation Method | Comm Services Impact |\n|----------------------|----------|---------------------|----------------------|\n| **Ni8mare (n8n)** | CVSS 10 | OAuth token theft via compromised community nodes | Enables unauthorized access to customer data, SMS gateways, and CRM integrations |\n| **Gogs RCE (CISA KEV)** | CVSS 9.8 | Exploited in zero-day attacks; patched Jan 12–13 | High risk to internal Git hosting used for telecom software development (e.g., OSS network management tools) |\n| **Instagram Password Reset Flaw** | CVSS 7.5 | Abused to trigger mass password resets; led to 17M+ scraped records | Direct user impact: account takeovers, SIM-swap prep, phishing bait |\n| **c-ares DLL Side-Loading** | CVSS 9.1 | Bypasses security controls to deploy malware | Threatens endpoint security for field engineers and customer service agents |\n| **ServiceNow AI Platform Flaw** | Critical | Unauthenticated user impersonation | Impacts service orchestration platforms used by major telcos for customer onboarding and support |\n\n### **Malware Families & Attack Vectors**\n- **AsyncRAT, Remcos, Guloader**: Multi-stage campaigns via fake employee reports (Jan 12); used to establish persistence in enterprise environments—including contact centers and network operations.\n- **PLUGGYAPE**: Uses Signal/WhatsApp to deliver malware to Ukrainian defense forces (Jan 14); demonstrates **encrypted messaging abuse** as a delivery vector—high risk for telecom operators’ messaging platforms.\n- **Magecart**: Long-running web skimming campaign targeting payment networks (Jan 13); impacts communication platforms offering e-commerce or subscription billing (e.g., telco self-service portals).\n- **VoidLink**: Advanced Linux malware targeting cloud/container environments (Jan 13–14); poses existential risk to cloud-based UCaaS, CPaaS, and VoIP infrastructure.\n\n### **Attack Surface Expansion**\n- **AI/LLM Platforms**: Reprompt attacks on Microsoft Copilot (Jan 14) and AI agent privilege escalation (Jan 14) reveal new lateral movement paths in AI-augmented support systems.\n- **Telegram Proxy Links**: IP address leakage via hidden proxy links (Jan 12–13); enables tracking of field technicians and internal staff using encrypted comms.\n- **Credential Stuffing**: GoBruteforcer botnet targeting crypto projects (Jan 12–13); telecom APIs (e.g., SMS verification, MFA) are prime targets for credential reuse.\n\n---\n\n## **Strategic Intelligence**\n\n### **Sub-Sector Risk Assessment**\n| Sub-Sector | Key Risks | High-Impact Incidents |\n|------------|-----------|------------------------|\n| **Mobile Network Operators (MNOs)** | SMS/MMS abuse, SIM-swap fraud, VoIP hijacking | Instagram password reset flaw (Jan 12–14); PLUGGYAPE malware (Jan 14) |\n| **Cloud Communications (UCaaS/CPaaS)** | OAuth token theft (n8n), container compromise (VoidLink), AI platform flaws (ServiceNow) | n8n supply chain attack (Jan 12); VoidLink (Jan 13–14) |\n| **Internet Platforms (Social/ Messaging)** | Scraping, deepfake abuse, IP leakage, regulatory scrutiny | Instagram data scraping (Jan 11–14); Grok/X deepfake scrutiny (Jan 12–13) |\n| **Telecom Equipment & OSS/BSS** | Git hosting (Gogs), CI/CD pipeline compromise, third-party app risks | Gogs RCE (Jan 12–13); poisoned Python libraries (Jan 13) |\n\n### **High-Impact Security Incidents**\n1. **Instagram Password Reset Flaw & Scraped Data (Jan 11–14)**  \n   - Meta denied a breach but confirmed a vulnerability enabling mass password resets.  \n   - 17M+ records were scraped (2022 data), but the *flaw itself* remains exploitable for real-time account takeover.  \n   - **Lesson**: Scraped data ≠ breach, but platform flaws can enable *active* compromise—telcos must audit SMS/MFA workflows for reuse of Instagram credentials.\n\n2. **Spanish Energy Giant Endesa Breach (Jan 12–13)**  \n   - Threat actor claimed full customer data theft (~1.5M users).  \n   - While energy-focused, Endesa’s reliance on telecom partners for smart meter comms and customer portals highlights **cross-sector dependency risk**.\n\n3. **PLUGGYAPE Malware Campaign (Jan 14)**  \n   - Uses Signal/WhatsApp to target Ukrainian defense forces.  \n   - **Critical Insight**: Encrypted messaging apps are now primary malware delivery vectors—telcos must monitor for anomalous bot activity on messaging platforms.\n\n### **Incident Response Insights**\n- **Credential Reuse is the #1 Amplifier**: Instagram, LinkedIn, and crypto scams all exploit reused credentials—telcos should enforce *unique password enforcement* for customer-facing portals.\n- **AI-Generated Phishing is Indistinguishable from Legitimate**: LinkedIn comment-reply phishing (Jan 13) and fake WhatsApp groups (OPCOPRO scam, Jan 12) require behavioral analytics—not just signature-based detection.\n- **Cloud Misconfigs Enable Escalation**: Salesforce misconfigs (Mandiant tool, Jan 13) and Pax8 exposure (Jan 14) show that *third-party SaaS* is now the weakest link in communication service delivery.\n\n---\n\n## **Forward-Looking Assessment**\n\n### **Emerging Threat Trends (Q1–Q2 2026)**\n1. **AI-Powered Telecom Fraud at Scale**:  \n   - Voice cloning + SMS phishing will target customer service centers (e.g., “I’m your child—send $500 via crypto” scams via WhatsApp).  \n   - *Prediction*: 30% increase in AI-driven pig butchering campaigns using telecom APIs.\n\n2. **Telecom Signaling System Targeting**:  \n   - SS7/Diameter vulnerabilities will be weaponized for location tracking and call interception—especially as 5G rollout expands attack surface.\n\n3. **Supply Chain Attacks on CPaaS Platforms**:  \n   - n8n, Twilio, and Vonage integrations will be targeted via compromised npm/PyPI packages (e.g., poisoned metadata in Hugging Face models).\n\n4. **Regulatory Escalation**:  \n   - Ofcom’s Grok/X investigation (Jan 12) and India’s crypto geolocation rules (Jan 13) signal imminent EU/US regulation on *AI-generated deepfakes* and *communication platform accountability*.\n\n### **Recommended Defensive Priorities**\n| Priority | Action | Rationale |\n|----------|--------|-----------|\n| **1. Credential Hygiene & MFA Hardening** | Enforce *context-aware MFA* for all customer and employee accounts; block SMS-based MFA for high-risk actions | Instagram flaw shows SMS is compromised; credential reuse drives 80% of account takeovers |\n| **2. AI Platform Security** | Audit LLM integrations (e.g., Copilot, Claude) for reprompt attacks; implement input/output filtering | Reprompt hijacking (Jan 14) enables full session takeover |\n| **3. CPaaS/UCaaS Supply Chain Review** | Map all third-party workflow tools (n8n, Zapier); isolate OAuth token scopes; disable community node execution | n8n attack proves community integrations are high-risk |\n| **4. Messaging Platform Monitoring** | Deploy behavioral analytics on WhatsApp/Signal/Telegram for bot-like activity (e.g., rapid group joins, identical messages) | PLUGGYAPE and OPCOPRO show encrypted platforms are active attack vectors |\n| **5. Cloud Container Hardening** | Patch VoidLink-vulnerable Linux kernels; enforce network segmentation for UCaaS workloads | VoidLink targets cloud infrastructure hosting SIP servers and WebRTC gateways |\n\n---\n\n**Prepared by:**  \nCybersecurity Intelligence Unit – Communication Services Practice  \nDate: January 15, 2026  \n\n*This assessment is based solely on the provided article corpus. No external data sources were used.*",
+  "summary": "**COMMUNICATION SERVICES CYBERSECURITY THREAT ASSESSMENT**  \n**Period Covered:** 30 Days (January 1–31, 2026)  \n**Prepared For:** Communication Services Sector Leadership & Security Operations  \n**Classification:** Sensitive – Law Enforcement & Critical Infrastructure  \n\n---\n\n## **Executive Summary**\n\nOver the past 30 days, the Communication Services sector has faced a confluence of *targeted espionage, AI-abused social engineering, and systemic supply chain compromises*, with notable escalation in attacks exploiting telecom infrastructure, messaging platforms, and cloud-native orchestration tools. While the broader threat landscape remains dominated by ransomware and fraud campaigns targeting healthcare, finance, and retail, several high-impact incidents directly implicate Communication Service Providers (CSPs) and their digital ecosystems.\n\nThree key patterns dominate:  \n1. **Telecom-Specific Espionage & Surveillance:** France’s €42M fine against three telcos (Free, Orange, SFR) for “sub-par security prior to a 24M customer breach” is the most explicit regulatory action against CSPs in recent memory—indicating heightened enforcement of telecom-specific security obligations under EU NIS2 and GDPR.  \n2. **AI-Enhanced Social Engineering at Scale:** Multiple campaigns leveraged AI to automate deepfake audio/video, fake WhatsApp/Telegram groups (e.g., OPCOPRO scam), and hyper-personalized phishing via LinkedIn comment-reply tactics—directly targeting CSP customers and employees.  \n3. **Supply Chain Compromise of Telecom-Adjacent Tools:** The Ni8mare (n8n) and VoidLink malware campaigns exploited workflow automation and cloud infrastructure tools widely adopted by CSPs for network orchestration and customer-facing services.\n\nStrategically, CSPs are increasingly positioned as *attack launchpads*—not just targets—due to their control over routing, identity, and messaging infrastructure. The convergence of AI, regulatory pressure, and supply chain complexity creates a high-risk environment where a single misconfigured API or compromised third-party tool can cascade into nationwide service disruption.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **State-Backed Actors (APT Groups)**  \n- **APT28 (Fancy Bear / Sofacy / Strontium):** Demonstrated *increased focus on credential harvesting* targeting European and Central Asian entities—including potential telecom partners or suppliers—via PDF-based login theft (BlueDelta variant). While not directly targeting CSPs, their activity against defense and research entities suggests possible reconnaissance for future telecom infrastructure targeting.  \n- **North Korean Groups (e.g., Kimsuky, Lazarus):** Not explicitly named in articles, but the *PLUGGYAPE* malware campaign (using Signal/WhatsApp to target Ukrainian defense forces) reflects tactics highly replicable against CSPs: leveraging encrypted messaging for C2 and evading traditional email-based detection.\n\n### **Criminal Groups & Services**  \n- **Black Axe:** Europol/Spain-led takedown of 34 members highlights the group’s deep integration into *financial fraud ecosystems*—including SIM-swap, vishing, and credential stuffing campaigns that rely on compromised telecom accounts. CSPs are critical enablers (or victims) in such operations.  \n- **RedVDS:** Microsoft and law enforcement disrupted this cybercrime-as-a-service platform, which specialized in *credential theft and account takeover (ATO)*—a primary vector for telecom fraud. RedVDS’ infrastructure often resold access to telecom portals and cloud-based PBX systems.\n\n### **Supply Chain Threat Actors**  \n- **n8n Supply Chain Compromise (Ni8mare):** Attackers abused community nodes in the n8n workflow automation platform to steal OAuth tokens—*directly impacting CSPs using n8n for network automation, customer onboarding, or billing orchestration*.  \n- **VoidLink Malware:** A Linux-based framework targeting cloud/container environments, including Kubernetes clusters common in CSP core networks. Its focus on *cloud-native infrastructure* makes it highly relevant to CSPs migrating to microservices and edge computing.\n\n---\n\n## **Technical Threat Analysis**\n\n### **Vulnerabilities & Exploits**  \n| CVE/Issue | Relevance to Communication Services | Status |\n|-----------|-------------------------------------|--------|\n| **Gogs RCE (CVE-2025-47180)** | Gogs is used in internal DevOps pipelines by CSPs; CISA added to KEV catalog. Patching delays risk source code theft (cf. Target breach). | Actively Exploited |\n| **n8n OAuth Token Theft (Ni8mare)** | n8n is deployed in CSPs for network orchestration; token theft enables lateral movement into customer identity systems. | Actively Exploited |\n| **c-ares DLL Side-Loading (CVE-2025-XXXX)** | Affects Windows-based network management tools; enables bypass of EDR and deployment of RATs (e.g., Remcos). | Actively Exploited |\n| **ServiceNow AI Platform Flaw** | Many CSPs use ServiceNow for ITSM and customer support; unauthenticated impersonation enables social engineering at scale. | Patched (Jan 2026) |\n\n### **Malware Families & Tactics**  \n- **AsyncRAT & Remcos RATs:** Multi-stage campaigns delivered via fake employee reports and PDFs—*targeting CSP helpdesk and NOC staff* to gain access to network management systems.  \n- **Magecart-Skimming Campaigns:** Long-running web skimming targeting payment gateways used by CSPs for billing and self-service portals.  \n- **OPCOPRO Scam:** AI-generated fake WhatsApp groups impersonating customer support to harvest credentials—*directly exploiting CSP customer trust in messaging channels*.  \n- **Predator Spyware:** Exploits failed attacks to refine intelligence for future exploits—*a growing concern for CSPs with high-value government contracts*.\n\n### **Attack Vectors**  \n- **OAuth & SSO Abuse:** ConsentFix and browser-in-browser phishing tactics target CSP employee and partner credentials.  \n- **Telegram Proxy IP Leaks:** Hidden proxy links in Telegram reveal user IPs—*a threat to CSP customers using encrypted messaging, and to CSP internal comms*.  \n- **AI-Powered Deepfakes:** Grok’s “nudify” button and AI voice cloning used in smut campaigns; regulators (Ofcom, EU) are now holding telcos/social platforms accountable for content moderation failures.\n\n---\n\n## **Strategic Intelligence**\n\n### **Sub-Sector Risk Assessment**  \n| Sub-Sector | Key Risks | High-Impact Incidents |\n|------------|-----------|----------------------|\n| **Mobile Network Operators (MNOs)** | SIM-swap fraud, SMS interception, customer data leaks | France’s €42M telco fines; 24M customer breach (unconfirmed CSP, but likely MNO) |\n| **Fixed-Line & Broadband Providers** | Router firmware exploits, Wi-Fi chipset flaws (Broadcom flaw), home gateway hijacking | Broadcom Wi-Fi flaw (CVE-2025-XXXX) enables network disruption |\n| **Cloud & Managed Services (CSPs offering cloud)** | n8n/OAuth abuse, VoidLink in Kubernetes, Salesforce misconfigs | n8n supply chain attack; Mandiant’s Salesforce misconfig tool release |\n| **Telecom Equipment & Infrastructure Vendors** | Source code theft, RCE in network management tools | Target source code leak (analogous risk for Ericsson/Nokia suppliers) |\n\n### **High-Impact Incidents**  \n- **France’s €42M Telco Fines (Jan 14, 2026):** First major regulatory penalty *explicitly citing security failures* leading to a 24M-customer breach. Signals a new era of telco-specific enforcement.  \n- **Endesa Data Breach (Jan 12–14):** Though in energy, the breach (900GB stolen, customer data exposed) mirrors CSP vulnerabilities—especially in third-party vendor access and cloud misconfigurations.  \n- **AZ Monica Hospital Cyberattack (Jan 13–14):** Belgian hospital shutdown after attack demonstrates cascading impact of ransomware on critical infrastructure—*a template for attacks on CSPs supporting public safety networks*.\n\n### **Lessons Learned & IR Insights**  \n- **Third-Party Risk is Telco Risk:** The n8n and VoidLink campaigns prove that CSPs must extend security oversight to *workflow automation tools and cloud-native infrastructure*, not just legacy network gear.  \n- **AI Defense Requires AI Detection:** Phishing via LinkedIn comments, fake WhatsApp groups, and reprompt attacks on Copilot require behavioral AI monitoring—not signature-based tools.  \n- **Regulatory Compliance ≠ Security Posture:** France’s fines show that meeting baseline NIS2 requirements is insufficient; regulators now demand *demonstrable, proactive security* for telecom-specific threats.\n\n---\n\n## **Forward-Looking Assessment**\n\n### **Emerging Threats (Q2–Q4 2026)**  \n1. **AI-Driven Network Automation Sabotage:** Attackers may target CSP DevOps pipelines to inject malicious code into network configuration tools (e.g., Ansible, Terraform), enabling silent routing hijacks or DDoS amplification.  \n2. **5G Core Network Exploitation:** As CSPs roll out standalone 5G, vulnerabilities in cloud-native 5G core (e.g., UDM, AUSF) may be exploited—*VoidLink’s cloud focus suggests readiness for this*.  \n3. **Regulatory Escalation:** Expect similar fines in the U.S. (FCC) and UK (Ofcom) as deepfake abuse and telco security failures become public crises.  \n4. **Telecom-Specific Ransomware:** Ransomware groups may begin *threatening to leak customer PII or disrupt emergency services*—leveraging telcos’ unique societal role.\n\n### **Recommended Defensive Priorities**  \n| Priority | Action | Rationale |\n|----------|--------|-----------|\n| **1. Secure Workflow Automation** | Audit n8n, Zapier, and ServiceNow integrations; enforce least-privilege OAuth; isolate automation environments | Ni8mare and OAuth phishing are *immediate* threats to CSP operations |\n| **2. AI Security Monitoring** | Deploy AI-native EDR and behavioral analytics for deepfake, voice cloning, and prompt injection attacks | AI abuse is accelerating; legacy tools cannot detect AI-augmented social engineering |\n| **3. Telecom-Specific Threat Intelligence** | Join ISAC/ISAO; monitor for telco-specific IOCs (e.g., SIM-swap kits, SS7/Diameter exploits) | France’s fine proves telco threats are distinct and high-impact |\n| **4. Third-Party Risk Expansion** | Extend vendor risk programs to include cloud-native tooling, open-source dependencies, and AI model providers | VoidLink and poisoned Python libraries show third-party risk extends beyond traditional vendors |\n| **5. Regulatory Readiness** | Conduct telco-specific tabletop exercises on deepfake crises, customer data breaches, and regulator engagement | Prove compliance *and* crisis response capability to avoid regulatory penalties |\n\n---\n\n**Prepared by:**  \n*Senior Threat Intelligence Analyst, Communication Services Practice*  \n*Cybersecurity Intelligence Division*  \n*Date: January 15, 2026*  \n\n*This assessment is based solely on publicly available articles published within the last 30 days. All findings are derived from article metadata, industry tags, and technical details provided in source materials.*",
   "stats": {
     "7_day": {
-      "total_documents": 10,
+      "total_documents": 7,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -17,10 +17,6 @@
         [
           "United States",
           3
-        ],
-        [
-          "France",
-          2
         ],
         [
           "Global",
@@ -29,33 +25,37 @@
         [
           "Singapore",
           2
+        ],
+        [
+          "European Union",
+          2
         ]
       ],
       "top_exploit_kits": [],
       "top_attack_vectors": []
     },
     "30_day": {
-      "total_documents": 55,
+      "total_documents": 56,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
+          "United States",
+          20
+        ],
+        [
           "Global",
           19
         ],
         [
-          "United States",
-          18
-        ],
-        [
           "European Union",
-          10
+          12
         ],
         [
           "United Kingdom",
-          8
+          10
         ],
         [
           "Europe",
@@ -66,7 +66,7 @@
       "top_attack_vectors": []
     },
     "150_day": {
-      "total_documents": 253,
+      "total_documents": 254,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -78,19 +78,19 @@
         ],
         [
           "United States",
-          65
+          67
+        ],
+        [
+          "European Union",
+          33
+        ],
+        [
+          "United Kingdom",
+          32
         ],
         [
           "Europe",
           31
-        ],
-        [
-          "European Union",
-          31
-        ],
-        [
-          "United Kingdom",
-          30
         ]
       ],
       "top_exploit_kits": [],
@@ -98,11 +98,11 @@
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Telecommunications": 16,
-        "Government": 9,
-        "Technology": 7,
+        "Telecommunications": 15,
+        "Government": 8,
         "Financial Services": 7,
-        "Social Media": 6
+        "Social Media": 6,
+        "Technology": 6
       },
       "2025-10": {
         "Financial Services": 32,
@@ -133,11 +133,11 @@
         "Financial Services": 9
       },
       "2026-02": {
+        "Telecommunications": 5,
+        "Technology": 4,
         "Social Media": 4,
-        "Telecommunications": 4,
-        "Technology": 3,
         "Artificial Intelligence Services": 3,
-        "Online Content Platforms": 2
+        "Financial Services": 3
       }
     },
     "highlighted_incident": {},
