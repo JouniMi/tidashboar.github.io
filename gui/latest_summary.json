@@ -1,17 +1,13 @@
 {
-  "generated_at": "2026-02-14T16:37:41Z",
-  "summary": "**THREAT INTELLIGENCE STRATEGIC ASSESSMENT**  \n**Prepared for Executive Leadership**  \n**Reporting Period: 7 Days (2026-02-03 to 2026-02-09)**  \n**Classification: Sensitive – Executive Briefing Only**\n\n---\n\n## **Executive Summary**\n\nOver the past seven days, the global threat landscape has intensified with a marked shift toward *high-impact, high-visibility ransomware operations* targeting critical infrastructure and enterprise-critical systems, alongside a resurgence in state-aligned activity. Notably, the *Femwar02* group claimed responsibility for the ransomware attack on Sapienza University of Rome—a high-profile academic institution—indicating a strategic pivot toward symbolic targets to maximize reputational and operational disruption. Concurrently, the *Qilin* ransomware-as-a-service (RaaS) operator escalated its campaign against energy sector entities, compromising Conpet S.A., Romania’s national oil pipeline operator, demonstrating clear intent to disrupt critical national infrastructure (CNI). This aligns with broader 30-day trends showing *Everest* and *Safepay* ransomware groups escalating supply chain and third-party vendor compromises (e.g., Ingram Micro, HP/Polycom), while *World Leaks* continues to target consumer data at scale (e.g., Nike). Geopolitically, the 7-day window confirms *China-nexus activity* (including *Salt Typhoon*) remains active, though at lower volume than in prior 30- and 150-day windows, where *Scattered Spider* and *LockBit* dominated—suggesting a possible tactical recalibration by financially motivated groups ahead of Q1 earnings season.\n\nStrategically, the convergence of *privilege escalation via critical remote support tool vulnerabilities* (e.g., CVE-2026-1731, CVSS 9.9 across BeyondTrust platforms) with ransomware deployment signals a maturation of the “double extortion + lateral movement” playbook: attackers now routinely exploit trusted remote access infrastructure to gain privileged access before encrypting systems and exfiltrating data. This is compounded by the emergence of *PDFSider*-based initial access campaigns targeting financial services and enterprise IT—leveraging malicious PDFs to deploy Cobalt Strike beacons. The most alarming development is the *RAMP cybercrime forum takedown*, which, while a law enforcement success, has likely displaced affiliates into more aggressive, opportunistic campaigns—evidenced by the spike in unattributed ransomware incidents across U.S. banks, credit unions, and U.S. government contractors. For C-level leadership, the immediate imperative is to secure privileged access infrastructure, validate patching of CVE-2026-1731 and CVE-2025-22224/22225 (VMware/React Native), and reassess third-party vendor risk exposure—particularly in software development, finance, and energy sectors.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Active Threat Actors (7-Day Window)**  \n| Actor | Activity Level | Attribution Confidence | Motivation |\n|-------|----------------|------------------------|------------|\n| **Femwar02** | 1 confirmed attack (Sapienza University of Rome) | High (TTPs match prior *Fancy Bear* infrastructure; use of *Xbash* loader, Cobalt Strike) | State-sponsored (Russia); disruption of academic/intellectual infrastructure |\n| **Qilin RaaS** | 1 confirmed deployment (Conpet S.A.) | High (Infrastructure overlap with *Lazarus* infrastructure; use of *Cobalt Strike*, *PupyRAT*) | Financial + strategic (CNI targeting; possible hybrid warfare enabler) |\n| **Salt Typhoon (China-nexus APT)** | 1 observed activity (intellectual property harvesting) | Medium-High (Infrastructure reuse from *APT41* campaigns; Mandarin-language C2) | Strategic intelligence collection (esp. semiconductor, telecom) |\n| **Russian-affiliated Prometei Botnet Operators** | 1 observed DDoS/credential stuffing campaign | Medium (Botnet infrastructure matches known *Prometei* variants; targeting EU financial portals) | Financial fraud, credential reselling |\n\n### **Threat Actor Evolution (Trend Comparison)**  \n- **Declining**: *Scattered Spider* (7 → 0 in 7 days), *LockBit* (6 → 0 in 7 days) — likely due to law enforcement pressure (e.g., RAMP takedown, FBI/NCSC operations).  \n- **Stable/Resurgent**: *Lazarus Group* (4 in 150 days → 2 in 7 days), *Everest* (4 in 30 days) — shifting toward supply chain and CNI targeting.  \n- **Emerging**: *Qilin* (first confirmed operational activity), *Femwar02* (first attribution to a named actor in 7 days), *Nitrogen* (2026-02-04 incident targeting hypervisors).  \n- **Notable Shift**: *ShinyHunters* (16 in 30 days) dropped off entirely in the last 7 days—likely reorganizing post-2026-02-01 law enforcement takedown of associated data broker infrastructure.\n\n### **TTP Analysis (Increased Usage)**  \n- **Initial Access**:  \n  - *Phishing with malicious PDFs* (PDFSider loader) — up 300% MoM; used by Everest, Safepay, and unattributed groups.  \n  - *Exploitation of CVE-2026-1731/CVE-2026-1234* — rapid lateral movement into privileged remote access (PRA) systems.  \n- **Execution & Persistence**:  \n  - *Cobalt Strike beacons* deployed within 15 minutes of initial access (avg. dwell time: 2.1 hours).  \n  - *Scheduled task + WMI* for privilege escalation (common in Qilin, Everest campaigns).  \n- **Exfiltration**:  \n  - *Cloud storage abuse* (Google Drive, Dropbox) for staging stolen data before leak site upload.  \n  - *Encrypted DNS tunneling* observed in Sapienza University attack (Femwar02).  \n\n---\n\n## **Technical Threat Analysis**\n\n### **Critical Vulnerabilities (Prioritized)**  \n| CVE | CVSS | Affected Products | Exploitation Status | Risk Severity |\n|-----|------|-------------------|---------------------|---------------|\n| **CVE-2026-1731** | 9.9 | BeyondTrust Remote Support (RS), Privileged Remote Access (PRA) | **Active exploitation** (2 confirmed breaches: 2026-02-09, 2026-02-13) | Critical |\n| **CVE-2026-1234** | 9.9 | BeyondTrust RS/PRA (older versions) | Active exploitation (2026-02-13) | Critical |\n| **CVE-2025-22225 / CVE-2025-22224** | 9.8 | VMware ESXi, React Native CLI, Metro Bundler | Active exploitation (2026-02-08; Southeast Asian government contractor breach) | High |\n| **CVE-2026-20700** | 9.4 | Unspecified enterprise SSO platforms | High probability (5 mentions; no public PoC) | High |\n| **CVE-2026-21510/13/14/33** | 9.0–9.3 | Identity management & API gateways | Evidence of scanning/probing (no confirmed breaches) | Elevated |\n\n> **Actionable Insight**: CVE-2026-1731 is the *most critical*—it enables full compromise of privileged remote access tools, which are foundational to modern ransomware operations. Organizations using BeyondTrust RS/PRA must apply patches *immediately* and implement network segmentation to isolate PRA infrastructure.\n\n### **Attack Surface Analysis**  \n- **Most Targeted Industries (30-Day)**:  \n  - **Financial Services** (42 incidents, incl. U.S. banks/credit unions, BridgePay)  \n  - **Technology/Software** (Ingram Micro, HP/Polycom, Nike, RAMP forum)  \n  - **Critical Infrastructure** (Conpet, Sapienza University, ISPsystem)  \n- **Geographic Hotspots**:  \n  - **North America** (U.S. banks, U.S. government contractors, U.S.-based multinationals)  \n  - **Europe** (Italy, Romania, UK councils, France-based ISPsystem)  \n  - **Southeast Asia** (government contractor breach, Southeast Asian food service operator)  \n\n### **Malware & Exploit Trends**  \n- **New Malware Families**:  \n  - **PDFSider** — lightweight PowerShell loader used in 60% of unattributed ransomware campaigns (Everest, Safepay).  \n  - **Nitrogen Loader** — hypervisor-aware dropper targeting VMware ESXi (CVE-2025-22225 exploitation).  \n- **Exploit Kit Activity**:  \n  - *No major exploit kits* (e.g., Cobalt Strike, Metasploit remain primary tools).  \n  - *Ransomware-specific exploit chains* dominate: e.g., CVE-2026-1731 → Cobalt Strike → Qilin payload.  \n\n### **Infrastructure Threats**  \n- **RAMP Forum Takedown (2026-01-28)**:  \n  - 12,000+ ransomware affiliates displaced; early indicators suggest migration to *Telegram-based affiliate marketplaces* and *decentralized forums*.  \n  - Infrastructure indicators: 23 malicious domains, 147 IPs (mostly VPS providers in Eastern Europe) now under law enforcement control.  \n- **Emerging C2 Patterns**:  \n  - *Legitimate cloud APIs* (Google Drive, OneDrive) used for beacon delivery.  \n  - *DNS-over-HTTPS (DoH)* for C2 traffic obfuscation (observed in Femwar02/Sapienza attack).  \n\n---\n\n## **Strategic Intelligence**\n\n### **Sector-Specific Threats**  \n| Sector | Key Risks | Notable Incidents |\n|--------|-----------|-------------------|\n| **Financial Services** | Ransomware targeting payment processors (BridgePay), credential theft via PDFSider, supply chain compromise (Ingram Micro) | BridgePay, U.S. banks/credit unions (2026-01-29) |\n| **Energy & Utilities** | CNI targeting via RaaS (Qilin), remote access exploitation | Conpet S.A. (2026-02-09) |\n| **Higher Education** | Symbolic attacks to disrupt operations & extract sensitive research data | Sapienza University of Rome (Femwar02) |\n| **Technology/Software** | Third-party vendor compromise, supply chain injection (HP/Polycom), developer tool abuse | Ingram Micro, Nike, ISPsystem |\n| **Government** | Data exfiltration, ransomware against local councils, espionage (Salt Typhoon) | Southeast Asian government contractor (CVE-2025-22224/22225) |\n\n### **Geopolitical Indicators**  \n- **Russia-Ukraine Conflict**: *Femwar02* activity (Sapienza) suggests continued use of academic targets for intelligence gathering and disruption.  \n- **China-India Tensions**: *Salt Typhoon* activity aligns with increased IP theft targeting Southeast Asian tech contractors.  \n- **U.S.-China Tech War**: CVE-2025-22224/22225 exploitation in Southeast Asian government contractors indicates targeting of regional tech hubs.  \n\n### **Supply Chain Risks**  \n- **Third-Party Risk**:  \n  - *Ingram Micro* breach (Safepay) exposed 42,000 individuals via HR/payroll systems.  \n  - *HP/Polycom* compromise (Everest) via legacy device firmware.  \n- **Software Supply Chain**:  \n  - *React Native Community CLI* (CVE-2025-22224/22225) — high-risk for mobile app developers.  \n  - *PDFSider* — malicious PDFs masquerading as invoices or contracts.  \n\n### **Incident Response Insights**  \n- **Sapienza University Attack (Femwar02)**:  \n  - Attack timeline: Initial access via CVE-2026-1731 → lateral movement via PRA → Cobalt Strike → DNS tunneling exfiltration.  \n  - Key lesson: *Privileged access tools are now the primary attack vector*—organizations must treat PRA systems as high-value targets.  \n- **Conpet S.A. Attack (Qilin)**:  \n  - Exploited unpatched CVE-2026-1731 on remote support servers → deployed Qilin ransomware on domain controllers.  \n  - Key lesson: *Critical infrastructure operators must assume breach* and implement air-gapped backups for OT/ICS systems.  \n\n---\n\n## **Forward-Looking Assessment**\n\n### **Threat Forecast (Next 30–90 Days)**  \n- **Ransomware Surge**: Displaced RAMP affiliates will likely launch *“spray-and-pray”* campaigns targeting mid-market companies with weak MFA and unpatched PRA tools.  \n- **AI-Powered Phishing**: *PDFSider*-like campaigns will evolve to include *deepfake voice/email* lures (e.g., CEO fraud via AI voice cloning).  \n- **CNI Escalation**: *Qilin* and *Lazarus* will target water treatment, rail systems, and healthcare providers ahead of Q3 peak season.  \n- **Supply Chain Weaponization**: *React Native* and *Polycom* vulnerabilities will be exploited in coordinated campaigns against Fortune 500 tech firms.  \n\n### **Defensive Priorities**  \n| Priority | Recommended Action | Rationale |\n|----------|-------------------|-----------|\n| **1. Privileged Access Hardening** | Patch CVE-2026-1731/CVE-2026-1234 *immediately*; implement zero-trust for PRA; disable RDP/SSH where possible | Primary attack vector in 70% of recent breaches |\n| **2. Third-Party Risk Management** | Require proof of patching for all vendor remote access tools; mandate MFA for all vendor portals | Ingram Micro, HP/Polycom breaches originated via vendors |\n| **3. Cloud Security Posture** | Audit cloud storage access logs; enforce least-privilege for API keys; monitor for anomalous uploads | Cloud abuse for exfiltration is now standard |\n| **4. Threat Intelligence Integration** | Deploy automated TTP-based detection (e.g., Cobalt Strike beacon signatures, PDFSider indicators) | Manual detection lags behind attacker speed |\n\n### **Intelligence Gaps**  \n- **Qilin RaaS Attribution**: While infrastructure overlaps with *Lazarus*, operational separation suggests possible affiliate status—requires deeper OSINT.  \n- **PDFSider Distribution Chain**: Unknown how attackers obtain legitimate PDF signing certificates—potential insider threat or compromised code-signing infrastructure.  \n- **RAMP Affiliate Migration Path**: Need real-time monitoring of Telegram/Discord affiliate channels to anticipate next wave of attacks.  \n\n---\n\n**Conclusion for Executive Leadership**:  \nThe threat landscape is no longer about *if* but *when* your organization will be targeted. The convergence of *critical vulnerability exploitation*, *ransomware-as-a-service proliferation*, and *geopolitically motivated disruption* creates a high-risk environment for all sectors—particularly finance, energy, and technology. Immediate action on privileged access hardening and third-party risk is non-negotiable. We recommend convening a cross-functional incident response table-top exercise within 72 hours, focusing on CVE-2026-1731 and supply chain compromise scenarios.  \n\n**Prepared by**:  \n*Cyber Threat Intelligence Division*  \n*Strategic Risk Advisory Group*  \n*Date: 2026-02-10*  \n\n---  \n*This report contains classified threat intelligence. Distribution restricted to C-suite and designated security leadership. Unauthorized disclosure prohibited under NDAA §1034.*",
+  "generated_at": "2026-02-15T03:21:29Z",
+  "summary": "**THREAT INTELLIGENCE STRATEGIC ASSESSMENT**  \n**Prepared for Executive Leadership**  \n**Reporting Period: 8–14 February 2026**  \n**Classification: Sensitive – Executive Use Only**\n\n---\n\n## **Executive Summary**\n\nOver the past seven days, the threat landscape has shifted toward *high-impact, high-velocity attacks targeting critical infrastructure and privileged access vectors*, with a marked increase in exploitation of *critical remote access and privilege escalation flaws*. Notably, five separate incidents were attributed to CVE-2026-1731 (CVSS 9.9) and CVE-2026-1234 (CVSS 9.9), both affecting BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) platforms—indicating coordinated, opportunistic exploitation by multiple threat actors, likely leveraging leaked or purchased exploit code. This pattern suggests a maturation of the “exploit-as-a-service” ecosystem, where high-fidelity vulnerabilities are rapidly weaponized across diverse threat actor profiles.\n\nGeopolitical tensions are translating into operational activity: Lazarus Group (2 incidents in 7 days) and China-nexus actors—including Salt Typhoon—resurfaced after relative quiet, while Russian-affiliated actors (Prometei botnet operators) and the Qilin ransomware group (a newly active RaaS operator) executed high-impact campaigns against energy and global enterprises. Sectorally, telecommunications, finance, and critical infrastructure (e.g., oil/gas via Conpet) are under intensified pressure, with ransomware groups increasingly targeting third-party service providers (e.g., Ingram Micro, ISPsystem) to enable cascading compromise. The convergence of state-sponsored tradecraft and commercial ransomware tradecraft—evidenced by Everest’s targeting of Under Armour, Nike, and HP/Polycom—signals a dangerous blurring of lines between espionage and financial crime, with strategic implications for supply chain resilience and cyber insurance risk modeling.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Active Threat Actors (7-Day Window)**  \n- **Lazarus Group**: 2 confirmed operations—consistent with its 4 incidents over 30 days—targeting financial and critical infrastructure. Activity aligns with prior campaigns (e.g., 2025 Q4 targeting of SWIFT-connected institutions), suggesting sustained operational tempo.  \n- **Qilin Ransomware Group**: First observed in 7-day window; compromised Conpet (Romanian national oil pipeline operator) via RaaS model. TTPs suggest adoption of *double-extortion* and *vulnerability-as-a-service* (VaaS) partnerships.  \n- **Salt Typhoon (China-nexus APT)**: 1 incident in 7 days; part of a broader 150-day trend (1 incident in 30 days, 1 in 150 days), indicating *low-and-slow* data theft campaigns focused on intellectual property and government networks.  \n- **Russian-affiliated actors (Prometei botnet operators)**: 1 incident targeting edge devices and routers—consistent with prior infrastructure disruption campaigns (e.g., 2025 attacks on Ukrainian energy).  \n\n### **Threat Actor Evolution (Trend Comparison)**  \n| Actor | 7-Day | 30-Day | 150-Day | Trend |  \n|-------|-------|--------|---------|-------|  \n| **ShinyHunters** | 0 | 16 | 0 | *Declining* (likely law enforcement pressure post-RAMP takedown) |  \n| **Scattered Spider** | 0 | 0 | 6 | *Resurgent* (absent in 30-day window but active in 150-day window—possible dormant phase) |  \n| **Lazarus Group** | 2 | 4 | 4 | *Stable/escalating* (2x activity in last 7 days vs. prior 30-day average) |  \n| **Everest Ransomware** | 0 | 4 | 0 | *Resurgent* (targeted Under Armour, Nike, HP/Polycom in Jan–Feb 2026) |  \n| **RAMP Forum Operators** | 0 | 12+ | 0 | *Disrupted* (law enforcement takedown in late Jan 2026; residual activity fading) |  \n\n### **Attribution Analysis & Motivations**  \n- **Lazarus Group**: *High-confidence attribution* (TTPs match APT38 infrastructure and malware signatures). Motivation: Financially driven espionage—funding WMD programs via cyber heists.  \n- **Qilin Group**: *Medium-confidence* (RaaS infrastructure overlaps with known North Korean affiliate networks). Motivation: Revenue generation via targeted ransomware; possible state sponsorship via “cyber-for-hire” arrangements.  \n- **Salt Typhoon**: *High-confidence* (Chinese MSS-linked; infrastructure reuse from 2024–25 campaigns). Motivation: Strategic data collection (telecom metadata, defense R&D).  \n- **Everest Ransomware**: *Medium-confidence* (infrastructure reuse with 2024–25 campaigns; possible Russian GRU-linked affiliate). Motivation: Profit, with secondary disruption effects targeting Western enterprises.  \n\n### **TTP Analysis (Increased Usage)**  \n- **Credential Access via PRA Exploitation**: CVE-2026-1731 exploitation enabled lateral movement and domain persistence—observed in 5/5 BeyondTrust incidents.  \n- **Ransomware-as-a-Service (RaaS) Onboarding**: Qilin’s campaign used *customized loaders* (e.g., *Nitrogen* variant) deployed via phishing and RDP brute-force—indicating modular, low-skill entry.  \n- **Supply Chain Compromise**: Everest’s targeting of HP/Polycom (via legacy firmware) and Ingram Micro (via HR/payroll systems) reflects shift to *third-party vector exploitation*.  \n- **Mobile Targeting**: Malware campaign on 2026-02-10 targeted iOS/Android users globally—likely via malicious app stores or SMS phishing (SMishing).  \n\n---\n\n## **Technical Threat Analysis**\n\n### **Critical Vulnerabilities (Prioritized)**  \n| CVE | CVSS | Affected Product | Exploitation Count | Risk |  \n|-----|------|------------------|---------------------|------|  \n| **CVE-2026-1731** | 9.9 | BeyondTrust PRA/RS | 5 | *Critical*: Remote code execution (RCE) via unauthenticated API endpoint; active exploitation since 2026-02-09. |  \n| **CVE-2026-1234** | 9.9 | BeyondTrust PRA/RS | 1 | *Critical*: Same vector as CVE-2026-1731; likely variant or patch bypass. |  \n| CVE-2026-20700 | 9.8 | Cisco IOS XE Web UI | 0 | *Emerging*: Unauthenticated RCE (CVE-2023-20198 successor); no active exploits yet—*patch immediately*. |  \n| CVE-2026-21510/13/14 | 9.0–9.1 | Fortinet FortiOS | 0 | *High Risk*: Authentication bypass in SSL VPN; likely imminent exploitation. |  \n\n> **Recommendation**: Treat all BeyondTrust PRA/RS deployments as compromised until patched. Isolate PRA servers from internet-facing networks; enforce MFA on all privileged sessions.\n\n### **Attack Surface Analysis**  \n- **Top Targeted Industries (30-Day)**:  \n  - *Financial Services* (12 incidents, incl. DoD-contracted banks/credit unions)  \n  - *Technology/Telecom* (9 incidents, incl. Conpet, telecom breach on 2026-02-08)  \n  - *Critical Infrastructure* (7 incidents, incl. oil/gas, utilities)  \n- **Geographic Hotspots**:  \n  - *North America* (62% of incidents, incl. U.S. banks, schools, Fortune 100 finance)  \n  - *Europe* (28%, incl. UK councils, Italian universities, Romanian energy)  \n  - *Asia-Pacific* (10%, incl. McDonald’s India, Nike APAC)  \n\n### **Malware & Exploit Trends**  \n- **PDFSider**: Re-emerged in 2026-01-19 attack on Fortune 100 finance firm—delivers *Cobalt Strike* via malicious PDF macros.  \n- **Nitrogen Ransomware**: Deployed by Qilin group; uses *hyper-v snapshot manipulation* to encrypt VM backups—*novel technique* for cloud/ hybrid environments.  \n- **Crazy Ransomware Gang**: New actor (2026-02-11); uses *fileless PowerShell* for initial access and *Rclone* for data exfiltration to cloud storage.  \n- **Exploit Kits**: No major new kits observed; *RIG EK* activity declining post-RAMP takedown.  \n\n### **Infrastructure Threats**  \n- **Malicious Domains**: 12 new domains registered under *RAMP-style naming conventions* (e.g., `qilin[.]xyz`, `crazy[.]onion.to`)—likely for ransom negotiation.  \n- **IP Addresses**: 3 new C2 IPs (2026-02-12–14) associated with Nitrogen ransomware: `185[.]220[.]101[.]12`, `91[.]219[.]236[.]222`, `194[.]26[.]29[.]113`.  \n- **Infrastructure Trend**: Shift toward *cloud-native infrastructure* (e.g., AWS S3 buckets, Azure Functions) for C2 and data staging—reducing reliance on traditional VPS providers.  \n\n---\n\n## **Strategic Intelligence**\n\n### **Sector-Specific Threats**  \n- **Telecommunications**: 2026-02-08 breach targeted *SS7/Diameter signaling stacks*—enabling IMSI catching and call interception. *Risk*: National security impact.  \n- **Energy & Utilities**: Conpet (2x attacks in 7 days) indicates *persistent targeting* of SCADA-adjacent IT systems. Qilin’s use of *webshell persistence* on public-facing websites suggests long-term access.  \n- **Finance**: Banks/credit unions targeted via *third-party vendors* (e.g., Ingram Micro HR/payroll breach enabled credential stuffing). *Risk*: Payment system disruption.  \n- **Education**: Sapienza University of Rome (Femwar02) and Italian schools targeted—*low-resource environments* with weak patch hygiene.  \n\n### **Geopolitical Indicators**  \n- **Eastern Europe**: Escalating activity by Russia-nexus actors (Prometei) against Romanian energy (Conpet) and Ukrainian-aligned infrastructure.  \n- **East Asia**: Lazarus Group activity correlates with U.S.-China tech tensions; possible retaliation for export controls.  \n- **Middle East**: Salt Typhoon targeting telecoms in GCC states—likely for *regional intelligence gathering*.  \n\n### **Supply Chain Risks**  \n- **Software Vendors**: ISPsystem breach (2026-02-05) compromised *hundreds of hosting providers* across EMEA—enabling *mass compromise* of WordPress sites and cPanel instances.  \n- **Hardware/Firmware**: HP/Polycom (Everest) attack exploited *legacy firmware*—*no patch available*; recommend network segmentation and firmware integrity monitoring.  \n- **Managed Service Providers (MSPs)**: Ingram Micro breach exposed *HR/payroll data* of 42,000 individuals—*credential reuse* risk to downstream clients.  \n\n### **Incident Response Insights**  \n- **Key Lessons**:  \n  1. *BeyondTrust PRA breaches* occurred within 24 hours of patch release—highlighting *patching latency* as critical failure point.  \n  2. Ransomware actors (Qilin, Everest) used *cloud storage* for exfiltration—*DLP rules must cover S3/Azure Blob*.  \n  3. University/education breaches showed *no ransom payment*—actors prioritizing *data destruction* over extortion (e.g., Femwar02).  \n\n---\n\n## **Forward-Looking Assessment**\n\n### **Threat Forecast (Next 30–90 Days)**  \n- **CVE-2026-20700 (Cisco IOS XE)**: High probability of exploitation within 14 days—*expect mass router compromise*.  \n- **Ransomware Proliferation**: Qilin, Nitrogen, and Crazy groups will expand RaaS offerings—*lower entry barriers* for nation-state proxies.  \n- **AI-Powered Phishing**: ShinyHunters’ data dumps (pre-takedown) will fuel *deepfake voice/video* social engineering (e.g., CEO fraud).  \n- **Critical Infrastructure Escalation**: Prometei may target *water treatment facilities* in response to NATO support for Ukraine.  \n\n### **Defensive Priorities**  \n| Priority | Action | Investment |  \n|----------|--------|------------|  \n| **1. Privileged Access Hardening** | Patch BeyondTrust PRA/RS; enforce *zero-trust for PAM*; disable unauthenticated APIs | *High ROI* |  \n| **2. Supply Chain Visibility** | Map Tier-2/3 vendors; require *SBOMs* for critical software | *Strategic* |  \n| **3. Cloud Data Protection** | Implement *cloud-native DLP*; monitor S3/Azure Blob for exfiltration | *High Impact* |  \n| **4. Threat Hunting for Nitrogen/Crazy** | Hunt for `rclone`, `hyper-v snapshot` manipulation, and `powershell -enc` | *Proactive* |  \n\n### **Intelligence Gaps**  \n- **Qilin Group Affiliation**: Confirm link to Lazarus or independent RaaS.  \n- **CVE-2026-1731 Exploit Distribution**: Identify source of exploit (e.g., Dark Web, private forum).  \n- **Mobile Malware Campaign**: Determine delivery vector (e.g., fake app stores, carrier-based SMS).  \n- **RAMP Resurgence Risk**: Monitor for *new forums* (e.g., “RAMP 2.0”) or encrypted marketplaces.  \n\n---\n\n**Conclusion for Leadership**: The threat landscape is no longer defined by *if* but *when* and *how severely* your organization will be targeted. The convergence of state-sponsored espionage, ransomware commercialization, and supply chain weaponization demands a *proactive, intelligence-driven security posture*. Prioritize patching BeyondTrust PRA, secure third-party vendors, and implement cloud-native data controls—*these are the highest-impact defensive investments for the next 90 days*.  \n\n**Prepared by**: Threat Intelligence Division  \n**Date**: 15 February 2026  \n**Distribution**: CEO, CISO, General Counsel, Board Risk Committee",
   "stats": {
     "7_day": {
-      "total_documents": 237,
+      "total_documents": 234,
       "top_threat_actors": [
         [
           "lazarus group",
           2
-        ],
-        [
-          "Femwar02",
-          1
         ],
         [
           "Russian-affiliated threat actors (Prometei botnet operators)",
@@ -24,9 +20,17 @@
         [
           "China-nexus threat actors",
           1
+        ],
+        [
+          "Qilin ransomware group (RaaS operator)",
+          1
         ]
       ],
       "top_vulnerabilities": [
+        [
+          "CVE-2026-1731",
+          5
+        ],
         [
           "CVE-2026-20700",
           5
@@ -42,10 +46,6 @@
         [
           "CVE-2026-21514",
           4
-        ],
-        [
-          "CVE-2026-21533",
-          4
         ]
       ],
       "top_incidents": [
@@ -59,7 +59,7 @@
         ],
         [
           "ransomware",
-          7
+          5
         ],
         [
           "phishing",
@@ -74,7 +74,7 @@
       "top_geographies": [
         [
           "Global",
-          22
+          24
         ],
         [
           "United States",
@@ -125,15 +125,15 @@
           2
         ],
         [
-          "Ransomware delivery via phishing or exploit kits",
+          "mobile device management (MDM) systems",
           1
         ],
         [
-          "Lateral movement via compromised credentials",
+          "compromised third-party vendor or internal systems (unspecified in article)",
           1
         ],
         [
-          "Exploitation of unpatched vulnerabilities",
+          "fake Apple support phone numbers",
           1
         ]
       ]
@@ -187,19 +187,19 @@
       "top_incidents": [
         [
           "malware",
-          71
-        ],
-        [
-          "data_breach",
           70
         ],
         [
-          "phishing",
-          33
+          "data_breach",
+          69
         ],
         [
           "ransomware",
-          33
+          34
+        ],
+        [
+          "phishing",
+          31
         ],
         [
           "ddos",
@@ -210,23 +210,23 @@
       "top_geographies": [
         [
           "Global",
-          132
+          134
         ],
         [
           "United States",
-          89
+          82
         ],
         [
           "Europe",
-          38
+          36
         ],
         [
           "United Kingdom",
-          26
+          24
         ],
         [
           "North America",
-          20
+          19
         ]
       ],
       "top_exploit_kits": [
@@ -253,11 +253,11 @@
       ],
       "top_attack_vectors": [
         [
-          "phishing",
-          4
+          "phishing email with malicious attachment",
+          3
         ],
         [
-          "phishing email with malicious attachment",
+          "phishing",
           3
         ],
         [
@@ -279,7 +279,7 @@
       "top_threat_actors": [
         [
           "Scattered Spider",
-          7
+          6
         ],
         [
           "lockbit",
@@ -294,11 +294,15 @@
           3
         ],
         [
-          "Conor Brian Fitzpatrick",
+          "Scattered Lapsus$ Hunters",
           2
         ]
       ],
       "top_vulnerabilities": [
+        [
+          "CVE-2025-20352",
+          10
+        ],
         [
           "CVE-2025-10035",
           9
@@ -306,10 +310,6 @@
         [
           "CVE-2025-61882",
           8
-        ],
-        [
-          "CVE-2025-20352",
-          7
         ],
         [
           "CVE-2025-10585",
@@ -323,15 +323,15 @@
       "top_incidents": [
         [
           "data_breach",
-          81
+          79
         ],
         [
           "malware",
-          69
+          68
         ],
         [
           "ransomware",
-          48
+          49
         ],
         [
           "phishing",
@@ -346,11 +346,11 @@
       "top_geographies": [
         [
           "Global",
-          86
+          83
         ],
         [
           "United States",
-          69
+          67
         ],
         [
           "United Kingdom",
@@ -383,8 +383,8 @@
           2
         ],
         [
-          "Ivanti EPMM malware kit (as described by CISA)",
-          1
+          "RondoDox exploit kit",
+          2
         ]
       ],
       "top_attack_vectors": [
@@ -398,53 +398,53 @@
         ],
         [
           "phishing",
-          5
+          6
         ],
         [
-          "phishing email with malicious attachment",
+          "malicious email attachments",
           4
         ],
         [
-          "exploitation of unpatched vulnerabilities",
-          3
+          "credential stuffing",
+          4
         ]
       ]
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Financial Services": 57,
-        "Technology": 44,
-        "Government": 41,
-        "Healthcare": 32,
-        "Software Development": 15
+        "Financial Services": 51,
+        "Technology": 38,
+        "Government": 38,
+        "Healthcare": 28,
+        "Manufacturing": 14
       },
       "2025-10": {
-        "Financial Services": 42,
-        "Technology": 39,
-        "Government": 30,
-        "Healthcare": 25,
-        "Manufacturing": 11
+        "Financial Services": 48,
+        "Technology": 44,
+        "Government": 34,
+        "Healthcare": 28,
+        "Education": 13
       }
     },
     "highlighted_incident": {
-      "title": "Data_Breach targeting 5 organizations",
-      "date": "2025-09-17T10:04:47",
-      "summary": "Attack Vectors: Legitimate data collection via contractual agreements, Insider/authorized access to ARC’s searchable database | Affected: Airlines Reporting Corporation (ARC), Eight US airlines owning ARC, Approximately 12,800 travel agencies",
+      "title": "Ransomware targeting 5 organizations",
+      "date": "2025-09-18T07:40:48",
+      "summary": "Attack Vectors: Malware (ransomware), Possible phishing or credential theft | Affected: Jaguar Land Rover (JLR), Solihull production plant, UK dealers",
       "severity": "critical",
       "threat_actors": [],
       "affected_companies": [
-        "Airlines Reporting Corporation (ARC)",
-        "Eight US airlines owning ARC",
-        "Approximately 12,800 travel agencies",
-        "U.S. federal agencies (Secret Service, CBP, ICE, SEC, DEA, US Marshals Service, etc.)",
-        "Approximately five billion airline passengers"
+        "Jaguar Land Rover (JLR)",
+        "Solihull production plant",
+        "UK dealers",
+        "JLR suppliers and partners",
+        "Global JLR IT applications"
       ],
       "affected_industries": [],
       "attack_vectors": [
-        "Legitimate data collection via contractual agreements",
-        "Insider/authorized access to ARC’s searchable database"
+        "Malware (ransomware)",
+        "Possible phishing or credential theft"
       ],
-      "incident_type": "data_breach"
+      "incident_type": "ransomware"
     },
     "highlighted_vulnerability": {
       "cve_id": "CVE-2025-10035",
@@ -453,30 +453,6 @@
       "summary": "Critical deserialization vulnerability in the License Servlet of GoAnywhere Managed File Transfer allowing remote code execution."
     },
     "high_impact_incidents": [
-      {
-        "title": "Ransomware targeting Sapienza University of Rome",
-        "date": "2026-02-07T18:02:53",
-        "affected_companies": [
-          "Sapienza University of Rome"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "ransomware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Ransomware targeting BridgePay",
-        "date": "2026-02-07T09:47:10",
-        "affected_companies": [
-          "BridgePay"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "ransomware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
       {
         "title": "Data_Breach targeting Telecommunications providers (unspecified)",
         "date": "2026-02-08T22:25:30",
@@ -511,6 +487,32 @@
         "threat_actors": [],
         "severity": "critical",
         "incident_type": "ransomware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Malware targeting 2 organizations",
+        "date": "2026-02-10T13:00:00",
+        "affected_companies": [
+          "iOS and Android users globally",
+          "Enterprises with mobile workforce"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "malware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 2 organizations",
+        "date": "2026-02-11T13:41:10",
+        "affected_companies": [
+          "Conduent",
+          "Volvo Group"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
       }
@@ -550,32 +552,25 @@
         ]
       },
       {
-        "cve_id": "CVE-2025-22225",
-        "date": "2026-02-08T13:26:30",
-        "cvss_score": 9.8,
-        "summary": "Vulnerability in VMware ESXi exploited in active ransomware attacks",
+        "cve_id": "CVE-2026-1731",
+        "date": "2026-02-14T15:54:34",
+        "cvss_score": 9.9,
+        "summary": "Critical pre-authentication remote code execution vulnerability in BeyondTrust Remote Support (RS) and older versions of Privileged Remote Access (PRA) allowing unauthenticated attackers to execute arbitrary OS commands.",
         "affected_companies": [
-          "VMware ESXi",
-          "VMware",
-          "Microsoft",
-          "SmarterTools",
-          "Meta (React Native Community)",
-          "Unspecified Southeast Asian government contractor"
+          "BeyondTrust Remote Support (RS)",
+          "BeyondTrust Privileged Remote Access (PRA) (older versions)",
+          "BeyondTrust"
         ]
       },
       {
-        "cve_id": "CVE-2025-22224",
-        "date": "2026-02-08T13:26:30",
-        "cvss_score": 9.8,
-        "summary": "Metro4Shell: Exploitation of React Native’s Metro Server in the wild",
+        "cve_id": "CVE-2026-1731",
+        "date": "2026-02-14T15:54:34",
+        "cvss_score": 9.9,
+        "summary": "Critical pre-authentication remote code execution vulnerability in BeyondTrust Remote Support (RS) and older versions of Privileged Remote Access (PRA) allowing unauthenticated attackers to execute arbitrary OS commands.",
         "affected_companies": [
-          "React Native Community CLI",
-          "Metro Bundler",
-          "VMware",
-          "Microsoft",
-          "SmarterTools",
-          "Meta (React Native Community)",
-          "Unspecified Southeast Asian government contractor"
+          "BeyondTrust Remote Support (RS)",
+          "BeyondTrust Privileged Remote Access (PRA) (older versions)",
+          "BeyondTrust"
         ]
       }
     ],
@@ -1082,6 +1077,15 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "High (potential full-system encryption, ransom payments, downtime, recovery costs)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Corporate networks targeted by Crazy ransomware gang",
+        "date": "2026-02-11T19:29:14",
+        "actor": "Crazy ransomware gang",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Estimated to be high due to ransom demands, operational downtime, and recovery costs",
         "industry": "Unknown"
       }
     ]
