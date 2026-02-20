@@ -33,6 +33,11 @@ const app = createApp({
             charts: {},
             breakingNews: {},
             
+            // Threat hunting hypotheses data
+            threatHuntingHypotheses: {},
+            loadingThreatHunting: false,
+            threatHuntingError: null,
+            
             // Industry data
             selectedIndustry: '',
             industryData: {},
@@ -75,7 +80,8 @@ const app = createApp({
                     this.loadVulnerabilities(),
                     this.loadThreatActors(),
                     this.loadStatisticsData(),
-                    this.loadBreakingNews()
+                    this.loadBreakingNews(),
+                    this.loadThreatHuntingHypotheses()
                 ]);
                 
                 this.updateLastUpdated();
@@ -163,6 +169,20 @@ const app = createApp({
             } catch (error) {
                 console.error('Failed to load breaking news:', error);
                 this.breakingNews = {};
+            }
+        },
+
+        async loadThreatHuntingHypotheses() {
+            this.loadingThreatHunting = true;
+            this.threatHuntingError = null;
+            try {
+                this.threatHuntingHypotheses = await apiService.getThreatHuntingHypotheses();
+            } catch (error) {
+                console.error('Failed to load threat hunting hypotheses:', error);
+                this.threatHuntingError = 'Failed to load threat hunting hypotheses. Please try again.';
+                this.threatHuntingHypotheses = {};
+            } finally {
+                this.loadingThreatHunting = false;
             }
         },
         
@@ -625,6 +645,7 @@ app.component('stats-cards', window.StatsCardsComponent);
 app.component('incidents-table', window.IncidentsTableComponent);
 app.component('vulnerabilities-table', window.VulnerabilitiesTableComponent);
 app.component('threat-actors-table', window.ThreatActorsTableComponent);
+app.component('threat-hunting-hypotheses', window.ThreatHuntingHypothesesComponent);
 app.component('charts-container', window.ChartsContainerComponent);
 
 // Mount the application

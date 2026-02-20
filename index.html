@@ -220,6 +220,11 @@
                         <span aria-hidden="true"><i class="bi bi-bar-chart me-1"></i></span> Analytics
                     </button>
                 </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" :class="{active: activeTab==='threat-hunting'}" @click="activeTab='threat-hunting'" role="tab" :aria-selected="activeTab==='threat-hunting'" aria-controls="threat-hunting-panel" id="threat-hunting-tab">
+                        <span aria-hidden="true"><i class="bi bi-bullseye me-1"></i></span> Threat Hunting
+                    </button>
+                </li>
             </ul>
 
             <!-- Tab Content -->
@@ -433,6 +438,16 @@
                         </div>
                     </div>
                 </div>
+
+                <!-- Threat Hunting Tab -->
+                <div v-show="activeTab==='threat-hunting'" id="threat-hunting-panel" role="tabpanel" aria-labelledby="threat-hunting-tab" tabindex="-1">
+                    <threat-hunting-hypotheses 
+                        :hypotheses-data="threatHuntingHypotheses" 
+                        :loading="loadingThreatHunting"
+                        :error="threatHuntingError"
+                        @refresh="loadThreatHuntingHypotheses">
+                    </threat-hunting-hypotheses>
+                </div>
             </div>
         </div>
     </div>
@@ -452,6 +467,7 @@
     <script src="./static/js/components/threat-actors-table.js"></script>
     <script src="./static/js/components/charts-container.js"></script>
     <script src="./static/js/components/analytics-dashboard.js"></script>
+    <script src="./static/js/components/threat-hunting-hypotheses.js"></script>
     <script src="./static/js/app.js"></script>
 <!-- 100% privacy-first analytics -->
 <script async src="https://scripts.simpleanalyticscdn.com/latest.js"></script>
