@@ -1,0 +1,608 @@
+{
+  "generated_at": "2026-02-20T13:23:34Z",
+  "time_window": "14 days",
+  "total_articles_analyzed": 415,
+  "hypotheses_count": 5,
+  "hypotheses": [
+    {
+      "hypothesis_id": "TH-001",
+      "title": "DNS Tunneling via nslookup in ClickFix Social Engineering Attacks",
+      "description": "Attackers have evolved the ClickFix technique to abuse nslookup for DNS-based malware staging, tricking users into running commands that fetch payloads via custom DNS queries. This is actively observed in campaigns by ClickFix and SmartLoader groups, and Microsoft has issued alerts about this specific evasion method.",
+      "threat_actors": [
+        "ClickFix",
+        "SmartLoader"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1071.004 - Application Layer Protocol: DNS",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1204.002 - User Execution: Malicious File"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "DNS query logs, especially TXT/NULL record lookups with unusually long subdomains or base64-encoded strings",
+          "tools": [
+            "DNS logs from Cisco Umbrella, Infoblox, or BIND; SIEM with DNS parsing; EDR with network telemetry"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Command-line logs showing nslookup execution with non-standard arguments, especially those parsing Name: field output",
+          "tools": [
+            "Windows Event ID 4688/10, Sysmon Event ID 1, EDR (e.g., CrowdStrike, SentinelOne)"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect nslookup-based payload retrieval",
+          "description": "Search for suspicious nslookup usage where the command output is parsed to extract and execute a second-stage payload via DNS TXT records.",
+          "sample_queries": [
+            "index=main source=\"WinEventLog:Microsoft-Windows-Sysmon/Operational\" EventID=1 Image=\"*\\\\nslookup.exe\" | regex _raw=\"(?i)(\\\\bnslookup\\\\b.*\\\\b(?<query>[a-zA-Z0-9+/=]{50,}\\\\.[a-zA-Z0-9-]+\\\\.[a-zA-Z]{2,})\\\\b)\"\n# Splunk SPL for Sysmon EventID 1",
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 Process=\"*\\\\nslookup.exe\" | eval cmdline=lower(CommandLine) | where match(cmdline, \"\\\\bnslookup\\\\b.*\\\\b[a-z0-9+/=]{40,}\\\\.[a-z0-9-]+\\\\.[a-z]{2,}\")\n# Elastic KQL",
+            "grep -rE 'nslookup.*[A-Za-z0-9+/=]{40,}\\.[a-z0-9-]+\\.[a-z]{2,}' /var/log/sysmon/*.log"
+          ],
+          "look_for": "nslookup commands with unusually long subdomains (likely base64-encoded payloads), especially when followed by PowerShell or cmd.exe execution"
+        },
+        {
+          "tactic_name": "Identify ClickFix诱饵 execution chains",
+          "description": "Look for the full ClickFix chain: fake CAPTCHA/error prompts → clipboard manipulation → user-run command → nslookup → PowerShell execution.",
+          "sample_queries": [
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 (Image=\"*\\\\powershell.exe\" OR Image=\"*\\\\cmd.exe\") ParentImage=\"*\\\\explorer.exe\" OR ParentImage=\"*\\\\mshta.exe\" | join ProcessId [search index=security_logs sourcetype=windows_sysmon EventCode=1 Image=\"*\\\\nslookup.exe\" | fields ProcessId, CommandLine]\n# Splunk SPL",
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 (Image=\"*\\\\powershell.exe\" OR Image=\"*\\\\cmd.exe\") AND CommandLine=\"*\\\\b64\\\\b*\" AND ParentImage=\"*\\\\nslookup.exe\"\n# Elastic KQL"
+          ],
+          "look_for": "PowerShell/cmd execution with base64 commands, preceded by nslookup execution from the same parent process chain"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [
+          "nslookup.exe",
+          "powershell.exe",
+          "cmd.exe",
+          "mshta.exe"
+        ],
+        "network_patterns": [
+          "DNS TXT queries with long base64-like subdomains (>40 chars), DNS NULL record queries",
+          "High-frequency DNS queries to same domain with similar subdomain patterns"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Clipboard content containing nslookup commands (check via EDR clipboard monitoring)",
+          "User interaction with browser prompts asking to copy/paste nslookup commands"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Isolate hosts where nslookup is used with non-standard arguments followed by PowerShell execution",
+        "Block outbound DNS queries with subdomains longer than 50 characters at the DNS resolver level",
+        "Review user activity logs for social engineering prompts (e.g., fake CAPTCHA) preceding nslookup execution"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "OpenClaw AI Agent Credential Theft via Infostealers",
+      "description": "Infostealers have begun targeting OpenClaw (formerly Clawdbot/Moltbot) configuration files to steal API keys, gateway tokens, and agent identities. This represents a shift from credential theft to stealing 'digital souls' of AI agents, with multiple reports from Hudson Rock and BleepingComputer.",
+      "threat_actors": [
+        "Unattributed infostealer operators",
+        "SmartLoader (indirectly via supply chain)"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Artificial Intelligence",
+        "Software Development",
+        "Finance"
+      ],
+      "mitre_attack_techniques": [
+        "T1552.001 - Unsecured Credentials: Credentials In Files",
+        "T1005 - Data from Local System",
+        "T1113 - Screen Capture (for credential harvesting UI overlays)"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "File system access logs for OpenClaw configuration directories, process creation with file read access to .clawdbot, .openclaw, or config.json files",
+          "tools": [
+            "Sysmon Event ID 11 (FileCreate), Event ID 15 (CreateRemoteThread), EDR with file access telemetry"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "Anomalous API key usage patterns, token generation from non-standard locations, unusual OAuth consent grants",
+          "tools": [
+            "Microsoft Defender for Identity, Okta Audit Logs, AWS CloudTrail"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect OpenClaw config file exfiltration",
+          "description": "Search for processes reading OpenClaw configuration files and sending data externally.",
+          "sample_queries": [
+            "index=security_logs sourcetype=windows_sysmon EventCode=11 TargetFilename=\"*\\\\.clawdbot*\" OR TargetFilename=\"*\\\\.openclaw*\" OR TargetFilename=\"*\\\\config.json\" AND (CommandLine=\"*\\\\curl*\" OR CommandLine=\"*\\\\powershell*\" OR CommandLine=\"*\\\\nc*\" OR CommandLine=\"*\\\\wget*\")\n# Splunk SPL",
+            "index=security_logs sourcetype=windows_sysmon EventCode=11 TargetFilename IN (\"*\\\\.clawdbot\\\\*\", \"*\\\\.openclaw\\\\*\", \"*\\\\config.json\", \"*\\\\clawdbot\\\\*\", \"*\\\\openclaw\\\\*\") | stats count by Process, TargetFilename, Computer | sort -count\n# Elastic KQL"
+          ],
+          "look_for": "Processes accessing files in OpenClaw directories (e.g., ~/.clawdbot, %APPDATA%\\\\OpenClaw) followed by network exfiltration"
+        },
+        {
+          "tactic_name": "Identify anomalous AI agent API usage",
+          "description": "Look for unusual API key usage patterns, such as keys being used from new IP addresses or for unexpected model calls.",
+          "sample_queries": [
+            "index=cloudtrail sourcetype=aws:cloudtrail (eventName=\"InvokeFunction\" OR eventName=\"GenerateContent\") AND (userIdentity.arn=\"*\\\\user*\" OR userIdentity.principalId=\"*\\\\service*\") | eval time=strftime(_time, \"%Y-%m-%d %H:%M:%S\") | stats count by userIdentity.arn, sourceIPAddress, eventName, time | sort -count\n# Splunk SPL",
+            "index=okta sourcetype=okta:audit (action=\"oauth2.token.issue\" OR action=\"api.key.create\") | stats count by actor.alternateId, sourceIPAddress, displayMessage | where count > 10\n# Elastic KQL"
+          ],
+          "look_for": "API keys used from multiple geographic locations, or keys used outside business hours with unusual payload sizes"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          ".clawdbot",
+          ".openclaw",
+          "config.json",
+          "clawdbot.json",
+          "openclaw_config.yaml"
+        ],
+        "registry_keys": [
+          "HKEY_CURRENT_USER\\\\Software\\\\OpenClaw",
+          "HKEY_CURRENT_USER\\\\Software\\\\Clawdbot"
+        ],
+        "process_names": [
+          "node.exe",
+          "python.exe",
+          "java.exe",
+          "dotnet.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to unknown endpoints with large JSON payloads containing tokens or keys",
+          "DNS queries to suspicious subdomains containing base64-encoded tokens"
+        ],
+        "user_agent_strings": [
+          "OpenClaw/1.*",
+          "Clawdbot/2.*",
+          "Moltbot/3.*"
+        ],
+        "other_indicators": [
+          "Files modified in ~/.clawdbot or %APPDATA%\\\\OpenClaw during off-hours",
+          "New API keys created by non-admin users with broad permissions"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Revoke all OpenClaw API keys and regenerate with least-privilege permissions",
+        "Enable file integrity monitoring on OpenClaw configuration directories",
+        "Audit all AI agent integrations for unauthorized access and implement network segmentation"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "SmartLoader Supply Chain Compromise via Trojanized MCP Servers",
+      "description": "SmartLoader has been observed cloning legitimate Model Context Protocol (MCP) servers (e.g., Oura MCP) to distribute StealC infostealers. Attackers create fake forks and contributors to build credibility, then trick users into downloading trojanized versions. This is a targeted supply chain attack with high impact potential.",
+      "threat_actors": [
+        "SmartLoader"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Healthcare",
+        "Consumer Electronics",
+        "AI Research"
+      ],
+      "mitre_attack_techniques": [
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1105 - Ingress Tool Transfer"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "Git traffic to non-official repositories, TLS certificate mismatches in GitHub/GitLab connections, unusual package download patterns",
+          "tools": [
+            "Proxy logs, Git server logs, TLS inspection logs, Zscaler/SquareX browser security logs"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process execution of Python/Node.js with MCP-related packages, file creation in /tmp or %TEMP% from development tools",
+          "tools": [
+            "EDR with process and file telemetry, Sysmon Event ID 1/11/26"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect fake MCP server clones",
+          "description": "Search for downloads from non-official GitHub/GitLab repositories mimicking legitimate MCP projects (e.g., oura-mcp-server).",
+          "sample_queries": [
+            "index=security_logs sourcetype=git:logs (action=\"clone\" OR action=\"fetch\") AND (repo_url=\"*ouramcp*\" OR repo_url=\"*oura-mcp*\" OR repo_url=\"*oura.mcp*\") | stats count by user, repo_url, source_ip | where count > 1\n# Splunk SPL",
+            "index=proxy_logs (url=\"*github.com*oura*mcp*\" OR url=\"*gitlab.com*oura*mcp*\") AND NOT url=\"*github.com/oura*\" AND NOT url=\"*gitlab.com/oura*\" | stats count by user, url, client_ip\n# Elastic KQL"
+          ],
+          "look_for": "Clones of legitimate MCP repositories with slight name variations (e.g., 'ouramcp' vs 'oura-mcp'), especially those with newly created accounts or suspicious commit histories"
+        },
+        {
+          "tactic_name": "Identify StealC deployment indicators",
+          "description": "Look for StealC-specific artifacts: process injection into browser processes, credential theft from Chrome/Edge, and exfiltration to known C2 domains.",
+          "sample_queries": [
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 (Image=\"*\\\\chrome.exe\" OR Image=\"*\\\\msedge.exe\") AND CommandLine=\"*\\\\stealc*\" OR CommandLine=\"*\\\\steal*\" | stats count by Computer, Process, CommandLine\n# Splunk SPL",
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 (CommandLine=\"*\\\\certutil*\" OR CommandLine=\"*\\\\bitsadmin*\" OR CommandLine=\"*\\\\powershell*\\\\b64*\") AND (CommandLine=\"*\\\\http*\\\\stealc*\" OR CommandLine=\"*\\\\raw\\\\github*stealc*\")\n# Elastic KQL"
+          ],
+          "look_for": "Chrome/Edge processes spawning PowerShell with base64 commands, or processes reading %APPDATA%\\\\Google\\\\Chrome\\\\User Data\\\\Default\\\\Login Data"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "forms.google.ss-o[.]com",
+          "id-v4[.]com",
+          "stealc[.]xyz",
+          "stealc[.]ru"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "stealc.exe",
+          "stealc.bin",
+          "ouramcp_installer.exe",
+          "oura-mcp-setup.exe"
+        ],
+        "registry_keys": [
+          "HKEY_CURRENT_USER\\\\Software\\\\OurA",
+          "HKEY_CURRENT_USER\\\\Software\\\\OuraMCP"
+        ],
+        "process_names": [
+          "stealc.exe",
+          "ouramcp-server.exe",
+          "node.exe",
+          "python.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to raw.githubusercontent.com with /stealc/ paths",
+          "DNS queries to id-v4[.]com or google.ss-o[.]com"
+        ],
+        "user_agent_strings": [
+          "OurA MCP Client/1.0",
+          "Oura Health MCP/2.3"
+        ],
+        "other_indicators": [
+          "Fake GitHub profiles with recent creation dates and few commits",
+          "MCP server downloads from non-official channels (e.g., Telegram, Discord)"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block downloads from unofficial MCP repositories at the network level",
+        "Audit all installed MCP servers and verify checksums against official sources",
+        "Hunt for StealC indicators in endpoint telemetry, especially credential theft artifacts"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "AI Assistant Abuse as C2 Proxies via Web Browsing Features",
+      "description": "AI assistants like Microsoft Copilot and xAI Grok with web browsing capabilities can be abused to relay C2 traffic, allowing attackers to blend into legitimate enterprise communications. This technique has been demonstrated in research and is likely being used by advanced groups to evade detection.",
+      "threat_actors": [
+        "Lazarus Group (indirectly via AI tool abuse)",
+        "APT31 (China-linked)",
+        "UNC2970 (North Korea-linked)"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Critical Infrastructure"
+      ],
+      "mitre_attack_techniques": [
+        "T1071.001 - Application Layer Protocol: Web Protocols",
+        "T1105 - Ingress Tool Transfer",
+        "T1559.002 - Inter-Process Communication: Agent Execution"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "HTTPS traffic to AI assistant endpoints (copilot.microsoft.com, grok.com) with unusual payload patterns, especially POST requests with large JSON bodies",
+          "tools": [
+            "TLS inspection logs, proxy logs (Zscaler, Bluecoat), network telemetry (Darktrace, ExtraHop)"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process execution of AI assistant tools with web browsing enabled, memory dumps showing C2 payloads",
+          "tools": [
+            "EDR with memory scanning (e.g., CrowdStrike, SentinelOne), Sysmon Event ID 1/6"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect AI-assisted C2 traffic",
+          "description": "Search for AI assistant tools making repeated requests to suspicious URLs or returning non-standard responses.",
+          "sample_queries": [
+            "index=proxy_logs (user_agent=\"*Copilot*\" OR user_agent=\"*Grok*\" OR user_agent=\"*BingBot*\" OR user_agent=\"*GPTBot*\") AND (url=\"*\\\\.onion*\" OR url=\"*pastebin*\" OR url=\"*raw\\\\.github*\" OR url=\"*hxxps://\\\\w+\\\\.xyz*\") | stats count by user, url, client_ip | where count > 5\n# Splunk SPL",
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 (Image=\"*\\\\copilot*\" OR Image=\"*\\\\grok*\" OR Image=\"*\\\\edge\\\\copilot*\" OR Image=\"*\\\\chrome\\\\grok*\") AND CommandLine=\"*\\\\--web-browsing*\" | stats count by Process, CommandLine, Computer\n# Elastic KQL"
+          ],
+          "look_for": "AI assistant tools making requests to known malicious domains (Pastebin, GitHub raw, .xyz domains) or returning large base64-encoded responses"
+        },
+        {
+          "tactic_name": "Identify prompt injection for C2",
+          "description": "Look for AI assistants being prompted with encoded commands or malicious URLs embedded in chat history.",
+          "sample_queries": [
+            "index=security_logs sourcetype=edr:memory (process=\"*copilot*\" OR process=\"*grok*\") AND (memory_pattern=\"*http*\\\\.onion*\" OR memory_pattern=\"*base64*\\\\.onion*\" OR memory_pattern=\"*eval*\\\\(base64*\")\n# Splunk SPL",
+            "index=security_logs sourcetype=edr:memory process=\"*copilot*\" | stats values(memory_pattern) by process, Computer | where mvcount(memory_pattern) > 10\n# Elastic KQL"
+          ],
+          "look_for": "Memory dumps from AI assistant processes containing encoded C2 commands, URLs, or shellcode"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "copilot.microsoft.com",
+          "grok.com",
+          "chatgpt[.]com",
+          "gemini[.]google[.]com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "copilot.exe",
+          "grok.exe",
+          "copilot-cli.exe"
+        ],
+        "registry_keys": [
+          "HKEY_CURRENT_USER\\\\Software\\\\Microsoft\\\\Copilot",
+          "HKEY_CURRENT_USER\\\\Software\\\\xAI\\\\Grok"
+        ],
+        "process_names": [
+          "copilot.exe",
+          "grok.exe",
+          "edge\\\\copilot.exe",
+          "chrome\\\\grok.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to copilot.microsoft.com with POST payloads >10KB",
+          "DNS queries to .onion domains via AI assistant tools",
+          "Unusual response sizes from AI assistant endpoints"
+        ],
+        "user_agent_strings": [
+          "Copilot/1.0",
+          "Grok/1.0",
+          "BingBot/2.0",
+          "GPTBot/1.0"
+        ],
+        "other_indicators": [
+          "AI assistant tools running with elevated privileges",
+          "Copilot/Grok processes spawning cmd.exe or powershell.exe"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Disable web browsing features in AI assistant tools unless absolutely necessary",
+        "Implement strict egress filtering for AI assistant endpoints",
+        "Monitor for AI assistant tools making requests to known malicious domains or returning suspicious payloads"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "Exploitation of BeyondTrust CVE-2026-1731 for Unauthenticated RCE",
+      "description": "BeyondTrust Remote Support and Privileged Remote Access products are vulnerable to CVE-2026-1731, a critical unauthenticated RCE flaw (CVSS 9.9) that has been actively exploited within hours of PoC release. Attackers target exposed instances to gain privileged access to enterprise environments.",
+      "threat_actors": [
+        "UNC3886 (China-linked)",
+        "APT36 (Pakistan-linked)",
+        "Unknown ransomware groups"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Critical Infrastructure"
+      ],
+      "mitre_attack_techniques": [
+        "T1210 - Exploitation of Remote Services",
+        "T1548.002 - Abuse Elevation Control Mechanism: Bypass User Account Control",
+        "T1021.001 - Remote Services: SMB/Windows Admin Shares"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "HTTP requests to BeyondTrust RS/PRA endpoints with unusual headers or payloads, especially /api/v1/ or /admin/ paths",
+          "tools": [
+            "WAF logs, proxy logs, IDS/IPS signatures (Suricata, Snort)"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process execution from BeyondTrust services, unusual network connections from BeyondTrust processes",
+          "tools": [
+            "Sysmon Event ID 1/3, EDR with network telemetry"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect CVE-2026-1731 exploitation attempts",
+          "description": "Search for HTTP requests to BeyondTrust endpoints with crafted payloads that trigger the unauthenticated RCE.",
+          "sample_queries": [
+            "index=proxy_logs (url=\"*\\\\/rs*\" OR url=\"*\\\\/pra*\" OR url=\"*\\\\/remotesupport*\") AND (status=\"200\" OR status=\"500\") AND (user_agent=\"*curl*\" OR user_agent=\"*python-requests*\" OR user_agent=\"*Go-http-client*\") | stats count by url, client_ip, user_agent | where count > 1\n# Splunk SPL",
+            "index=security_logs sourcetype=network:conn (dest_port=80 OR dest_port=443) AND (dest_ip IN (\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\")) AND (dest_port=80 OR dest_port=443) AND (dest_ip IN (\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\")) AND (dest_port=80 OR dest_port=443) AND (dest_ip IN (\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\"))\n# Elastic KQL - adjust for actual IP ranges"
+          ],
+          "look_for": "HTTP requests to BeyondTrust endpoints with unusual headers (e.g., X-Forwarded-For, custom tokens) or large JSON payloads"
+        },
+        {
+          "tactic_name": "Identify lateral movement from compromised BeyondTrust instances",
+          "description": "Look for SMB/WinRM connections from BeyondTrust servers to other enterprise systems, indicating post-exploitation activity.",
+          "sample_queries": [
+            "index=security_logs sourcetype=windows_sysmon EventCode=3 (SourceIp IN (\"10.0.0.0/8\", \"172.16.0.0/12\", \"192.168.0.0/16\")) AND (DestPort=445 OR DestPort=5985 OR DestPort=5986) | stats count by SourceIp, DestIp, DestPort | where count > 10\n# Splunk SPL",
+            "index=security_logs sourcetype=windows_sysmon EventCode=1 (ParentImage=\"*\\\\rsagent*\" OR ParentImage=\"*\\\\praagent*\") AND (Image=\"*\\\\schtasks*\" OR Image=\"*\\\\psexec*\" OR Image=\"*\\\\wmic*\")\n# Elastic KQL"
+          ],
+          "look_for": "BeyondTrust processes spawning tools like psexec, schtasks, or wmic, or making network connections to internal systems"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "rsagent.exe",
+          "praagent.exe",
+          "beyondtrust.exe"
+        ],
+        "registry_keys": [
+          "HKEY_LOCAL_MACHINE\\\\SYSTEM\\\\CurrentControlSet\\\\Services\\\\BeyondTrust",
+          "HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\BeyondTrust"
+        ],
+        "process_names": [
+          "rsagent.exe",
+          "praagent.exe",
+          "beyondtrust.exe",
+          "beyondtrust-agent.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to BeyondTrust endpoints (ports 80/443) with POST requests to /api/v1/ or /admin/",
+          "SMB/WinRM connections from BeyondTrust servers to internal systems"
+        ],
+        "user_agent_strings": [
+          "BeyondTrust RS Agent/1.0",
+          "BeyondTrust PRA Agent/2.0"
+        ],
+        "other_indicators": [
+          "BeyondTrust services running as SYSTEM or LocalService",
+          "Unusual outbound connections from BeyondTrust servers to external IPs"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Immediately patch BeyondTrust RS/PRA to the latest version",
+        "Block external access to BeyondTrust endpoints unless absolutely necessary",
+        "Hunt for lateral movement from BeyondTrust servers using internal network logs"
+      ]
+    }
+  ],
+  "stats": {
+    "priority_breakdown": {
+      "HIGH": 3,
+      "CRITICAL": 2
+    },
+    "confidence_breakdown": {
+      "HIGH": 4,
+      "MEDIUM": 1
+    },
+    "unique_threat_actors": [
+      "SmartLoader",
+      "ClickFix",
+      "APT36 (Pakistan-linked)",
+      "Lazarus Group (indirectly via AI tool abuse)",
+      "APT31 (China-linked)",
+      "UNC2970 (North Korea-linked)",
+      "SmartLoader (indirectly via supply chain)",
+      "Unattributed infostealer operators",
+      "UNC3886 (China-linked)",
+      "Unknown ransomware groups"
+    ],
+    "unique_industries_targeted": [
+      "Financial Services",
+      "Finance",
+      "Consumer Electronics",
+      "Technology",
+      "Critical Infrastructure",
+      "Government",
+      "Artificial Intelligence",
+      "Healthcare",
+      "AI Research",
+      "Software Development"
+    ],
+    "unique_mitre_techniques": [
+      "T1021.001 - Remote Services: SMB/Windows Admin Shares",
+      "T1552.001 - Unsecured Credentials: Credentials In Files",
+      "T1210 - Exploitation of Remote Services",
+      "T1559.002 - Inter-Process Communication: Agent Execution",
+      "T1005 - Data from Local System",
+      "T1204.002 - User Execution: Malicious File",
+      "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+      "T1071.001 - Application Layer Protocol: Web Protocols",
+      "T1105 - Ingress Tool Transfer",
+      "T1113 - Screen Capture (for credential harvesting UI overlays)",
+      "T1071.004 - Application Layer Protocol: DNS",
+      "T1548.002 - Abuse Elevation Control Mechanism: Bypass User Account Control",
+      "T1059.001 - Command and Scripting Interpreter: PowerShell"
+    ],
+    "source_data_stats": {
+      "top_threat_actors": [
+        [
+          "ShinyHunters",
+          5
+        ],
+        [
+          "Phobos ransomware group",
+          3
+        ],
+        [
+          "lazarus group",
+          3
+        ],
+        [
+          "SmartLoader",
+          2
+        ],
+        [
+          "ClickFix",
+          2
+        ]
+      ],
+      "top_industries": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Healthcare",
+        "Telecommunications"
+      ],
+      "top_attack_vectors": [
+        [
+          "third-party vendor compromise",
+          2
+        ],
+        [
+          "Social engineering",
+          2
+        ],
+        [
+          "compromised customer contact system",
+          2
+        ],
+        [
+          "Third-party vendor compromise",
+          2
+        ],
+        [
+          "supply chain attack",
+          1
+        ]
+      ],
+      "unique_iocs": {
+        "domains": 0,
+        "ips": 0
+      }
+    }
+  }
+}
