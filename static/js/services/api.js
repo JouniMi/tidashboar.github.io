@@ -194,6 +194,10 @@ class ApiService {
         return this.request('breaking_news.json');
     }
 
+    async getThreatHuntingHypotheses(params = {}) {
+        return this.request('threat_hunting_hypotheses.json');
+    }
+
     // ============================================================================
     // UTILITY METHODS
     // ============================================================================
