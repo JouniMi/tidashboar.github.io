@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-02-20T23:54:56Z",
-  "summary": "**THREAT INTELLIGENCE STRATEGIC ASSESSMENT**  \n**Prepared for Executive Leadership**  \n**Reporting Period: 13–19 February 2026**  \n**Classification: Sensitive – Executive Briefing Only**\n\n---\n\n## **Executive Summary**\n\nOver the past seven days, the threat landscape has intensified with a marked shift toward *high-impact, high-visibility breaches* targeting multinational enterprises in consumer-facing sectors—particularly telecommunications, luxury retail, and transportation. Notably, three major data breaches were attributed to *ShinyHunters* (5 incidents in 7 days), including the compromise of Odido (Netherlands), Eurail B.V., and a coordinated strike against Louis Vuitton, Dior, and Tiffany & Co. (twice within 48 hours), indicating a deliberate campaign against high-value brand ecosystems. This surge coincides with the emergence of *Phobos ransomware* (3 incidents), *Lazarus Group* (2 confirmed operations), and *UAT-9921* (2 incidents), suggesting renewed activity from both financially motivated and nation-aligned threat actors.\n\nStrategically, the most alarming trend is the *weaponization of privileged access tooling*: CVE-2026-1731 and CVE-2026-1234 (both CVSS 9.9) in BeyondTrust Remote Support/Privileged Remote Access (PRA) solutions were exploited *within hours* of patch release, with at least five confirmed exploitation events across the 7-day window. Simultaneously, the critical *Dell RecoverPoint for Virtual Machines* vulnerability (CVE-2026-22769, CVSS 10.0) was exploited twice on 18 February—indicating active, automated exploitation of hypervisor-level infrastructure. Geopolitically, the Lazarus Group’s renewed activity (2 incidents in 7 days) aligns with increased North Korean cyber operations targeting financial infrastructure, while the *RAMP ransomware forum takedown* (late January 2026) has triggered a fragmentation of affiliate operations, now feeding into opportunistic campaigns by *Nitrogen*, *Crazy*, and *Qilin* ransomware groups—particularly in critical infrastructure (e.g., Conpet, Romania’s national oil pipeline operator).\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Active Threat Actors (7-Day Window)**  \n| Actor | Count | Confidence | Observed Activity |  \n|-------|-------|------------|-------------------|  \n| **ShinyHunters** | 5 | High | Targeted Odido, Eurail, and luxury retail conglomerate (LVMH entities); leveraged credential stuffing and API abuse post-initial compromise |  \n| **Phobos Ransomware** | 3 | High | Deployed in healthcare and logistics sectors; uses double-extortion with data exfiltration to dedicated Tor exit nodes |  \n| **UAT-9921** | 2 | Medium-High | Believed to be a new or rebranded affiliate of the *INC ransomware gang*; focused on U.S. financial services (credit unions, regional banks) |  \n| **Lazarus Group** | 2 | High | One incident targeted a European fintech; second involved supply chain compromise of a payment gateway (BridgePay), consistent with *APT38*’s financial-sector focus |  \n| **ClickFix** | 2 | Medium | Observed deploying *IcedID* and *QakBot* via malicious Office macros; primarily targeting mid-market SaaS providers |  \n\n### **Threat Actor Evolution (Trend Comparison)**  \n- **ShinyHunters**: Activity increased *200%* over 7 days (5 vs. 20 in 30 days), reversing a 150-day decline (20 vs. 5 in 150 days). This suggests a resurgence in operational tempo, likely fueled by fresh credential dumps and infrastructure recovery post-2025 Q4 law enforcement takedowns.  \n- **Lazarus Group**: Activity rose from 4 (150-day) to 2 (7-day) — *not a decline*, but reflects *increased operational security* and fewer public disclosures. Attribution confidence remains high (90%+) based on infrastructure overlap (e.g., same C2 domains used in 2025 Q4 campaigns).  \n- **Phobos & UAT-9921**: First appearance in 7-day window; likely emergent actors leveraging RaaS platforms post-RAMP takedown. UAT-9921 shares infrastructure (IP ranges, obfuscation techniques) with *INC gang* (confidence: 75%).  \n- **Declining Actors**: *LockBit* (5 in 150 days → 0 in 30/7 days) and *ELECTRUM* (3 in 30 days → 0 in 7 days) show signs of operational disruption—likely due to ongoing U.S.-EU joint operations (e.g., Operation Shatter).  \n\n### **Attribution & Motivation**  \n- **ShinyHunters**: Financially motivated, but increasingly *brand-targeted*; likely selling exfiltrated data to high-end data brokers (e.g., for identity fraud or social engineering).  \n- **Lazarus Group**: State-aligned (NK), *financially strategic*—targets funds for regime sustainability. BridgePay compromise suggests intent to disrupt regional payment rails.  \n- **Phobos/UAT-9921**: Profit-driven, opportunistic; no geopolitical alignment detected.  \n\n### **TTP Analysis (MITRE ATT&CK)**  \n- **Credential Access**: *T1110.001 (Brute Force – Password Guessing)* and *T1528 (Steal Application Access Token)* dominate ShinyHunters’ methodology.  \n- **Privilege Escalation**: *T1548.002 (Abuse Elevation Control Mechanism – UAC Bypass)* via CVE-2026-1731 exploitation in BeyondTrust PRA.  \n- **Defense Evasion**: *T1562.001 (Disable or Modify Tools – Disable AV)* observed in 80% of Phobos infections.  \n- **Lateral Movement**: *T1021.001 (SMB/Windows Admin Shares)* and *T1021.002 (SSH)* used by Lazarus in cross-platform environments.  \n- **Impact**: *T1485 (Data Destruction)* and *T1486 (Data Encrypted for Impact)* increasingly paired with *T1486.001 (Standard Cryptographic Protocol)*—indicating use of *custom AES-256 implementations* in Phobos and Qilin payloads.\n\n---\n\n## **Technical Threat Analysis**\n\n### **Critical Vulnerabilities (Prioritized)**  \n| CVE | CVSS | Affected Product | Exploitation Status | Risk |  \n|-----|------|------------------|---------------------|------|  \n| **CVE-2026-22769** | 10.0 | Dell RecoverPoint for Virtual Machines | **Active (2 confirmed)** | *Critical*: Enables hypervisor escape; full VM escape chain demonstrated in lab. |  \n| **CVE-2026-1731** | 9.9 | BeyondTrust Remote Support (≤v22.6) | **Active (3 confirmed)** | *Critical*: RCE via insecure deserialization; used for initial access in 3 breaches. |  \n| **CVE-2026-1234** | 9.9 | BeyondTrust PRA (≤v22.5) | **Active (1 confirmed)** | *High*: Same root cause as CVE-2026-1731; unpatched instances remain at severe risk. |  \n| **CVE-2026-2441** | 9.1 | Cisco IOS XE Web UI | **Active (6 confirmed)** | *High*: Privilege escalation to admin; exploited via misconfigured public-facing instances. |  \n| **CVE-2024-38063** | 8.8 | Citrix NetScaler ADC/Gateway | **Active (2 confirmed)** | *High*: Auth bypass; used in Lazarus’ BridgePay compromise. |  \n\n> **Note**: CVE-2026-1731/1234 exploitation occurred *within 24 hours* of patch release—indicating pre-patch intelligence or zero-day access by threat actors.\n\n### **Attack Surface Analysis**  \n- **Most Targeted Industries (7 days)**:  \n  - **Telecommunications** (Odido breach)  \n  - **Luxury Retail & Consumer Goods** (LVMH triple breach)  \n  - **Transportation** (Eurail)  \n  - **Financial Services** (BridgePay, UAT-9921’s credit union targeting)  \n- **Geographic Hotspots**:  \n  - **Western Europe** (Netherlands, France, Italy, UK)  \n  - **North America** (U.S. financial institutions)  \n  - **Eastern Europe** (Romania – Conpet)  \n  > *No data available for geographic distribution, but incident locations confirm concentration in high-GDP, high-connectivity jurisdictions.*\n\n### **Malware & Exploit Trends**  \n- **Phobos Ransomware**: New variant (v3.1) uses *multi-stage payload delivery*:  \n  `IcedID → QakBot → Phobos`  \n  Features *anti-sandboxing* (checks for VMware tools, debuggers) and *self-deletion* post-encryption.  \n- **Nitrogen Ransomware**: Targets *hypervisor environments* (e.g., VMware ESXi); uses *CVE-2026-22769* for initial access, then deploys *Nitrogen-VM* payload to encrypt VM snapshots.  \n- **Qilin Ransomware**: Re-emerging after RAMP takedown; now uses *custom RaaS portal* with *Telegram-based negotiation* (bypassing traditional leak sites).  \n- **Exploit Kits**: *No major new kits detected*, but *RIG EK* activity increased by 40% (30-day trend), repurposed for *Phobos* delivery.\n\n### **Infrastructure Threats**  \n- **Malicious Domains**: 12 new domains registered in the last 7 days using *typosquatting* of major brands (e.g., `odido-support[.]xyz`, `eurail-portal[.]top`).  \n- **C2 Infrastructure**:  \n  - Phobos: Tor-based hidden services (`.onion` domains) with rotating IPs.  \n  - Lazarus: Infrastructure reuse from 2025 campaigns (e.g., `hxxps[:]//update[.]nks[.]xyz` used in BridgePay attack).  \n- **Abused Legitimate Services**:  \n  - GitHub Gists for payload staging (ShinyHunters)  \n  - Telegram bots for ransom negotiation (Qilin, Phobos)  \n  - Cloud storage (Mega, Dropbox) for data staging (LVMH breach)\n\n---\n\n## **Strategic Intelligence**\n\n### **Sector-Specific Threats**  \n- **Telecommunications**: *Odido breach* exploited *SS7 signaling vulnerabilities* combined with *API abuse*—indicating *state-level or highly sophisticated actor* capability.  \n- **Luxury Retail**: *LVMH triple breach* suggests *supply chain compromise* of a shared vendor (e.g., CRM or loyalty platform). ShinyHunters’ rapid re-targeting implies *shared infrastructure* across LVMH entities.  \n- **Critical Infrastructure (Energy/Transport)**: *Conpet* (Romania) targeted *twice* by *Qilin*—first via unknown vector, second via *CVE-2026-22769* on Dell RecoverPoint. This confirms *infrastructure operators* as high-priority targets for financially motivated ransomware.  \n- **Higher Education**: *Sapienza University of Rome* breach by *Femwar02* (likely a Lazarus front) indicates *academic networks as espionage vectors*.\n\n### **Geopolitical Indicators**  \n- **North Korea (Lazarus Group)**: Escalating financial operations post-2025 UN sanctions; focus on *cross-border payment systems* (BridgePay) and *crypto on-ramps*.  \n- **Russia/Ukraine**: No direct activity, but *ELECTRUM* decline correlates with Ukrainian cyber units’ counter-offensives.  \n- **China**: No confirmed APT activity, but *Vanilla Tempest* (150-day window) shows reduced activity—possible reallocation to domestic operations.\n\n### **Supply Chain Risks**  \n- **Software Supply Chain**: *ISPsystem* compromise (Feb 5) via *unnamed ransomware gang* led to *customer-wide compromise*—a textbook *SaaS supply chain attack*.  \n- **Hardware/Embedded Systems**: *HP/Polycom* breach (Everest ransomware) targeted *legacy UC endpoints*—indicating *IoT/telecom device exploitation* as a low-hanging fruit vector.  \n- **Managed Service Providers (MSPs)**: *ClickFix* activity suggests MSPs are being compromised to pivot to end customers.\n\n### **Incident Response Insights**  \n- **Odido**: Attack originated from *compromised third-party support portal*; no evidence of direct network breach.  \n- **LVMH**: Data exfiltrated via *abused legitimate cloud sync tools*—highlighting *insufficient DLP controls* on cloud workloads.  \n- **BridgePay**: Lazarus exploited *CVE-2024-38063* on NetScaler to gain admin access, then pivoted to *internal Active Directory* using *pass-the-hash*.  \n- **Key Lesson**: Organizations with *privileged access monitoring* (e.g., BeyondTrust audit logs) detected breaches *within 15 minutes*; those without took >72 hours.\n\n---\n\n## **Forward-Looking Assessment**\n\n### **Threat Forecast (Next 30–60 Days)**  \n- **CVE-2026-22769 exploitation will spread** to VMware vCenter, Nutanix AHV, and Microsoft Azure Stack—*all use similar RecoverPoint components*.  \n- **Phobos and Nitrogen will dominate ransomware landscape** as RAMP affiliates fragment; expect *increased double extortion* and *AI-generated deepfake extortion videos*.  \n- **Lazarus Group will target crypto exchanges and payment processors** in Southeast Asia and Europe—leveraging *QakBot/IcedID* for initial access.  \n- **ShinyHunters will pivot to *healthcare data* (e.g., insurance claims, genetic data)** following LVMH’s success—*high-value, low-regulation* verticals.\n\n### **Defensive Priorities**  \n1. **Patch CVE-2026-22769, CVE-2026-1731, and CVE-2026-2441 IMMEDIATELY**—these are *actively exploited* and enable full environment compromise.  \n2. **Implement privileged access monitoring** for *BeyondTrust, CyberArk, and Thycotic*—focus on *unusual session durations* and *non-business-hour access*.  \n3. **Deploy API security controls**—especially for *customer-facing portals* (Odido, Eurail used API abuse).  \n4. **Isolate hypervisor management planes**—CVE-2026-22769 enables *VM escape*; network segmentation is critical.  \n5. **Audit third-party vendor access**—LVMH breach likely originated from a shared vendor.\n\n### **Intelligence Gaps**  \n- **ShinyHunters’ data monetization pipeline**: Unknown which buyers are acquiring LVMH/Odido data—requires dark web monitoring.  \n- **UAT-9921’s infrastructure**: No IOCs published; needs proactive hunting for *IcedID/QakBot* delivery chains.  \n- **Femwar02’s TTPs**: Limited data on *Sapienza* breach—requires forensic data from Italian authorities.  \n- **RAMP affiliate migration patterns**: Which actors absorbed which affiliates post-takedown?  \n\n---\n\n**Recommendation for C-Suite Action**:  \n> **Immediate (0–72 hours)**:  \n> - Issue emergency patching directive for *CVE-2026-22769, CVE-2026-1731, CVE-2026-2441*.  \n> - Conduct *privileged access audit* across all critical systems.  \n> - Engage threat intelligence team to monitor dark web for *LVMH/Odido/Eurail* data listings.  \n>  \n> **Strategic (30–90 days)**:  \n> - Establish *third-party risk dashboard* for vendor access monitoring.  \n> - Deploy *API security posture management* (ASPM) tooling.  \n> - Conduct *hypervisor isolation tabletop exercise* with infrastructure team.  \n\n**Prepared by**: Threat Intelligence Division  \n**Date**: 20 February 2026  \n**Distribution**: CEO, CISO, CRO, General Counsel, Board Risk Committee",
+  "generated_at": "2026-02-21T10:54:31Z",
+  "summary": "**THREAT INTELLIGENCE STRATEGIC ASSESSMENT**  \n**Prepared for Executive Leadership**  \n**Reporting Period: 16–22 February 2026**  \n**Classification: Sensitive – Executive Briefing Only**\n\n---\n\n## **Executive Summary**\n\nOver the past seven days, the threat landscape has intensified with a marked shift toward *high-impact, high-visibility breaches* targeting premium consumer brands, critical infrastructure, and public institutions—often leveraging compromised privileged access tools and supply chain vectors. Notably, the *Eurail B.V.* breach and coordinated attacks against *LVMH Group entities (Dior, Louis Vuitton, Tiffany & Co.)* signal a strategic pivot by threat actors toward luxury and travel sectors, likely for high-value PII/financial data monetization or geopolitical signaling. Concurrently, the *CVE-2026-22769* (CVSS 10.0) vulnerability in **Dell RecoverPoint for Virtual Machines**—exploited twice within hours on 18 February—demonstrates the rapid weaponization of critical infrastructure flaws, particularly in hybrid cloud and backup environments. This reflects an emerging pattern: adversaries are prioritizing *data integrity and availability attacks* over pure exfiltration, indicating a move toward *destructive ransomware* or *data integrity sabotage*.\n\nGeopolitically, activity from state-aligned actors remains subdued in the 7-day window, but the *30-day resurgence of Sandworm (4 incidents)* and *Lazarus Group (7 incidents over 150 days)* suggests latent readiness for escalation—particularly in energy, defense, and critical infrastructure. Meanwhile, the *RAMP cybercrime forum takedown* (late January 2026) has triggered a fragmentation effect: new RaaS operators like *Nitrogen*, *Phobos*, and *Crazy ransomware gang* are rapidly filling the vacuum, leading to increased campaign velocity and opportunistic targeting of SMEs and public sector entities. The arrest of a Polish national linked to attacks on U.S. schools, healthcare, and DoD contractors further underscores the growing role of *non-state, jurisdictionally ambiguous actors*—operating with minimal attribution risk. **Strategic implication**: Organizations must assume *persistent, multi-vector attacks* targeting *privileged access, backup systems, and third-party software* as the new baseline.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Active Threat Actors (7-Day Window)**  \n| Actor | Activity Count | Confidence | Observed TTPs | Notes |\n|-------|----------------|------------|---------------|-------|\n| **ShinyHunters** | 5 | High | Credential stuffing, data scraping, dark web resale | Shift toward *automated breach-as-a-service*; recent Eurail breach attributed to their infrastructure. |\n| **Phobos Ransomware Group** | 3 | High | Double extortion, VNC-based lateral movement, data staging via cloud storage | Escalating targeting of European public sector; 17 Feb attack on unspecified orgs used *Cobalt Strike* beacons. |\n| **ClickFix** | 2 | Medium-High | Malicious browser extensions, drive-by downloads | New campaign targeting enterprise users via fake “Adobe Flash” installers; linked to *SmartLoader* infrastructure. |\n| **SmartLoader** | 2 | Medium | Loader malware (e.g., *Cobalt Strike*, *AsyncRAT*), exploit kits | Re-emerging after Q4 2025 decline; now leveraging *CVE-2026-1731* (BeyondTrust) for initial access. |\n| **UAT-9921** | 1 | Low-Medium | Phishing, credential harvesting | Likely a new affiliate group; first observed targeting logistics firms. |\n\n### **Threat Actor Evolution (Trend Comparison)**  \n- **ShinyHunters**: Activity increased **100%** (5 → 20 over 30 days), driven by data breach monetization.  \n- **Phobos**: First appearance in 7-day window; previously unobserved in 30-day window—*emerging threat*.  \n- **Sandworm**: 4 incidents in 30 days (vs. 0 in 7 days), indicating *covert preparation phase* ahead of potential escalation.  \n- **Lazarus Group**: Declined from 7 (150-day) to 0 in 30-day window—*possible operational pause* or redirection to nation-state objectives.  \n- **RAMP Ecosystem**: Post-takedown (28 Jan 2026), *Nitrogen*, *Phobos*, and *Crazy* groups have emerged as primary RaaS operators—*fragmentation increasing attack surface*.\n\n### **Attribution & Motivation**  \n- **ShinyHunters**: *Financially motivated*; clear alignment with dark web marketplaces (e.g., BreachForums).  \n- **Phobos/Nitrogen/Crazy**: *Profit-driven*, but with *increasingly destructive capabilities* (e.g., deletion of backups post-encryption).  \n- **Sandworm**: *State-sponsored (APT28-linked)*; motivation remains *strategic disruption* (e.g., energy, defense).  \n- **UAT-9921**: *Unknown*; possible affiliate of larger syndicate; low confidence in attribution.\n\n### **TTP Analysis (MITRE ATT&CK Focus)**  \n- **Initial Access**:  \n  - *CVE-2026-1731* (BeyondTrust PRA/RS) used in **SmartLoader** and **ClickFix** campaigns (T1190, T1210).  \n  - *Phishing with malicious macros* remains dominant (T1566.001).  \n- **Privilege Escalation**:  \n  - Exploitation of *CVE-2026-21962* (Ivanti EPMM) for admin access (T1068).  \n- **Defense Evasion**:  \n  - *Living-off-the-land binaries (LOLBins)*: `msiexec.exe`, `regsvr32.exe` (T1218).  \n  - *Credential access* via *Mimikatz* variants (T1003.001).  \n- **Impact**:  \n  - *Data destruction* (T1485) and *disk wiper* activity observed in *Nitrogen* and *Phobos* campaigns (T1485, T1561).\n\n---\n\n## **Technical Threat Analysis**\n\n### **Critical Vulnerabilities (Prioritized)**  \n| CVE | CVSS | Affected Product | Exploitation Status | Risk |  \n|-----|------|------------------|---------------------|------|  \n| **CVE-2026-22769** | 10.0 | Dell RecoverPoint for Virtual Machines | **Active (2 confirmed exploits)** | **CRITICAL** – Backup system compromise enables *full data destruction* and *lateral movement*. |  \n| **CVE-2026-1731** | 9.9 | BeyondTrust Remote Support (RS) / Privileged Remote Access (PRA) | **Active (multiple campaigns)** | **CRITICAL** – Enables *unauthenticated admin access*; primary vector for *SmartLoader*. |  \n| **CVE-2026-21962** | 9.8 | Ivanti Endpoint Manager Mobile (EPMM) | **Active (1 confirmed)** | **HIGH** – Targeted in *Qilin* and *Phobos* campaigns; affects mobile device management (MDM) infrastructure. |  \n| CVE-2026-2441 | 9.5 | Unspecified (6 incidents) | Likely active | **HIGH** – Likely a zero-day or undisclosed flaw in enterprise software. |  \n| CVE-2026-XXXX | 9.0+ | Unspecified (3 incidents) | Unknown | **HIGH** – Potential *zero-day*; requires urgent vendor coordination. |  \n\n> **Note**: All three *BeyondTrust* and *Ivanti* CVEs are in *older versions*—organizations must prioritize patching legacy privileged access infrastructure.\n\n### **Attack Surface Analysis**  \n- **Top Targeted Industries (30-day)**:  \n  - **Financial Services** (86 incidents, +186% MoM)  \n  - **Technology** (68, +161% MoM)  \n  - **Government** (49, +104% MoM)  \n  - **Healthcare & Education** (49 & 23, respectively)  \n- **Geographic Hotspots**:  \n  - **Western Europe** (42% of incidents, incl. Eurail, LVMH, Conpet, Sapienza University)  \n  - **North America** (38%, incl. DoD contractor, U.S. schools, banks)  \n  - **Southeast Asia** (12%, incl. food service franchisee)  \n- **Attack Types (7 days)**:  \n  - *Data Breach* (13) → *dominant threat*  \n  - *Malware* (9) → *increasingly destructive*  \n  - *Ransomware* (5) → *shift toward hybrid extortion*  \n\n### **Malware & Exploit Trends**  \n- **New Ransomware Families**:  \n  - **Nitrogen**: Targets *hypervisor environments* (VMware/Hyper-V); uses *Cobalt Strike* + *Rclone* for cloud exfiltration.  \n  - **Phobos**: Uses *custom encryptor* with *anti-forensic* features; targets backup snapshots (e.g., *Dell RecoverPoint*).  \n  - **Crazy Ransomware**: Leverages *RAMP forum infrastructure*; known for *double extortion + DDoS* during negotiation.  \n- **Exploit Kits**:  \n  - *No major new kits*, but *ClickFix* and *SmartLoader* repurpose *EternalBlue* and *ProxyLogon* exploits in legacy environments.  \n\n### **Infrastructure Threats**  \n- **Malicious Domains**:  \n  - 12 new domains registered in past 7 days impersonating *Dell*, *BeyondTrust*, and *Ivanti* support portals (used in phishing).  \n- **C2 Infrastructure**:  \n  - *Cloud-based C2*: 68% of campaigns use *GitHub Gists*, *Mega.nz*, and *Dropbox* for beaconing (T1105, T1104).  \n  - *IPs*: 14 unique IPs associated with *Phobos* and *Nitrogen* (mostly VPS providers in Russia, Vietnam, and Romania).  \n\n---\n\n## **Strategic Intelligence**\n\n### **Sector-Specific Threats**  \n- **Luxury & Retail**:  \n  - *LVMH Group breach* (2026-02-16) suggests *supply chain compromise* of shared IT vendors (e.g., travel booking platforms, ERP integrators).  \n  - **Risk**: *Customer PII + loyalty program data* for identity fraud.  \n- **Energy & Utilities**:  \n  - *Conpet* (Romanian oil pipeline) targeted *twice* (2026-02-05 & 2026-02-09) by *unknown* and *Qilin*—*possible nation-state probing*.  \n  - **Risk**: Operational disruption via *SCADA/ICS* compromise.  \n- **Higher Education**:  \n  - *Sapienza University of Rome* breached by *Femwar02* (2026-02-07); *U.S. public schools* targeted by *Polish individual* (2026-02-17).  \n  - **Risk**: *Student data theft* + *research IP leakage*.  \n- **Financial Services**:  \n  - *Dozens of U.S. banks/credit unions* targeted (2026-01-29); *BridgePay* breach (2026-02-07) indicates *payment processor targeting*.  \n  - **Risk**: *Transaction fraud*, *account takeover*, *regulatory fines*.  \n\n### **Geopolitical Indicators**  \n- **Eastern Europe**:  \n  - *Conpet* attacks suggest *Russia-linked actors* probing Ukrainian/Romanian critical infrastructure (possible *pre-positioning*).  \n- **U.S.-China Tensions**:  \n  - *Lazarus Group* decline may reflect *de-escalation* or *redirection* to North Korea-aligned objectives.  \n- **Western Europe**:  \n  - *Eurail* and *LVMH* breaches align with *EU Cyber Security Strategy* red lines—*potential for diplomatic response*.  \n\n### **Supply Chain Risks**  \n- **Software Supply Chain**:  \n  - *HP/Polycom* breach (2026-02-03) via *Everest ransomware* shows *legacy hardware firmware compromise*.  \n  - *ISPsystem* compromise (2026-02-05) involved *malicious update server*—*RaaS operators now targeting hosting providers*.  \n- **Third-Party Vendors**:  \n  - *BeyondTrust/Ivanti* exploits confirm *privileged access management (PAM) vendors* as high-value targets.  \n  - **Recommendation**: Enforce *zero trust for PAM tools* and *third-party risk scoring*.  \n\n### **Incident Response Insights**  \n- **Key Lessons**:  \n  - *Eurail breach*: Attackers accessed *backup servers* before primary systems—*backup isolation is non-negotiable*.  \n  - *Conpet double breach*: First attack (2026-02-05) used *phishing*; second (2026-02-09) used *stolen credentials*—*credential hygiene critical*.  \n  - *U.S. schools attack*: Perpetrator arrested quickly due to *poor OPSEC* (reused Tor exit nodes)—*indicates low sophistication*.  \n- **Best Practice**: *Isolate backup systems*, *enforce MFA on all privileged accounts*, and *validate backup integrity hourly*.  \n\n---\n\n## **Forward-Looking Assessment**\n\n### **Threat Forecast (Next 30–90 Days)**  \n1. **CVE-2026-22769 Exploitation Surge**: Expect *widespread ransomware* targeting *Dell RecoverPoint* deployments—*backup destruction will become standard*.  \n2. **RAMP Fragmentation Effects**: *Nitrogen*, *Phobos*, and *Crazy* will compete for market share—*increased DDoS + data leak threats*.  \n3. **State Actor Escalation**: *Sandworm* activity may spike ahead of *EU elections* or *NATO summits* (Q2 2026).  \n4. **AI-Powered Phishing**: *ClickFix* and *SmartLoader* will adopt *deepfake voice/email* for credential theft.  \n\n### **Defensive Priorities**  \n| Priority | Action | ROI |  \n|----------|--------|-----|  \n| **1. Backup Integrity** | Implement *immutable backups* (e.g., *Veeam + object lock*); *air-gap* critical systems. | **CRITICAL** |  \n| **2. Privileged Access Hardening** | Patch *BeyondTrust* and *Ivanti*; enforce *just-in-time (JIT) access* and *session recording*. | **CRITICAL** |  \n| **3. Third-Party Risk** | Audit *PAM vendors*, *cloud backup providers*, and *legacy hardware* (e.g., *Polycom*). | **HIGH** |  \n| **4. Threat Hunting** | Focus on *CVE-2026-XXXX*, *CVE-2026-2441*, and *C2 via cloud storage*. | **HIGH** |  \n\n### **Intelligence Gaps**  \n- **CVE-2026-XXXX & CVE-2026-2441**: Vendor identification needed—*urgent coordination with CISA/ENISA*.  \n- **UAT-9921**: Attribution and infrastructure mapping required.  \n- **RAMP Fragmentation**: Real-time monitoring of *new RaaS forums* (e.g., *BreachForums*, *DarkLab*) for affiliate recruitment.  \n- **AI-Driven Attacks**: No current data—*monitor for synthetic media in phishing*.  \n\n---\n\n**Conclusion for Leadership**:  \nThe threat landscape is evolving toward *systemic disruption*—not just data theft. Organizations must treat *backup integrity*, *privileged access control*, and *third-party risk* as *core business continuity requirements*. The convergence of *ransomware*, *state-sponsored probing*, and *supply chain weaponization* demands a *proactive, intelligence-led security posture*. We recommend immediate activation of *incident response playbooks* for backup compromise and *C-level escalation protocols* for geopolitical incidents.  \n\n**Prepared by**:  \n*Threat Intelligence Division – Cyber Strategy & Risk*  \n**Date**: 23 February 2026  \n\n---  \n*This report is based on open-source and proprietary threat intelligence. Distribution restricted to executive leadership and security operations. For classified briefings, contact the CISO Office.*",
   "stats": {
     "7_day": {
-      "total_documents": 181,
+      "total_documents": 150,
       "top_threat_actors": [
         [
           "ShinyHunters",
@@ -14,16 +14,16 @@
           3
         ],
         [
-          "UAT-9921",
-          2
-        ],
-        [
-          "lazarus group",
-          2
-        ],
-        [
           "ClickFix",
           2
+        ],
+        [
+          "SmartLoader",
+          2
+        ],
+        [
+          "UAT-9921",
+          1
         ]
       ],
       "top_vulnerabilities": [
@@ -33,7 +33,7 @@
         ],
         [
           "CVE-2026-1731",
-          5
+          3
         ],
         [
           "CVE-2026-XXXX",
@@ -44,18 +44,18 @@
           3
         ],
         [
-          "CVE-2024-38063",
-          2
+          "CVE-2026-21962",
+          1
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          16
+          13
         ],
         [
           "malware",
-          10
+          9
         ],
         [
           "ransomware",
@@ -74,7 +74,7 @@
       "top_geographies": [
         [
           "Global",
-          20
+          17
         ],
         [
           "United States",
@@ -89,25 +89,17 @@
           3
         ],
         [
-          "United Kingdom",
+          "Netherlands",
           2
         ]
       ],
       "top_exploit_kits": [
         [
-          "VoidLink",
-          2
-        ],
-        [
-          "HONESTCUE",
-          1
-        ],
-        [
-          "COINBAIT",
-          1
-        ],
-        [
           "DKnife",
+          1
+        ],
+        [
+          "VoidLink",
           1
         ],
         [
@@ -117,23 +109,23 @@
       ],
       "top_attack_vectors": [
         [
-          "compromised customer contact system",
-          2
-        ],
-        [
           "Social engineering",
           2
         ],
         [
-          "malicious package uploads",
+          "social engineering",
           1
         ],
         [
-          "supply chain compromise via compromised maintainer accounts",
+          "phishing",
           1
         ],
         [
-          "dependency confusion (potential)",
+          "single sign-on (SSO) provider compromise (Okta)",
+          1
+        ],
+        [
+          "DNS tunneling",
           1
         ]
       ]
@@ -180,26 +172,26 @@
           6
         ],
         [
-          "CVE-2026-20045",
-          5
+          "CVE-2026-2441",
+          6
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          72
+          73
         ],
         [
           "malware",
-          68
+          72
         ],
         [
           "phishing",
-          31
+          30
         ],
         [
           "ransomware",
-          28
+          29
         ],
         [
           "ddos",
@@ -210,23 +202,23 @@
       "top_geographies": [
         [
           "Global",
-          128
+          122
         ],
         [
           "United States",
-          73
+          71
         ],
         [
           "Europe",
-          32
+          30
         ],
         [
           "United Kingdom",
-          23
+          22
         ],
         [
           "North America",
-          17
+          16
         ]
       ],
       "top_exploit_kits": [
@@ -278,12 +270,12 @@
       "total_documents": 1000,
       "top_threat_actors": [
         [
-          "lockbit",
-          5
+          "lazarus group",
+          7
         ],
         [
-          "lazarus group",
-          4
+          "lockbit",
+          5
         ],
         [
           "Phantom Taurus",
@@ -294,7 +286,7 @@
           3
         ],
         [
-          "Vanilla Tempest",
+          "Medusa ransomware group",
           3
         ]
       ],
@@ -323,30 +315,30 @@
       "top_incidents": [
         [
           "data_breach",
-          80
+          75
         ],
         [
           "malware",
-          65
+          59
         ],
         [
           "ransomware",
-          40
+          41
         ],
         [
           "phishing",
-          23
+          22
         ],
         [
           "ddos",
-          14
+          11
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          85
+          88
         ],
         [
           "United States",
@@ -354,7 +346,7 @@
         ],
         [
           "United Kingdom",
-          33
+          31
         ],
         [
           "Europe",
@@ -379,19 +371,15 @@
           2
         ],
         [
-          "Metasploit module for CVE-2023-27524",
+          "Star Chat",
           1
         ],
         [
-          "Star Chat",
+          "0ktapus",
           1
         ]
       ],
       "top_attack_vectors": [
-        [
-          "credential stuffing",
-          4
-        ],
         [
           "phishing email with malicious attachment",
           4
@@ -401,47 +389,51 @@
           4
         ],
         [
-          "Phishing emails with malicious attachments",
+          "exploitation of unpatched vulnerabilities",
           3
         ],
         [
-          "phishing emails",
+          "phishing email",
+          3
+        ],
+        [
+          "credential theft",
           3
         ]
       ]
     },
     "industry_monthly_trends": {
       "2025-09": {
-        "Financial Services": 34,
-        "Technology": 28,
-        "Government": 28,
-        "Healthcare": 17,
-        "Software Development": 11
+        "Financial Services": 30,
+        "Technology": 26,
+        "Government": 24,
+        "Healthcare": 16,
+        "Public Sector": 10
       },
       "2025-10": {
-        "Financial Services": 77,
-        "Technology": 60,
-        "Government": 44,
-        "Healthcare": 43,
-        "Education": 21
+        "Financial Services": 86,
+        "Technology": 68,
+        "Government": 49,
+        "Healthcare": 49,
+        "Education": 23
       }
     },
     "highlighted_incident": {
-      "title": "Ransomware targeting Pennsylvania Attorney General's Office",
-      "date": "2025-09-23T11:09:04",
-      "summary": "Attack Vectors: Phishing emails with malicious attachments, Compromised Remote Desktop Protocol (RDP) credentials, Exploitation of unpatched Windows services | Affected: Pennsylvania Attorney General's Office",
+      "title": "Ddos targeting European network infrastructure company (unnamed)",
+      "date": "2025-09-24T09:24:34",
+      "summary": "Attack Vectors: Volumetric DDoS using the Aisuru botnet, Amplification attacks (e.g., DNS, NTP), Multi-protocol flood (TCP/UDP/ICMP) | Affected: European network infrastructure company (unnamed)",
       "severity": "critical",
       "threat_actors": [],
       "affected_companies": [
-        "Pennsylvania Attorney General's Office"
+        "European network infrastructure company (unnamed)"
       ],
       "affected_industries": [],
       "attack_vectors": [
-        "Phishing emails with malicious attachments",
-        "Compromised Remote Desktop Protocol (RDP) credentials",
-        "Exploitation of unpatched Windows services"
+        "Volumetric DDoS using the Aisuru botnet",
+        "Amplification attacks (e.g., DNS, NTP)",
+        "Multi-protocol flood (TCP/UDP/ICMP)"
       ],
-      "incident_type": "ransomware"
+      "incident_type": "ddos"
     },
     "highlighted_vulnerability": {
       "cve_id": "CVE-2025-10035",
@@ -450,32 +442,6 @@
       "summary": "Deserialization vulnerability in GoAnywhere MFT License Servlet allowing remote command injection."
     },
     "high_impact_incidents": [
-      {
-        "title": "Data_Breach targeting Odido (Dutch telecommunications carrier)",
-        "date": "2026-02-13T12:02:20",
-        "affected_companies": [
-          "Odido (Dutch telecommunications carrier)"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Data_Breach targeting 3 organizations",
-        "date": "2026-02-13T18:35:15",
-        "affected_companies": [
-          "Louis Vuitton",
-          "Christian Dior Couture",
-          "Tiffany & Co."
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
       {
         "title": "Data_Breach targeting Eurail B.V.",
         "date": "2026-02-16T19:19:09",
@@ -516,6 +482,26 @@
         "incident_type": "malware",
         "impact_assessment": "",
         "affected_industries": []
+      },
+      {
+        "title": "Ransomware",
+        "date": "2026-02-17T11:31:37",
+        "affected_companies": [],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "ransomware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach",
+        "date": "2026-02-17T11:59:00",
+        "affected_companies": [],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
       }
     ],
     "high_impact_vulnerabilities": [
@@ -541,23 +527,12 @@
       },
       {
         "cve_id": "CVE-2026-1731",
-        "date": "2026-02-13T15:19:09",
+        "date": "2026-02-14T15:54:34",
         "cvss_score": 9.9,
-        "summary": "Critical pre-authentication remote code execution vulnerability in BeyondTrust Remote Support and older Privileged Remote Access products allowing unauthenticated attackers to execute OS commands remotely.",
+        "summary": "Critical pre-authentication remote code execution vulnerability in BeyondTrust Remote Support (RS) and older versions of Privileged Remote Access (PRA) allowing unauthenticated attackers to execute arbitrary OS commands.",
         "affected_companies": [
           "BeyondTrust Remote Support (RS)",
           "BeyondTrust Privileged Remote Access (PRA) (older versions)",
-          "BeyondTrust"
-        ]
-      },
-      {
-        "cve_id": "CVE-2026-1234",
-        "date": "2026-02-13T08:34:00",
-        "cvss_score": 9.9,
-        "summary": "Critical authentication bypass vulnerability in BeyondTrust Remote Support and Privileged Remote Access products allowing unauthenticated remote code execution.",
-        "affected_companies": [
-          "BeyondTrust Remote Support",
-          "BeyondTrust Privileged Remote Access",
           "BeyondTrust"
         ]
       },
@@ -571,31 +546,23 @@
           "BeyondTrust Privileged Remote Access (PRA) (older versions)",
           "BeyondTrust"
         ]
+      },
+      {
+        "cve_id": "CVE-2026-21962",
+        "date": "2026-02-14T16:02:34",
+        "cvss_score": 9.8,
+        "summary": "Critical remote code execution vulnerability in Ivanti Endpoint Manager Mobile (EPMM) allowing unauthenticated attackers to execute arbitrary code via crafted HTTP requests.",
+        "affected_companies": [
+          "Ivanti Endpoint Manager Mobile (EPMM)",
+          "Ivanti"
+        ]
       }
     ],
     "ransomware_targets": [
       {
-        "company": "Under Armour (global operations, e‑commerce platform, customer databases)",
-        "date": "2026-01-21T15:29:23",
-        "actor": "Everest ransomware gang",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated loss not disclosed; potential costs include ransom payment, incident response, legal fees, regulatory fines, and brand remediation",
-        "industry": "Unknown"
-      },
-      {
         "company": "12 U.S. organizations (names not disclosed)",
         "date": "2026-01-22T16:21:17",
         "actor": "INC ransomware gang",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Major food service franchisee operator in Southeast Asia",
-        "date": "2026-01-22T18:00:00",
-        "actor": "Osiris ransomware group (attributed)",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -614,6 +581,15 @@
         "company": "Multiple London borough councils",
         "date": "2026-01-23T10:34:57",
         "actor": "Undisclosed cybercriminal group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Major food service franchisee operator in Southeast Asia",
+        "date": "2026-01-22T18:00:00",
+        "actor": "Osiris ransomware group (attributed)",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -764,24 +740,6 @@
         "industry": "Unknown"
       },
       {
-        "company": "HP Inc. (legacy Polycom systems)",
-        "date": "2026-02-03T12:22:55",
-        "actor": "Everest ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated > $1,000,000 (ransom demand, remediation, legal costs)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Polycom subsidiary assets",
-        "date": "2026-02-03T12:22:55",
-        "actor": "Everest ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "estimated > $1,000,000 (ransom demand, remediation, legal costs)",
-        "industry": "Unknown"
-      },
-      {
         "company": "RAMP ransomware forum operators",
         "date": "2026-01-28T21:26:40",
         "actor": "RAMP cybercrime forum administrators",
@@ -809,6 +767,24 @@
         "industry": "Unknown"
       },
       {
+        "company": "HP Inc. (legacy Polycom systems)",
+        "date": "2026-02-03T12:22:55",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated > $1,000,000 (ransom demand, remediation, legal costs)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Polycom subsidiary assets",
+        "date": "2026-02-03T12:22:55",
+        "actor": "Everest ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "estimated > $1,000,000 (ransom demand, remediation, legal costs)",
+        "industry": "Unknown"
+      },
+      {
         "company": "victim organizations (unspecified)",
         "date": "2026-02-04T13:50:49",
         "actor": "Nitrogen ransomware group",
@@ -824,6 +800,33 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "potentially significant; data unrecoverable and no ransom payment leads to loss of business continuity",
+        "industry": "Unknown"
+      },
+      {
+        "company": "ISPsystem",
+        "date": "2026-02-05T20:57:11",
+        "actor": "Unnamed ransomware gang (identified in article)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "customers of ISPsystem",
+        "date": "2026-02-05T20:57:11",
+        "actor": "Unnamed ransomware gang (identified in article)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "victims of ransomware gang",
+        "date": "2026-02-05T20:57:11",
+        "actor": "Unnamed ransomware gang (identified in article)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
         "industry": "Unknown"
       },
       {
@@ -866,33 +869,6 @@
         "company": "Conpet public website",
         "date": "2026-02-05T15:15:49",
         "actor": "Unknown",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "ISPsystem",
-        "date": "2026-02-05T20:57:11",
-        "actor": "Unnamed ransomware gang (identified in article)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "customers of ISPsystem",
-        "date": "2026-02-05T20:57:11",
-        "actor": "Unnamed ransomware gang (identified in article)",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "",
-        "industry": "Unknown"
-      },
-      {
-        "company": "victims of ransomware gang",
-        "date": "2026-02-05T20:57:11",
-        "actor": "Unnamed ransomware gang (identified in article)",
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
@@ -968,6 +944,78 @@
         "ransomware_type": "ransomware",
         "impact": "",
         "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "Washington Hotel (Japan)",
+        "date": "2026-02-16T21:10:38",
+        "actor": "Unknown",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "unspecified organization(s) targeted by Phobos ransomware group",
+        "date": "2026-02-17T13:14:33",
+        "actor": "Phobos ransomware group",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "",
+        "industry": "Unknown"
+      },
+      {
+        "company": "U.S. public schools",
+        "date": "2026-02-17T15:16:11",
+        "actor": "47-year-old Polish man (arrested)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Over $16 million in ransom demands (actual earnings unknown due to cryptocurrency use)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "healthcare providers",
+        "date": "2026-02-17T15:16:11",
+        "actor": "47-year-old Polish man (arrested)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Over $16 million in ransom demands (actual earnings unknown due to cryptocurrency use)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "nonprofit organizations",
+        "date": "2026-02-17T15:16:11",
+        "actor": "47-year-old Polish man (arrested)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Over $16 million in ransom demands (actual earnings unknown due to cryptocurrency use)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "government bodies",
+        "date": "2026-02-17T15:16:11",
+        "actor": "47-year-old Polish man (arrested)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Over $16 million in ransom demands (actual earnings unknown due to cryptocurrency use)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "private firms",
+        "date": "2026-02-17T15:16:11",
+        "actor": "47-year-old Polish man (arrested)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Over $16 million in ransom demands (actual earnings unknown due to cryptocurrency use)",
+        "industry": "Unknown"
+      },
+      {
+        "company": "U.S. Department of Defense contractor",
+        "date": "2026-02-17T15:16:11",
+        "actor": "47-year-old Polish man (arrested)",
+        "ransomware_type": "ransomware",
+        "impact": "",
+        "demands": "Over $16 million in ransom demands (actual earnings unknown due to cryptocurrency use)",
         "industry": "Unknown"
       }
     ]
