@@ -1,15 +1,657 @@
 {
-  "generated_at": "2026-02-21T22:08:21Z",
+  "generated_at": "2026-02-22T03:40:40Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 381,
-  "hypotheses_count": 0,
-  "hypotheses": [],
+  "total_articles_analyzed": 372,
+  "hypotheses_count": 5,
+  "hypotheses": [
+    {
+      "hypothesis_id": "TH-001",
+      "title": "Detection of ClickFix DNS Tunneling Attacks Using nslookup for Malware Delivery",
+      "description": "Attackers are increasingly using DNS tunneling via the nslookup command as part of ClickFix social engineering campaigns to deliver second-stage payloads (e.g., ModeloRAT, StealC). This hypothesis targets the unique behavior where victims are tricked into executing nslookup commands that parse DNS responses for encoded payloads, bypassing traditional command-line restrictions.",
+      "threat_actors": [
+        "ClickFix",
+        "SmartLoader",
+        "Lazarus Group"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Telecommunications",
+        "Critical Infrastructure"
+      ],
+      "mitre_attack_techniques": [
+        "T1071.004 - Application Layer Protocol: DNS",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1204.002 - User Execution: Malicious File",
+        "T1105 - Ingress Tool Transfer"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs with command-line arguments, DNS query logs, and parent-child process relationships",
+          "tools": [
+            "CrowdStrike, SentinelOne, Sysmon, Elastic EDR"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "DNS query logs with unusually long TXT/CNAME responses, nslookup.exe execution patterns, and DNS traffic to suspicious domains",
+          "tools": [
+            "Cisco Stealthwatch, Zeek, Splunk NDR"
+          ]
+        },
+        {
+          "source_type": "Email",
+          "specific_data": "Phishing emails containing fake CAPTCHA/error instructions, links to malicious Google Forms or Pastebin, and embedded JavaScript payloads",
+          "tools": [
+            "Mimecast, Proofpoint, Microsoft Defender for Office 365"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Process Tree Analysis for nslookup Abuse",
+          "description": "Identify suspicious nslookup.exe executions initiated by non-system processes (e.g., cmd.exe, powershell.exe, wscript.exe) with DNS queries containing encoded payloads in response fields.",
+          "sample_queries": [
+            "index=security_events sourcetype=sysmon EventCode=1 Image=\"*\\\\nslookup.exe\" | stats count by parent_image, user, query_string | where query_string LIKE \"%.%\" AND query_string LIKE \"%=%\""
+          ],
+          "look_for": "nslookup.exe spawned by non-standard processes, especially with DNS queries containing base64-encoded or hex-encoded subdomains (e.g., aGVsbG8=.malware[.]xyz)"
+        },
+        {
+          "tactic_name": "DNS Response Length Anomaly Detection",
+          "description": "Detect unusually long DNS TXT or CNAME responses (>100 characters) that may contain encoded payloads, often used in ClickFix DNS exfiltration.",
+          "sample_queries": [
+            "index=dns_logs query_type IN (TXT, CNAME) response_length > 100 | eval payload=substr(response, 1, 200) | where payload LIKE \"%=%\" OR payload LIKE \"%base64%\" OR payload LIKE \"%http%\""
+          ],
+          "look_for": "DNS TXT responses with embedded URLs, base64 strings, or PowerShell commands (e.g., powershell.exe -enc)"
+        },
+        {
+          "tactic_name": "Fake CAPTCHA/Update Social Engineering Detection",
+          "description": "Search for phishing emails or web traffic referencing fake CAPTCHA, system updates, or error messages that instruct users to copy/paste commands.",
+          "sample_queries": [
+            "index=proxy_logs (url=\"*forms.google*\" OR url=\"*captha*\" OR url=\"*update-now*\") AND user_agent LIKE \"%Chrome%\" | stats count by user, url, user_agent | where count > 3"
+          ],
+          "look_for": "Requests to domains mimicking Google Forms (e.g., forms.google.ss-o[.]com), CAPTCHA pages, or update prompts with suspicious URLs"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "forms.google.ss-o[.]com",
+          "id-v4[.]com",
+          "access-authority-2fa7abff0e[.]s3.us-east-1[.]amazonaws[.]com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "*.ss-o[.]com",
+          "Security_Reports.pdf",
+          "update_now.exe"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "nslookup.exe",
+          "cmd.exe",
+          "powershell.exe",
+          "wscript.exe"
+        ],
+        "network_patterns": [
+          "DNS queries to high-entropy subdomains",
+          "nslookup.exe with -q=TXT flag",
+          "HTTP traffic to AWS S3 buckets with PDF lures"
+        ],
+        "user_agent_strings": [
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.7632.75 Safari/537.36"
+        ],
+        "other_indicators": [
+          "Clipboard manipulation via JavaScript",
+          "Fake Claude AI guides on Google Ads",
+          "Pastebin comments with JavaScript payloads"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block nslookup.exe execution unless explicitly whitelisted (e.g., via AppLocker)",
+        "Enable DNS response size limits (e.g., <100 chars for TXT records)",
+        "Hunt for users executing nslookup with suspicious parameters and correlate with phishing email delivery",
+        "Isolate endpoints showing nslookup.exe spawning PowerShell with encoded commands"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "Hunting for OpenClaw AI Agent Configuration Theft via Infostealers",
+      "description": "Information-stealing malware is now specifically targeting OpenClaw (formerly Clawdbot/Moltbot) configuration environments to steal API keys, gateway tokens, and agent identities. This hypothesis focuses on detecting exfiltration of OpenClaw-related files (e.g., config.json, tokens.env) from endpoints where AI agents are deployed.",
+      "threat_actors": [
+        "Unattributed infostealer operators",
+        "SmartLoader"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Artificial Intelligence",
+        "Software Development",
+        "Finance"
+      ],
+      "mitre_attack_techniques": [
+        "T1552.001 - Unsecured Credentials: Credentials In Files",
+        "T1005 - Data from Local System",
+        "T1041 - Exfiltration Over C2 Channel",
+        "T1113 - Screen Capture"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "File system monitoring for reads of OpenClaw config files, process access to agent memory, and network connections to known C2 domains",
+          "tools": [
+            "CrowdStrike, Microsoft Defender for Endpoint, Velociraptor"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "TLS certificate mismatches, HTTPS traffic to known infostealer C2 (e.g., Telegram, Discord), and unusual data volume to cloud storage",
+          "tools": [
+            "Darktrace, Cisco Stealthwatch, Zeek"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "Anomalous API key usage patterns, token generation from non-standard locations, and privilege escalation to service accounts",
+          "tools": [
+            "Okta, Microsoft Entra ID, CyberArk"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "OpenClaw File Access Monitoring",
+          "description": "Detect access to OpenClaw configuration files (e.g., config.json, tokens.env, secrets.yaml) by non-agent processes.",
+          "sample_queries": [
+            "index=endpoint_events (file_path=\"*openclaw*\" OR file_path=\"*clawdbot*\" OR file_path=\"*clawhub*\" OR file_path=\"*config.json\" OR file_path=\"*tokens.env\") AND (process_name=\"*infostealer*\" OR parent_process=\"*chrome*\" OR parent_process=\"*discord*\") | stats count by user, file_path, process_name"
+          ],
+          "look_for": "Access to files containing 'openclaw', 'clawdbot', or 'clawhub' in path; config.json with 'api_key', 'token', or 'gateway_url' fields"
+        },
+        {
+          "tactic_name": "AI Agent Credential Exfiltration via Cloud Storage",
+          "description": "Identify unusual uploads to cloud storage (e.g., Google Drive, Dropbox) or Telegram from endpoints running AI agents.",
+          "sample_queries": [
+            "index=cloud_logs (action=\"upload\" OR action=\"share\") AND (file_name=\"*.json\" OR file_name=\"*.env\" OR file_name=\"*.yaml\") AND (file_size > 10000 AND file_size < 100000) | stats count by user, file_name, destination | where count > 1"
+          ],
+          "look_for": "Small JSON/ENV files uploaded to cloud storage or Telegram with names like 'agent_config.json', 'openclaw_token.txt', or 'api_keys.json'"
+        },
+        {
+          "tactic_name": "Process Memory Dumping of Agent Environments",
+          "description": "Detect memory dumps or process inspection tools (e.g., procdump, tasklist) targeting AI agent processes (e.g., node, python, java).",
+          "sample_queries": [
+            "index=endpoint_events (process_name=\"*procdump*\" OR process_name=\"*tasklist*\" OR process_name=\"*processhacker*\") AND (target_process=\"*node*\" OR target_process=\"*python*\" OR target_process=\"*java*\") | stats count by user, source_process, target_process"
+          ],
+          "look_for": "Procdump or similar tools targeting node/python/java processes running on ports 3000/8080 (common MCP agent ports)"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "clawhub.ai",
+          "openclaw.io",
+          "clawdbot.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "config.json",
+          "tokens.env",
+          "secrets.yaml",
+          "agent_config.json",
+          "openclaw_token.txt"
+        ],
+        "registry_keys": [
+          "HKEY_CURRENT_USER\\\\Software\\\\OpenClaw",
+          "HKEY_CURRENT_USER\\\\Software\\\\Clawdbot"
+        ],
+        "process_names": [
+          "node",
+          "python",
+          "java",
+          "procdump.exe",
+          "tasklist.exe",
+          "processhacker.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to Telegram/Discord with large payloads",
+          "DNS queries to clawhub.ai subdomains",
+          "HTTP/2 traffic to port 443 with TLS SNI mismatch"
+        ],
+        "user_agent_strings": [
+          "OpenClaw-Agent/1.0",
+          "Clawdbot-Client/2.3"
+        ],
+        "other_indicators": [
+          "API keys in config files with 'openai_', 'gemini_', or 'claude_' prefixes",
+          "Gateway tokens containing 'claw_' or 'mcp_' prefixes",
+          "Agent processes listening on 0.0.0.0:3000"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Audit all OpenClaw deployments for exposed configuration files and enforce least-privilege access",
+        "Monitor for file access to config.json in agent directories using EDR",
+        "Block outbound traffic to known infostealer C2 (e.g., Telegram, Discord) unless explicitly allowed",
+        "Review API key usage logs for anomalous access patterns from non-agent services"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "Detection of Dell RecoverPoint Zero-Day Exploitation (CVE-2026-22769) by UNC6201",
+      "description": "A maximum-severity (CVSS 10.0) hardcoded credential vulnerability in Dell RecoverPoint for Virtual Machines (CVE-2026-22769) has been actively exploited since mid-2024 by China-linked APT UNC6201 to establish long-term access. This hypothesis targets lateral movement and persistence artifacts post-exploitation, including ghost NICs and credential dumping.",
+      "threat_actors": [
+        "UNC6201",
+        "Lazarus Group"
+      ],
+      "industries_targeted": [
+        "Critical Infrastructure",
+        "Energy",
+        "Healthcare",
+        "Government",
+        "Finance"
+      ],
+      "mitre_attack_techniques": [
+        "T1210 - Exploitation of Remote Services",
+        "T1021.001 - Remote Services: SMB/Windows Admin Shares",
+        "T1003.001 - OS Credential Dumping: LSASS Memory",
+        "T1547.001 - Boot or Logon Autostart: Registry Run Keys"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "SMB traffic to port 445 from non-standard hosts, unusual SMB2/3 dialect usage, and connections to Dell RecoverPoint appliances",
+          "tools": [
+            "Zeek, Splunk NDR, Wireshark"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "LSASS process memory access, unusual PowerShell commands (e.g., Invoke-Mimikatz), and registry modifications to autorun keys",
+          "tools": [
+            "Sysmon, Microsoft Defender for Endpoint, Elastic EDR"
+          ]
+        },
+        {
+          "source_type": "Application",
+          "specific_data": "Dell RecoverPoint logs showing unauthenticated access, failed login attempts, and ghost NIC creation events",
+          "tools": [
+            "Dell Support Center, SIEM with custom Dell RecoverPoint logs"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Ghost NIC Detection in Network Traffic",
+          "description": "Identify network traffic from non-existent or ghost network interfaces, often used by UNC6201 to maintain persistence without detection.",
+          "sample_queries": [
+            "index=network_logs (src_ip=\"*\" AND dst_ip=\"*\" AND interface=\"ghost*\" OR interface=\"fake*\" OR interface=\"tunnel*\") | stats count by src_ip, dst_ip, interface | where count > 5"
+          ],
+          "look_for": "Traffic from interfaces with names like 'ghost_nic', 'tunnel0', or 'fake_eth0' in logs (note: interface names may be obfuscated)"
+        },
+        {
+          "tactic_name": "LSASS Memory Access via PowerShell",
+          "description": "Detect PowerShell commands attempting to dump LSASS memory, a common post-exploitation step after initial access.",
+          "sample_queries": [
+            "index=endpoint_events (process_name=\"*powershell*\" OR process_name=\"*cmd*\") AND (command_line=\"*Invoke-Mimikatz*\" OR command_line=\"*procdump*\" OR command_line=\"*lsass*\" OR command_line=\"*sekurlsa::logonpasswords*\") | stats count by user, process_name, command_line"
+          ],
+          "look_for": "PowerShell commands containing 'mimikatz', 'procdump', 'lsass', or 'sekurlsa::logonpasswords'"
+        },
+        {
+          "tactic_name": "Dell RecoverPoint Unauthenticated Access",
+          "description": "Search for SMB connections to Dell RecoverPoint appliances on port 445 with hardcoded credentials (e.g., 'admin'/'password' or 'root'/'toor').",
+          "sample_queries": [
+            "index=smb_logs (src_ip=\"*\" AND dst_ip=\"*dell*\" OR dst_ip=\"*recoverpoint*\") AND (auth_method=\"NTLM\" AND username=\"admin\" OR username=\"root\") AND status=\"failure\" | stats count by src_ip, dst_ip, username | where count > 10"
+          ],
+          "look_for": "Repeated SMB login failures to Dell RecoverPoint IPs with default credentials, especially from non-admin workstations"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [
+          "Known Dell RecoverPoint appliance IPs (e.g., 10.0.0.100-10.0.0.200 in internal ranges)"
+        ],
+        "file_hashes": [],
+        "file_names": [
+          "ghost_nic.ko",
+          "recoverpoint_exploit.py",
+          "lsass_dump.bin"
+        ],
+        "registry_keys": [
+          "HKEY_LOCAL_MACHINE\\\\SOFTWARE\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run\\\\ghost_nic",
+          "HKEY_CURRENT_USER\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\RunOnce"
+        ],
+        "process_names": [
+          "lsass.exe",
+          "svchost.exe",
+          "powershell.exe",
+          "procdump.exe",
+          "mimikatz.exe"
+        ],
+        "network_patterns": [
+          "SMB traffic to port 445 from non-standard hosts",
+          "HTTP/HTTPS to Dell RecoverPoint web interface (port 8080) with default credentials",
+          "DNS queries to 'ghost_nic.dell[.]com'"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Hardcoded credentials: 'admin'/'password', 'root'/'toor', 'dell'/'dell123'",
+          "Ghost NIC MAC addresses with OUI '00:50:56' (VMware) or '00:0C:29'",
+          "Unusual SMB2 dialect negotiation (e.g., 'SMB 3.1.1' with no encryption)"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Patch Dell RecoverPoint for Virtual Machines immediately using vendor-provided updates",
+        "Hunt for LSASS memory access attempts using Sysmon EventCode 10 (ProcessAccess)",
+        "Block SMB traffic to Dell RecoverPoint appliances from non-admin workstations",
+        "Review SMB logs for repeated authentication failures with default credentials"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "Hunting for AI-Driven C2 Communication via Copilot/Grok Web Browsing Features",
+      "description": "AI assistants like Microsoft Copilot and xAI Grok with web browsing capabilities can be abused as stealthy C2 relays. Attackers encode commands in URL parameters or use AI-generated prompts to fetch payloads, blending C2 traffic with legitimate enterprise AI usage. This hypothesis targets anomalous AI assistant network behavior.",
+      "threat_actors": [
+        "APT31",
+        "UNC2970",
+        "Unknown AI-focused threat actors"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Finance",
+        "Government",
+        "Healthcare",
+        "Education"
+      ],
+      "mitre_attack_techniques": [
+        "T1071.001 - Application Layer Protocol: Web Protocols",
+        "T1105 - Ingress Tool Transfer",
+        "T1559.002 - Inter-Process Communication: Dynamic Data Exchange",
+        "T1552.006 - Unsecured Credentials: API Keys"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "HTTPS traffic to AI services (e.g., copilot.microsoft.com, grok.com) with encoded payloads in URL parameters, and anomalous request patterns",
+          "tools": [
+            "Zeek, Cisco Stealthwatch, Darktrace"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Copilot/Grok process execution with suspicious command-line arguments, and file writes from AI assistant processes",
+          "tools": [
+            "Microsoft Defender for Endpoint, CrowdStrike"
+          ]
+        },
+        {
+          "source_type": "Cloud",
+          "specific_data": "API calls to AI services with unusual data volumes, and access to cloud storage from AI assistant sessions",
+          "tools": [
+            "AWS CloudTrail, Azure Monitor, Google Cloud Logging"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "AI Assistant URL Parameter Analysis",
+          "description": "Detect AI assistant requests with base64-encoded or hex-encoded parameters that may contain C2 commands or payloads.",
+          "sample_queries": [
+            "index=proxy_logs (url=\"*copilot.microsoft.com*\" OR url=\"*grok.com*\" OR url=\"*chatgpt.com*\" OR url=\"*gemini.google.com*\") AND (url LIKE \"%q=%\" OR url LIKE \"%prompt=%\" OR url LIKE \"%data=%\") | eval encoded=substr(url, match(url, \"q=([A-Za-z0-9+/=]{50,})\"), 50) | where encoded LIKE \"%base64%\" OR encoded LIKE \"%http%\""
+          ],
+          "look_for": "URL parameters with >50-character base64 strings, hex-encoded payloads, or embedded URLs (e.g., 'http://malware[.]xyz/payload.exe')"
+        },
+        {
+          "tactic_name": "Copilot/Grok Process Behavior Anomalies",
+          "description": "Identify AI assistant processes writing files to non-standard locations or spawning child processes with suspicious arguments.",
+          "sample_queries": [
+            "index=endpoint_events (process_name=\"*copilot*\" OR process_name=\"*grok*\" OR process_name=\"*chatgpt*\") AND (file_path=\"*\\\\AppData\\\\Local\\\\Temp*\" OR file_path=\"*\\\\Downloads*\" OR file_path=\"*.exe\" OR file_path=\"*.ps1\") | stats count by user, process_name, file_path"
+          ],
+          "look_for": "Copilot/Grok processes creating files in %TEMP% or %Downloads% with extensions .exe, .ps1, or .bat"
+        },
+        {
+          "tactic_name": "AI-Driven Prompt Injection for Data Exfiltration",
+          "description": "Detect prompts that instruct AI assistants to extract sensitive data (e.g., 'Summarize all emails from CEO') or access cloud storage.",
+          "sample_queries": [
+            "index=ai_logs (prompt LIKE \"%extract%\" OR prompt LIKE \"%summarize%\" OR prompt LIKE \"%download%\" OR prompt LIKE \"%upload%\") AND (prompt LIKE \"%confidential%\" OR prompt LIKE \"%internal%\" OR prompt LIKE \"%customer%\") | stats count by user, prompt | where count > 3"
+          ],
+          "look_for": "Prompts containing 'extract', 'summarize', or 'download' combined with sensitive keywords (e.g., 'confidential', 'internal', 'customer')"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "copilot.microsoft.com",
+          "grok.com",
+          "chatgpt.com",
+          "gemini.google.com",
+          "claude.ai"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "payload.exe",
+          "data_dump.json",
+          "extracted_data.csv",
+          "prompt_log.txt"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "copilot.exe",
+          "grok.exe",
+          "chatgpt.exe",
+          "gemini.exe",
+          "claude.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to AI services with large payloads (>10KB) in URL parameters",
+          "DNS queries to AI service subdomains with encoded data",
+          "HTTP/2 traffic with TLS SNI mismatch"
+        ],
+        "user_agent_strings": [
+          "Copilot/1.0",
+          "Grok/2.0",
+          "ChatGPT/3.5",
+          "Gemini/1.5"
+        ],
+        "other_indicators": [
+          "Base64-encoded payloads in URL parameters",
+          "Prompts with 'base64', 'hex', or 'url encode'",
+          "AI assistant processes spawning cmd.exe or powershell.exe"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "High",
+      "recommended_actions": [
+        "Restrict AI assistant web browsing permissions to approved domains only",
+        "Monitor AI assistant network traffic for large URL-encoded payloads",
+        "Block AI assistant processes from writing executable files to disk",
+        "Audit prompts for data extraction instructions using DLP policies"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "Detection of Firebase Misconfiguration Exploits Leading to Massive Data Leaks",
+      "description": "Firebase misconfigurations have led to leaks of 300M+ messages (e.g., Chat & Ask AI). Attackers exploit overly permissive security rules (e.g., allow read/write for all users) to exfiltrate sensitive user data. This hypothesis targets Firebase access patterns and misconfigured bucket rules.",
+      "threat_actors": [
+        "Unknown",
+        "SmartLoader",
+        "ShinyHunters"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Artificial Intelligence",
+        "Consumer Software",
+        "Finance",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1526 - Cloud Service Discovery",
+        "T1530 - Data from Cloud Storage",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1048.001 - Exfiltration Over Alternative Protocol: Symmetric Encrypted Non-C2"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Cloud",
+          "specific_data": "Firebase security rules, access logs, and storage object access events",
+          "tools": [
+            "Google Cloud Security Command Center, AWS GuardDuty, Palo Alto Prisma Cloud"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "HTTPS traffic to Firebase endpoints (e.g., *.firebaseio.com) with large data downloads, and anomalous query patterns",
+          "tools": [
+            "Zeek, Splunk NDR, Cisco Stealthwatch"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "Firebase authentication logs, token issuance, and user role changes",
+          "tools": [
+            "Firebase Console, Okta, Microsoft Entra ID"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Firebase Security Rule Misconfiguration Detection",
+          "description": "Detect Firebase projects with overly permissive security rules (e.g., allow read/write for all users).",
+          "sample_queries": [
+            "index=cloud_logs (resource_type=\"firebase_security_rules\" OR resource_type=\"firestore_security_rules\") AND (rule LIKE \"%allow read, write: if true%\" OR rule LIKE \"%allow read, write: if request.auth == null%\" OR rule LIKE \"%allow read, write: if request.time != null%\") | stats count by project_id, rule"
+          ],
+          "look_for": "Rules with 'if true', 'if request.auth == null', or 'if request.time != null' allowing read/write access"
+        },
+        {
+          "tactic_name": "Firebase Data Exfiltration via Large Downloads",
+          "description": "Identify large data downloads from Firebase storage (e.g., >100MB) that may indicate exfiltration.",
+          "sample_queries": [
+            "index=cloud_logs (resource_type=\"firebase_storage\" OR resource_type=\"firestore\") AND (event=\"download\" OR event=\"read\") AND (bytes_transferred > 100000000) | stats count by user, object_name, bytes_transferred"
+          ],
+          "look_for": "Downloads of >100MB from Firebase storage, especially to non-corporate IPs or during off-hours"
+        },
+        {
+          "tactic_name": "Firebase Query Pattern Anomalies",
+          "description": "Detect anomalous Firebase queries that may indicate data scraping (e.g., full collection scans).",
+          "sample_queries": [
+            "index=firebase_logs (query LIKE \"%*%\" OR query LIKE \"%orderBy=%\" OR query LIKE \"%limitToFirst=999999%\") AND (collection LIKE \"%messages%\" OR collection LIKE \"%users%\" OR collection LIKE \"%accounts%\") | stats count by user, collection, query"
+          ],
+          "look_for": "Queries with wildcards (*), orderBy without index, or high limit values (e.g., limitToFirst=999999) on sensitive collections"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "*.firebaseio.com",
+          "*.firestore.googleapis.com",
+          "firestore.googleapis.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "firebase_export.json",
+          "messages_backup.json",
+          "user_data.csv"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "firebase",
+          "firestore",
+          "gcloud"
+        ],
+        "network_patterns": [
+          "HTTPS to Firebase endpoints with large payloads",
+          "HTTP/2 traffic with TLS SNI mismatch",
+          "DNS queries to *.firebaseio.com"
+        ],
+        "user_agent_strings": [
+          "Firebase-Admin-SDK/6.0",
+          "Google-API-Java-Client/2.0"
+        ],
+        "other_indicators": [
+          "Firebase tokens with 'firebase' prefix",
+          "Unauthenticated requests to /.json endpoints",
+          "Queries with 'orderBy=\"$key\"' or 'limitToFirst=999999'"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Audit all Firebase projects for overly permissive security rules",
+        "Enable Firebase Audit Logs and set alerts for large data downloads",
+        "Restrict Firebase access to authenticated users only and enforce least-privilege rules",
+        "Hunt for queries with wildcards or high limits on sensitive collections"
+      ]
+    }
+  ],
   "stats": {
-    "priority_breakdown": {},
-    "confidence_breakdown": {},
-    "unique_threat_actors": [],
-    "unique_industries_targeted": [],
-    "unique_mitre_techniques": [],
+    "priority_breakdown": {
+      "CRITICAL": 2,
+      "HIGH": 3
+    },
+    "confidence_breakdown": {
+      "HIGH": 4,
+      "MEDIUM": 1
+    },
+    "unique_threat_actors": [
+      "SmartLoader",
+      "UNC6201",
+      "Lazarus Group",
+      "ShinyHunters",
+      "Unknown",
+      "UNC2970",
+      "Unknown AI-focused threat actors",
+      "APT31",
+      "Unattributed infostealer operators",
+      "ClickFix"
+    ],
+    "unique_industries_targeted": [
+      "Artificial Intelligence",
+      "Government",
+      "Education",
+      "Critical Infrastructure",
+      "Software Development",
+      "Energy",
+      "Consumer Software",
+      "Telecommunications",
+      "Finance",
+      "Healthcare",
+      "Financial Services",
+      "Technology"
+    ],
+    "unique_mitre_techniques": [
+      "T1071.001 - Application Layer Protocol: Web Protocols",
+      "T1526 - Cloud Service Discovery",
+      "T1559.002 - Inter-Process Communication: Dynamic Data Exchange",
+      "T1547.001 - Boot or Logon Autostart: Registry Run Keys",
+      "T1041 - Exfiltration Over C2 Channel",
+      "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "T1021.001 - Remote Services: SMB/Windows Admin Shares",
+      "T1113 - Screen Capture",
+      "T1210 - Exploitation of Remote Services",
+      "T1105 - Ingress Tool Transfer",
+      "T1552.006 - Unsecured Credentials: API Keys",
+      "T1530 - Data from Cloud Storage",
+      "T1071.004 - Application Layer Protocol: DNS",
+      "T1204.002 - User Execution: Malicious File",
+      "T1552.001 - Unsecured Credentials: Credentials In Files",
+      "T1048.001 - Exfiltration Over Alternative Protocol: Symmetric Encrypted Non-C2",
+      "T1003.001 - OS Credential Dumping: LSASS Memory",
+      "T1005 - Data from Local System"
+    ],
     "source_data_stats": {
       "top_threat_actors": [
         [
