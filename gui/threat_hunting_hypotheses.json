@@ -1,15 +1,498 @@
 {
-  "generated_at": "2026-02-22T14:57:14Z",
+  "generated_at": "2026-02-22T20:37:12Z",
   "time_window": "14 days",
   "total_articles_analyzed": 372,
-  "hypotheses_count": 0,
-  "hypotheses": [],
+  "hypotheses_count": 5,
+  "hypotheses": [
+    {
+      "hypothesis_id": "TH-001",
+      "title": "Detection of ClickFix DNS Tunneling Attacks Using nslookup for Malware Delivery",
+      "description": "Attackers are increasingly using DNS tunneling via the nslookup command as part of ClickFix social engineering campaigns to deliver second-stage payloads (e.g., ModeloRAT, StealC). This technique bypasses traditional command-line restrictions and leverages built-in Windows tools to evade detection. We are hunting for suspicious DNS queries containing encoded payloads in response fields.",
+      "threat_actors": [
+        "ClickFix",
+        "SmartLoader",
+        "Lazarus Group"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Telecommunications"
+      ],
+      "mitre_attack_techniques": [
+        "T1071.004 - Application Layer Protocol: DNS",
+        "T1059.003 - Command and Scripting Interpreter: Windows Command Shell",
+        "T1105 - Ingress Tool Transfer"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "DNS query logs, especially TXT/NULL record queries and Name field parsing in responses",
+          "tools": [
+            "DNS logging infrastructure (e.g., BIND, Cisco Stealthwatch), SIEM (Splunk, Sentinel), EDR (CrowdStrike, SentinelOne)"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs with command-line arguments containing 'nslookup' and suspicious patterns (e.g., 'nslookup -q=TXT', 'nslookup <domain> | findstr Name:')",
+          "tools": [
+            "EDR, Sysmon (Event ID 1), Windows Event Logs (4688/1)"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "DNS Query Pattern Analysis",
+          "description": "Search for DNS queries with unusually long or base64-like subdomains and responses containing 'Name:' followed by encoded data or PowerShell commands",
+          "sample_queries": [
+            "index=netdns sourcetype=dns * | where match(query, \"^[a-zA-Z0-9]{30,}\") OR match(query, \"[a-f0-9]{16,}\")",
+            "index=security_logs EventCode=4688 CommandLine=*nslookup* AND (CommandLine=*findstr* OR CommandLine=*|*) | table CommandLine, User, Hostname"
+          ],
+          "look_for": "nslookup commands with non-standard flags (e.g., -q=TXT), chained with pipe operators or findstr, and responses containing base64-encoded strings or PowerShell scripts"
+        },
+        {
+          "tactic_name": "Command-Line Chain Detection",
+          "description": "Identify suspicious command-line chains where nslookup is used to retrieve and parse data for execution",
+          "sample_queries": [
+            "index=windows_logs EventCode=4688 CommandLine=*nslookup* AND (CommandLine=*findstr* OR CommandLine=*powershell* OR CommandLine=*cmd.exe*)",
+            "index=sysmon EventID=1 (CommandLine=*nslookup* AND CommandLine=*(Name:*)*)"
+          ],
+          "look_for": "nslookup followed by parsing of 'Name:' response field to extract and execute payloads (e.g., via PowerShell or cmd /c)"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [
+          "cmd.exe",
+          "powershell.exe",
+          "nslookup.exe"
+        ],
+        "network_patterns": [
+          "DNS queries with unusually long subdomains (>30 chars), DNS TXT/NULL queries with high entropy responses",
+          "DNS responses containing 'Name:' followed by encoded strings"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Suspicious command-line patterns: 'nslookup -q=TXT <domain> | findstr Name:'",
+          "Use of 'Name:' field in DNS responses as payload channel"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Isolate affected hosts and capture memory/disk images",
+        "Review DNS logs for similar patterns across the network",
+        "Block nslookup usage via AppLocker/WDAC if not required",
+        "Update EDR rules to flag nslookup + findstr/powershell chains"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "Hunting for OpenClaw AI Agent Configuration Theft via Infostealers",
+      "description": "Information-stealing malware has been observed exfiltrating OpenClaw (formerly Clawdbot/Moltbot) configuration files, including API keys, gateway tokens, and agent settings. This indicates attackers are targeting AI agent identities and digital 'souls'—a new attack vector beyond traditional credential theft. We are hunting for evidence of OpenClaw-related files being accessed or exfiltrated by infostealers.",
+      "threat_actors": [
+        "SmartLoader",
+        "Lazarus Group",
+        "UAT-9921"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Artificial Intelligence",
+        "Software Development",
+        "Finance"
+      ],
+      "mitre_attack_techniques": [
+        "T1552.001 - Unsecured Credentials: Credentials in Files",
+        "T1005 - Data from Local System",
+        "T1041 - Exfiltration Over C2 Channel"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "File access logs for OpenClaw configuration paths, process injection into agent processes, API key access patterns",
+          "tools": [
+            "EDR (SentinelOne, CrowdStrike), Sysmon (Event ID 11/15), File Integrity Monitoring"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "Anomalous API token usage, unusual OAuth grants to third-party services",
+          "tools": [
+            "Okta, Azure AD Audit Logs, SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "OpenClaw File Access Monitoring",
+          "description": "Search for access to OpenClaw configuration directories and files (e.g., ~/.clawdbot, ~/.openclaw, ClawHub)",
+          "sample_queries": [
+            "index=endpoint_logs (file_path=*openclaw* OR file_path=*clawdbot* OR file_path=*clawhub*) AND (access_type=read OR access_type=modify)",
+            "index=sysmon EventID=11 (TargetFilename=*openclaw* OR TargetFilename=*clawdbot*)"
+          ],
+          "look_for": "Read/write access to OpenClaw config files (e.g., config.json, tokens.json, gateway_config.yaml), especially from non-user processes (e.g., infostealers like Lumma, RedLine)"
+        },
+        {
+          "tactic_name": "Credential Theft via AI Agent Processes",
+          "description": "Detect infostealer processes accessing AI agent memory or configuration",
+          "sample_queries": [
+            "index=endpoint_logs (process_name=*LummaStealer* OR process_name=*RedLine* OR process_name=*StealC*) AND (file_path=*openclaw* OR file_path=*clawdbot*)"
+          ],
+          "look_for": "Infostealer processes reading OpenClaw config files or environment variables containing gateway tokens or API keys"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "config.json",
+          "tokens.json",
+          "gateway_config.yaml",
+          "clawdbot.db",
+          "clawhub_config.json"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "LummaStealer.exe",
+          "RedLine.exe",
+          "StealC.exe",
+          "OpenClaw.exe",
+          "clawdbot.exe"
+        ],
+        "network_patterns": [
+          "Outbound connections to known infostealer C2 (e.g., Telegram channels, Discord webhooks) with config file payloads"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "OpenClaw config paths: ~/.openclaw/, ~/.clawdbot/, %APPDATA%\\OpenClaw\\",
+          "Environment variables: CLAWDBOT_API_KEY, OPENCLAW_GATEWAY_TOKEN"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Rotate all OpenClaw API keys and gateway tokens immediately if found",
+        "Audit AI agent permissions and revoke unnecessary scopes",
+        "Deploy EDR rules to block infostealer execution and monitor config file access"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "Detection of AI-Assisted Malware C2 via Web Browsing Features (e.g., Copilot, Grok)",
+      "description": "AI assistants with web browsing capabilities (e.g., Microsoft Copilot, xAI Grok) have been weaponized as stealthy C2 relays. Attackers abuse their URL-fetching features to receive commands and exfiltrate data, blending into legitimate enterprise traffic. We are hunting for anomalous web requests from AI assistant processes to suspicious domains or encoded payloads.",
+      "threat_actors": [
+        "SmartLoader",
+        "Lazarus Group",
+        "UNC3886"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1105 - Ingress Tool Transfer",
+        "T1071.001 - Application Layer Protocol: Web Protocols",
+        "T1559.002 - Inter-Process Communication: Dynamic Data Exchange"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "HTTPS traffic logs from AI assistant processes (e.g., copilot.exe, grok.exe), URL fetch patterns, TLS SNI anomalies",
+          "tools": [
+            "TLS inspection proxies, Zeek logs, SIEM, EDR"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process execution logs for AI assistants with web browsing enabled, network calls to non-standard endpoints",
+          "tools": [
+            "EDR, Sysmon (Event ID 1), Windows Event Logs"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "AI Assistant Network Behavior Analysis",
+          "description": "Detect AI assistants making unexpected outbound HTTPS requests to non-MS/GA domains or with encoded payloads",
+          "sample_queries": [
+            "index=netflow (process_name=*copilot* OR process_name=*grok*) AND NOT (dest_domain IN (\"*.microsoft.com\", \"*.openai.com\", \"*.x.ai\", \"*.google.com\"))",
+            "index=sysmon EventID=3 (process_name=*copilot* OR process_name=*grok*) AND dest_port=443 AND NOT dest_ip IN (known_good_ips)"
+          ],
+          "look_for": "AI assistants (copilot.exe, grok.exe) making outbound HTTPS requests to unknown domains, especially with base64-encoded paths or POST bodies"
+        },
+        {
+          "tactic_name": "Anomalous URL Fetching Patterns",
+          "description": "Identify AI assistants fetching URLs with suspicious patterns (e.g., long base64 strings, obfuscated endpoints)",
+          "sample_queries": [
+            "index=proxy_logs (user_agent=*copilot* OR user_agent=*grok*) AND (url=*base64* OR url=*%3D* OR url=*%2B* OR url=*%2F*)",
+            "index=sysmon EventID=1 (CommandLine=*copilot* OR CommandLine=*grok*) AND CommandLine=*fetch* AND CommandLine=*(http*base64*)"
+          ],
+          "look_for": "AI assistant processes using web browsing features to fetch URLs containing encoded data (e.g., 'https://evil[.]com/cmd?d=base64encodedpayload')"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [
+          "copilot.exe",
+          "grok.exe",
+          "chatgpt.exe",
+          "claude.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to non-whitelisted domains, high-frequency short-lived connections, POST requests with base64 payloads"
+        ],
+        "user_agent_strings": [
+          "*Copilot*",
+          "*Grok*",
+          "*ChatGPT*",
+          "*Claude*"
+        ],
+        "other_indicators": [
+          "AI assistants with web browsing enabled making non-user-initiated network calls",
+          "URLs with encoded command parameters (e.g., ?d=, ?cmd=, ?payload=)"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Disable web browsing features in AI assistants for non-essential users",
+        "Block outbound HTTPS to unknown domains from AI assistant processes",
+        "Monitor for AI assistant processes accessing sensitive endpoints (e.g., internal APIs, credential stores)"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "Hunting for DKnife AitM Framework Exploitation via Router Compromise",
+      "description": "The DKnife framework, used by China-linked actors since 2019, hijacks routers and edge devices to perform Adversary-in-the-Middle (AitM) attacks, including deep-packet inspection, traffic manipulation, and malware delivery. We are hunting for signs of router compromise (e.g., unexpected firmware changes, unusual traffic patterns) and DKnife-specific implants.",
+      "threat_actors": [
+        "UNC3886",
+        "SmartLoader"
+      ],
+      "industries_targeted": [
+        "Telecommunications",
+        "Critical Infrastructure",
+        "Government",
+        "Finance"
+      ],
+      "mitre_attack_techniques": [
+        "T1557 - Adversary-in-the-Middle",
+        "T1190 - Exploit Public-Facing Application",
+        "T1200 - Hardware Additions"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "TLS inspection logs, DNS traffic anomalies, unexpected certificate changes, router management traffic",
+          "tools": [
+            "TLS inspection, Zeek, Wireshark, SIEM"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Router firmware hashes, SSH keys, management interface access logs",
+          "tools": [
+            "Network scanning tools (Nmap), EDR, Configuration management (Ansible, Puppet)"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Router Firmware Integrity Monitoring",
+          "description": "Detect unauthorized firmware changes or unexpected router behavior (e.g., new SSH keys, modified configs)",
+          "sample_queries": [
+            "index=router_logs (event=firmware_update OR event=config_change) AND NOT (source=known_admin OR user=known_admin)",
+            "index=network_scan (port=22 OR port=80 OR port=443) AND (service=ssh AND key_changed=true) AND (device_type=router OR device_type=firewall)"
+          ],
+          "look_for": "Unexpected SSH key changes, firmware checksum mismatches, or new admin accounts on routers/firewalls"
+        },
+        {
+          "tactic_name": "AitM Traffic Pattern Detection",
+          "description": "Identify traffic anomalies consistent with AitM (e.g., TLS downgrade attempts, unexpected certificate chains)",
+          "sample_queries": [
+            "index=tls_inspection (cert_chain_changed=true OR cert_issuer_changed=true) AND NOT (source_ip IN (known_good_ips))",
+            "index=zeek (ssl_version=TLSv1.0 OR ssl_version=TLSv1.1) AND (dest_port=443) AND (client_hello_sni=* AND server_hello_cipher=*unusual*)"
+          ],
+          "look_for": "Unexpected TLS version downgrades, certificate mismatches, or traffic rerouting through unknown intermediaries"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [],
+        "network_patterns": [
+          "Unusual DNS responses with unexpected A records, TLS handshakes with unknown CAs, router management traffic to non-admin IPs"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Router firmware hashes matching known DKnife implants (e.g., 'dknife_router_v3.bin')",
+          "SSH keys added to routers without admin approval"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Audit all router firmware versions and compare against known-good baselines",
+        "Disable remote management on edge devices unless absolutely necessary",
+        "Deploy network segmentation to limit lateral movement from compromised routers"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "Detection of Phobos Ransomware via Compromised Credentials and RaaS Infrastructure",
+      "description": "Phobos ransomware operators have been actively targeting organizations via compromised credentials and RaaS infrastructure. Polish authorities recently arrested a suspect linked to Phobos, with evidence including stolen credentials, server IPs, and logins. We are hunting for credential stuffing, lateral movement using stolen credentials, and Phobos-specific artifacts (e.g., encrypted files with .phobos extension).",
+      "threat_actors": [
+        "Phobos Ransomware Group"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1110.001 - Password Guessing",
+        "T1078.004 - Valid Accounts: Cloud Accounts",
+        "T1486 - Data Encrypted for Impact"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Identity",
+          "specific_data": "Failed login attempts, password spray events, unusual geographic logins",
+          "tools": [
+            "Azure AD Identity Protection, Okta, SIEM"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process execution logs for ransomware tools (e.g., encryptors), file modification patterns",
+          "tools": [
+            "EDR, Sysmon (Event ID 11/15), File Integrity Monitoring"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Credential Stuffing Detection",
+          "description": "Search for high-volume failed logins followed by successful logins from anomalous locations",
+          "sample_queries": [
+            "index=auth_logs (event=failed_login) AND (user=* AND source_ip=*) | stats count by user, source_ip | where count > 50",
+            "index=auth_logs (event=success_login) AND (source_ip NOT IN (known_good_ips)) AND (user IN (recent_failed_users))"
+          ],
+          "look_for": "Credential stuffing patterns: >50 failed logins in 10 minutes, followed by a successful login from an unusual IP or location"
+        },
+        {
+          "tactic_name": "Phobos Ransomware Artifact Detection",
+          "description": "Detect Phobos-specific file encryption patterns and artifacts",
+          "sample_queries": [
+            "index=endpoint_logs (file_path=* AND file_extension=.phobos) OR (file_path=* AND file_name LIKE '%Phobos%' OR file_name LIKE '%DECRYPT%')",
+            "index=sysmon EventID=11 (TargetFilename=* AND TargetFilename LIKE '%.phobos%') OR (TargetFilename=* AND TargetFilename LIKE '%DECRYPT%')"
+          ],
+          "look_for": "Files with .phobos extension, files named 'DECRYPT_INSTRUCTIONS.txt', or rapid file modification across large datasets"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "DECRYPT_INSTRUCTIONS.txt",
+          "HOW_TO_DECRYPT.txt",
+          "PHOBOS_README.txt"
+        ],
+        "registry_keys": [
+          "HKCU\\Software\\Phobos",
+          "HKLM\\SOFTWARE\\Phobos"
+        ],
+        "process_names": [
+          "Phobos.exe",
+          "encryptor.exe",
+          "ransomware.exe"
+        ],
+        "network_patterns": [
+          "Outbound connections to Phobos C2 (e.g., Telegram bots, dark web forums) with encrypted data payloads"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Stolen credentials from past breaches (e.g., ShinyHunters leak), use of RDP/SSH with compromised credentials"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Reset all credentials for compromised accounts and enforce MFA",
+        "Block known Phobos C2 domains/IPs at the firewall",
+        "Deploy EDR rules to detect ransomware encryption patterns and勒索软件 behavior"
+      ]
+    }
+  ],
   "stats": {
-    "priority_breakdown": {},
-    "confidence_breakdown": {},
-    "unique_threat_actors": [],
-    "unique_industries_targeted": [],
-    "unique_mitre_techniques": [],
+    "priority_breakdown": {
+      "HIGH": 3,
+      "CRITICAL": 2
+    },
+    "confidence_breakdown": {
+      "HIGH": 4,
+      "MEDIUM": 1
+    },
+    "unique_threat_actors": [
+      "Phobos Ransomware Group",
+      "Lazarus Group",
+      "UAT-9921",
+      "UNC3886",
+      "ClickFix",
+      "SmartLoader"
+    ],
+    "unique_industries_targeted": [
+      "Healthcare",
+      "Critical Infrastructure",
+      "Government",
+      "Financial Services",
+      "Technology",
+      "Finance",
+      "Artificial Intelligence",
+      "Software Development",
+      "Telecommunications"
+    ],
+    "unique_mitre_techniques": [
+      "T1190 - Exploit Public-Facing Application",
+      "T1200 - Hardware Additions",
+      "T1110.001 - Password Guessing",
+      "T1552.001 - Unsecured Credentials: Credentials in Files",
+      "T1071.001 - Application Layer Protocol: Web Protocols",
+      "T1005 - Data from Local System",
+      "T1559.002 - Inter-Process Communication: Dynamic Data Exchange",
+      "T1059.003 - Command and Scripting Interpreter: Windows Command Shell",
+      "T1071.004 - Application Layer Protocol: DNS",
+      "T1041 - Exfiltration Over C2 Channel",
+      "T1557 - Adversary-in-the-Middle",
+      "T1486 - Data Encrypted for Impact",
+      "T1105 - Ingress Tool Transfer",
+      "T1078.004 - Valid Accounts: Cloud Accounts"
+    ],
     "source_data_stats": {
       "top_threat_actors": [
         [
