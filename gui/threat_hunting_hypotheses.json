@@ -1,80 +1,71 @@
 {
-  "generated_at": "2026-02-25T04:00:35Z",
+  "generated_at": "2026-02-25T15:11:52Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 444,
+  "total_articles_analyzed": 472,
   "hypotheses_count": 5,
   "hypotheses": [
     {
       "hypothesis_id": "TH-001",
-      "title": "Lazarus Group Medusa Ransomware Deployment via Compromised Healthcare and Social Services Infrastructure",
-      "description": "Lazarus Group has adopted Medusa ransomware in targeted attacks against healthcare and social services organizations in the U.S. and Middle East. Based on recent incidents, attackers likely gain initial access via supply chain compromise, phishing, or exploitation of unpatched vulnerabilities (e.g., BeyondTrust CVE-2026-1731). We should hunt for Medusa-specific artifacts, lateral movement via legitimate remote access tools, and ransomware execution patterns.",
+      "title": "Lazarus Group Medusa Ransomware Deployment via Compromised Supply Chain or Credential Theft",
+      "description": "Lazarus Group has recently adopted Medusa ransomware in attacks targeting healthcare, financial services, and government sectors across the Middle East and U.S. The group leverages supply chain compromise and credential-based access. We should hunt for Medusa-related artifacts, lateral movement via RDP/PSExec, and indicators of Medusa’s execution chain.",
       "threat_actors": [
         "lazarus group"
       ],
       "industries_targeted": [
         "Healthcare",
-        "Social Services"
+        "Financial Services",
+        "Government"
       ],
       "mitre_attack_techniques": [
-        "T1190 - Exploit Public-Facing Application",
-        "T1078.003 - Valid Accounts: Domain Accounts",
+        "T1021.001 - Remote Desktop Protocol",
+        "T1566.001 - Phishing",
         "T1486 - Data Encrypted for Impact",
-        "T1021.001 - Remote Services: SMB/Windows Admin Shares",
-        "T1562.001 - Impair Defenses: Disable or Modify Tools"
+        "T1059.001 - PowerShell",
+        "T1055.001 - Process Injection"
       ],
       "data_sources_needed": [
         {
           "source_type": "Endpoint",
-          "specific_data": "Process execution logs, command-line arguments, file creation/modification timestamps, registry modifications, memory dumps",
+          "specific_data": "Process execution logs (especially PowerShell, cmd.exe), file creation/modification timestamps for .exe, .dll, .ps1 files, memory dumps for Medusa strings",
           "tools": [
-            "CrowdStrike, SentinelOne, Elastic EDR, Sysmon"
+            "CrowdStrike, SentinelOne, Sysmon, Elastic EDR"
           ]
         },
         {
           "source_type": "Network",
-          "specific_data": "Outbound connections to C2 domains/IPs, encrypted traffic to unusual destinations, SMB traffic to non-standard hosts",
+          "specific_data": "Outbound connections to known C2 domains/IPs, DNS queries for Medusa-related subdomains, unusual SMB/RDP traffic volumes",
           "tools": [
-            "Palo Alto Networks, Zeek, Darktrace"
+            "Darktrace, Zeek, Palo Alto Networks"
           ]
         },
         {
           "source_type": "Identity",
-          "specific_data": "Unusual RDP/SSH logins, privilege escalation events, MFA bypass attempts, anomalous service account usage",
+          "specific_data": "Failed login attempts followed by successful logins, unusual geographic logins, MFA bypass events",
           "tools": [
-            "Azure AD Audit Logs, Okta, CrowdStrike Falcon Identity"
+            "Microsoft Sentinel, Okta, CrowdStrike Falcon Identity"
           ]
         }
       ],
       "hunting_tactics": [
         {
           "tactic_name": "Medusa Ransomware Artifact Detection",
-          "description": "Search for Medusa-specific file artifacts, command-line flags, and encryption behavior",
+          "description": "Search for Medusa-specific file artifacts and execution patterns",
           "sample_queries": [
-            "event.type:file AND (file.name:*medusa* OR file.path:*\\medusa* OR file.extension:*.medusa)",
-            "process.name:rundll32.exe AND process.command_line:*Medusa*",
-            "file.name:README_MEDUSA.txt OR file.name:MEDUSA_RECOVERY.txt OR file.name:*_DECRYPT.txt"
+            "index=endpoint sourcetype=win* (Image=\"*\\medusa.exe\" OR Image=\"*\\Medusa*.exe\" OR Image=\"*\\medusa*.dll\")",
+            "index=endpoint sourcetype=sysmon EventID=1 (CommandLine=\"*medusa*\" OR CommandLine=\"*Medusa*\" OR CommandLine=\"*Ransomware*\")",
+            "index=network dest_port=445 OR dest_port=139 (dns_query=\"*medusa*\" OR dns_query=\"*lazarus*\")"
           ],
-          "look_for": "Files with .medusa extension, README files referencing Medusa, suspicious rundll32.exe usage with Medusa-related arguments"
+          "look_for": "Medusa.exe, Medusa.dll, Medusa ransom note files (e.g., _DECRYPT_FILES_*.txt), PowerShell scripts with Medusa-related strings"
         },
         {
-          "tactic_name": "BeyondTrust CVE-2026-1731 Exploitation Indicators",
-          "description": "Detect exploitation of the actively exploited BeyondTrust flaw used to deploy VShell and gain persistence",
+          "tactic_name": "Credential Theft Followed by Lateral Movement",
+          "description": "Detect credential harvesting followed by RDP/PSExec lateral movement, typical of Lazarus campaigns",
           "sample_queries": [
-            "process.name:vshell.exe OR process.name:VShell.exe",
-            "process.parent_name:svchost.exe AND process.command_line:*-i -c* AND process.current_directory:*\\Program Files\\BeyondTrust*",
-            "network.connection.dest_port:22 AND process.name:svchost.exe AND process.command_line:*-i*"
+            "index=security sourcetype=win* EventID=4624 Logon_Type=10 AND (Logon_Process=\"seclogo\" OR Authentication_Package=\"Negotiate\") | stats count by user, src_ip, dest_host | where count > 3",
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\psexec.exe\" OR Image=\"*\\PsExec64.exe\" OR Image=\"*\\wmiprvse.exe\") AND (CommandLine=\"*cmd.exe*\" OR CommandLine=\"*powershell*\")",
+            "index=network dest_port=3389 AND (src_ip IN (\"192.168.*\", \"10.*\", \"172.16.*\")) AND dest_host IN (\"*dc*\", \"*file*\")"
           ],
-          "look_for": "VShell execution, svchost.exe spawning SSH clients with interactive flags, unexpected SSH connections from domain controllers"
-        },
-        {
-          "tactic_name": "Credential Theft and Lateral Movement",
-          "description": "Identify post-exploitation credential harvesting and movement using legitimate remote access tools",
-          "sample_queries": [
-            "process.name:mimikatz.exe OR process.name:sekurlsa::logonpasswords",
-            "process.name:psexec.exe AND process.command_line:*-s* AND process.command_line:*\\\\*",
-            "event.action:connection AND network.connection.dest_port:445 AND process.name:svchost.exe AND process.command_line:*lsass*"
-          ],
-          "look_for": "Mimikatz usage, PsExec with SYSTEM token, LSASS access via svchost.exe"
+          "look_for": "Multiple RDP logins to domain controllers or file servers within 5 minutes, PsExec usage with cmd/powershell, credential dumping tools (mimikatz, lsass.exe access)"
         }
       ],
       "iocs_and_patterns": {
@@ -83,31 +74,147 @@
         "file_hashes": [],
         "file_names": [
           "medusa.exe",
-          "VShell.exe",
-          "README_MEDUSA.txt",
-          "MEDUSA_RECOVERY.txt",
+          "Medusa*.exe",
+          "Medusa*.dll",
+          "_DECRYPT_FILES_*.txt",
           "README_DECRYPT.txt"
         ],
         "registry_keys": [
-          "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\VShell",
-          "HKLM\\SYSTEM\\CurrentControlSet\\Services\\VShell"
+          "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Medusa",
+          "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Medusa"
         ],
         "process_names": [
-          "vshell.exe",
           "medusa.exe",
-          "mimikatz.exe",
-          "psexec.exe"
+          "Medusa.exe",
+          "Medusa*.exe",
+          "psexec.exe",
+          "PsExec64.exe",
+          "wmiprvse.exe"
         ],
         "network_patterns": [
-          "Outbound SSH (22) from non-server hosts",
-          "SMB (445) to domain controllers",
-          "Unusual HTTPS to Eastern Europe or North Korea IP ranges"
+          "RDP (3389) from internal to internal hosts",
+          "SMB (445) to multiple hosts in quick succession",
+          "DNS queries with Medusa or Lazarus-related subdomains"
         ],
         "user_agent_strings": [],
         "other_indicators": [
-          "Service creation named 'VShell' or 'Medusa'",
-          "Scheduled tasks with Medusa-related names",
-          "Unusual RDP sessions from non-standard locations"
+          "Use of PowerShell with -enc or -encodedcommand flags",
+          "Execution of cmd.exe via WMI or WScript",
+          "Creation of scheduled tasks with Medusa payloads"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Isolate hosts showing Medusa-related artifacts immediately",
+        "Revoke and reset credentials for all users on affected hosts",
+        "Block outbound connections to suspicious domains/IPs identified in network logs",
+        "Review and harden RDP access policies, enforce MFA and network segmentation"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "ShinyHunters Data Exfiltration via Credential Compromise or Third-Party Vendor Breach",
+      "description": "ShinyHunters has breached multiple high-profile organizations including CarGurus, Wynn Resorts, Figure, and Canada Goose. Their typical TTPs include credential stuffing, phishing, and third-party vendor compromise. We should hunt for indicators of credential theft (e.g., password spray, MFA fatigue), unusual data movement, and access to SaaS platforms like Salesforce or Zendesk.",
+      "threat_actors": [
+        "ShinyHunters"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Healthcare",
+        "Telecommunications",
+        "Social Media"
+      ],
+      "mitre_attack_techniques": [
+        "T1110.001 - Password Spray",
+        "T1566.001 - Phishing",
+        "T1078.004 - Cloud Accounts",
+        "T1021.001 - RDP",
+        "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Identity",
+          "specific_data": "Failed login attempts (EventID 4625), MFA failures, logins from new IPs/countries, anomalous session durations",
+          "tools": [
+            "Microsoft Sentinel, Okta, Azure AD Audit Logs, CrowdStrike Identity"
+          ]
+        },
+        {
+          "source_type": "Cloud",
+          "specific_data": "Salesforce login events, API calls to Zendesk/Salesforce, data export events, privilege escalations",
+          "tools": [
+            "Salesforce Shield, Microsoft Cloud App Security, Palo Alto Prisma Cloud"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Browser extension installs, Chrome profile exports, clipboard monitoring, file access to sensitive directories",
+          "tools": [
+            "CrowdStrike, Microsoft Defender for Endpoint"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Credential Theft and Password Spray Detection",
+          "description": "Detect credential stuffing and password spray attacks preceding ShinyHunters-style breaches",
+          "sample_queries": [
+            "index=security sourcetype=win* EventID=4625 (Account_Name!=\"*$\" AND Account_Name!=\"ANONYMOUS LOGON\") | stats count by Account_Name, src_ip | where count > 10",
+            "index=security sourcetype=azuread EventID=50001 OR EventID=50053 OR EventID=50126 | stats count by user, ipaddr | where count > 5",
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\mimikatz*\" OR Image=\"*\\mimilib.dll\" OR CommandLine=\"*sekurlsa*\" OR CommandLine=\"*lsadump*\")"
+          ],
+          "look_for": "Multiple failed logins for common usernames (e.g., admin, support), logins from Tor exit nodes or known proxy IPs, credential dumping tools"
+        },
+        {
+          "tactic_name": "SaaS Platform Compromise and Data Exfiltration",
+          "description": "Detect unauthorized access to SaaS platforms (e.g., Salesforce, Zendesk) and large data exports",
+          "sample_queries": [
+            "index=salesforce (action=\"login\" OR action=\"api_call\") (status=\"failure\" OR status=\"success\") | stats count by user, src_ip | where count > 100",
+            "index=cloud sourcetype=msgraph Data_Access_Event=\"export\" AND (File_Type=\"csv\" OR File_Type=\"xlsx\" OR File_Type=\"json\") AND Size > 100MB",
+            "index=endpoint sourcetype=sysmon EventID=1 (CommandLine=\"*curl*\" OR CommandLine=\"*wget*\" OR CommandLine=\"*powershell*\" OR CommandLine=\"*net use*\") AND (CommandLine=\"*s3://*\" OR CommandLine=\"*dropbox*\" OR CommandLine=\"*google drive*\")"
+          ],
+          "look_for": "Bulk exports of user data, access to Salesforce/Zendesk from new IPs, use of cloud storage APIs for exfiltration"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "forms.google.ss-o[.]com",
+          "uswebzoomus[.]com",
+          "access-authority-2fa7abff0e[.]s3.us-east-1[.]amazonaws[.]com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "*customer_export*.csv",
+          "*user_data*.xlsx",
+          "*contact_list*.json",
+          "*salesforce_dump*.zip"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "mimikatz.exe",
+          "mimilib.dll",
+          "sekurlsa::logonpasswords",
+          "curl.exe",
+          "wget.exe"
+        ],
+        "network_patterns": [
+          "Large outbound HTTPS traffic to cloud storage providers (Dropbox, Google Drive, S3)",
+          "DNS queries to known phishing domains",
+          "Unusual outbound traffic to SaaS platforms"
+        ],
+        "user_agent_strings": [
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 (ShinyHunters bot)"
+        ],
+        "other_indicators": [
+          "Use of stolen credentials from past breaches (e.g., LinkedIn, Adobe)",
+          "Access from Tor exit nodes",
+          "MFA fatigue attacks (multiple MFA prompts in short time)"
         ]
       },
       "priority": "CRITICAL",
@@ -115,519 +222,361 @@
       "estimated_detection_rate": "High",
       "false_positive_risk": "Medium",
       "recommended_actions": [
-        "Isolate affected hosts immediately upon detection",
-        "Reset credentials for all compromised accounts",
-        "Review BeyondTrust configurations and apply patches (CVE-2026-1731)",
-        "Scan for Medusa ransomware artifacts across all endpoints and file shares"
+        "Enforce MFA across all SaaS platforms and block legacy authentication",
+        "Review and restrict Salesforce/Zendesk API access policies",
+        "Implement data loss prevention (DLP) for large exports and cloud storage uploads",
+        "Scan for compromised credentials using HaveIBeenPwned and breach databases"
       ]
     },
     {
-      "hypothesis_id": "TH-002",
-      "title": "ClickFix Social Engineering Campaigns Delivering MIMICRAT, CastleLoader, and LummaStealer via Fake CAPTCHA and nslookup DNS Tunneling",
-      "description": "ClickFix threat actors have evolved their social engineering tactics to include DNS tunneling via nslookup commands and abuse of Google Ads, Claude AI, and compromised websites to deliver infostealers like MIMICRAT, CastleLoader, and LummaStealer. We should hunt for signs of these evolving delivery mechanisms, especially in endpoints with PowerShell, nslookup, and browser-based command execution.",
+      "hypothesis_id": "TH-003",
+      "title": "SmartLoader Campaigns Using AI-Themed Supply Chain Compromise (e.g., Oura MCP Clone)",
+      "description": "SmartLoader has been observed cloning legitimate AI projects (e.g., Oura MCP server) to distribute StealC infostealer. This supply chain compromise leverages trust in AI tooling and GitHub forks. We should hunt for fake GitHub repositories, malicious npm/PyPI packages, and StealC execution artifacts.",
       "threat_actors": [
-        "ClickFix"
+        "SmartLoader"
       ],
       "industries_targeted": [
-        "Financial Services",
         "Technology",
-        "E-commerce",
-        "Crypto users"
+        "Software Development",
+        "Healthcare"
       ],
       "mitre_attack_techniques": [
-        "T1566.001 - Phishing: Spearphishing Attachment",
-        "T1059.001 - Command Shell: PowerShell",
-        "T1071.001 - Application Layer Protocol: Web Protocols",
-        "T1105 - Ingress Tool Transfer",
-        "T1059.003 - Command Shell: Windows Command Shell"
+        "T1195.002 - Supply Chain Compromise",
+        "T1059.001 - PowerShell",
+        "T1055.001 - Process Injection",
+        "T1071.001 - Web Protocols",
+        "T1105 - Ingress Tool Transfer"
       ],
       "data_sources_needed": [
         {
           "source_type": "Endpoint",
-          "specific_data": "PowerShell command-line logs, nslookup execution, browser process spawning unusual child processes, file creation in temp directories",
+          "specific_data": "Process execution logs, PowerShell command lines, file creation in %TEMP%, registry run keys",
           "tools": [
-            "Sysmon, Elastic EDR, Microsoft Defender ATP"
+            "CrowdStrike, SentinelOne, Sysmon"
           ]
         },
         {
           "source_type": "Network",
-          "specific_data": "DNS queries with long encoded subdomains, HTTP requests to Pastebin/Google Sites, suspicious Google Ad redirects",
+          "specific_data": "DNS queries for GitHub/GitLab subdomains, HTTP/HTTPS requests to GitHub, npm/PyPI endpoints",
           "tools": [
-            "Zeek DNS logs, Cisco Umbrella, Palo Alto URL filtering logs"
+            "Zeek, Palo Alto Networks, Cisco Umbrella"
           ]
         },
         {
-          "source_type": "Email",
-          "specific_data": "Phishing emails with fake CAPTCHA links, malicious attachments, or Google-hosted payloads",
+          "source_type": "Code/Dev",
+          "specific_data": "npm/PyPI package downloads, GitHub repository clones, CI/CD pipeline logs",
           "tools": [
-            "Mimecast, Proofpoint, Microsoft Defender for Office 365"
+            "GitHub Advanced Security, GitGuardian, Snyk, Jfrog Xray"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "nslookup DNS Tunneling Detection",
-          "description": "Detect nslookup abuse for malware staging via DNS TXT record parsing",
+          "tactic_name": "Fake AI Project Repository Detection",
+          "description": "Search for GitHub repositories mimicking legitimate AI projects (e.g., Oura MCP) with suspicious activity",
           "sample_queries": [
-            "process.name:nslookup.exe AND process.command_line:*-q=txt* AND process.command_line:*\\x[0-9a-f]{2}*",
-            "process.parent_name:cmd.exe AND process.name:nslookup.exe AND process.command_line:*\\|*",
-            "process.name:nslookup.exe AND process.command_line:*\\;* AND process.command_line:*powershell*"
+            "index=github sourcetype=git_clone (repo_url=\"*ouramcp*\" OR repo_url=\"*oura*\" OR repo_url=\"*mcp*\") AND (fork_count=0 OR stars<5) AND (commit_count<10 OR created_at>\"2025-12-01\")",
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\node.exe\" OR Image=\"*\\python.exe\") AND (CommandLine=\"*npm install*\" OR CommandLine=\"*pip install*\") AND (CommandLine=\"*ouramcp*\" OR CommandLine=\"*stealc*\")",
+            "index=network dest_domain=\"github.com\" (dns_query=\"*stealc*\" OR dns_query=\"*ouramcp*\")"
           ],
-          "look_for": "nslookup.exe with encoded TXT queries, nslookup piped to PowerShell/cmd, nslookup used in command chains"
+          "look_for": "Repositories with low stars/forks but high download counts, fake contributor profiles, recent creation dates, use of StealC or Oura MCP names"
         },
         {
-          "tactic_name": "ClickFix PowerShell Execution Patterns",
-          "description": "Identify PowerShell scripts used in ClickFix campaigns to download and execute payloads",
+          "tactic_name": "StealC Execution and Persistence Detection",
+          "description": "Detect StealC infostealer execution and persistence mechanisms",
           "sample_queries": [
-            "process.name:powershell.exe AND process.command_line:*-enc* AND process.command_line:*[Convert]::FromBase64String*",
-            "process.name:powershell.exe AND process.command_line:*-w hidden* AND process.command_line:*net user*",
-            "process.parent_name:cmd.exe AND process.name:powershell.exe AND process.command_line:*-nop* AND process.command_line:*-noni*"
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\rundll32.exe\" OR Image=\"*\\regsvr32.exe\" OR Image=\"*\\mshta.exe\") AND (CommandLine=\"*stealc*\" OR CommandLine=\"*StealC*\")",
+            "index=endpoint sourcetype=win* EventID=4688 (NewProcessName=\"*\\cmd.exe\" OR NewProcessName=\"*\\powershell.exe\") AND (CommandLine=\"*stealc*\" OR CommandLine=\"*StealC*\")",
+            "index=endpoint sourcetype=sysmon EventID=1 (CommandLine=\"*reg add HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /v StealC*\")"
           ],
-          "look_for": "Encoded PowerShell with base64, hidden PowerShell launching net user/net view, non-interactive PowerShell from cmd.exe"
+          "look_for": "StealC.exe, StealC.dll, rundll32 regsvr32 mshta with StealC arguments, registry run keys for persistence"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "stealc[.]com",
+          "stealc[.]xyz",
+          "ouramcp[.]xyz",
+          "ouramcp[.]io"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "StealC.exe",
+          "StealC.dll",
+          "StealC.bin",
+          "ouramcp.exe",
+          "stealc_launcher.bat"
+        ],
+        "registry_keys": [
+          "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\StealC",
+          "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\StealC"
+        ],
+        "process_names": [
+          "StealC.exe",
+          "StealC.dll",
+          "rundll32.exe",
+          "regsvr32.exe",
+          "mshta.exe"
+        ],
+        "network_patterns": [
+          "DNS queries to GitHub with StealC/Ouramcp subdomains",
+          "HTTP/HTTPS to GitHub with unusual file extensions (.bin, .dat)",
+          "Outbound connections to known C2 IPs (e.g., 185.220.101.x)"
+        ],
+        "user_agent_strings": [
+          "StealC/1.0",
+          "Ouramcp/1.0"
+        ],
+        "other_indicators": [
+          "Fake GitHub forks with no commits",
+          "npm packages with malicious scripts in package.json",
+          "PyPI packages with setup.py executing remote code"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block npm/PyPI packages with known malicious hashes",
+        "Audit GitHub repositories for fake forks and suspicious activity",
+        "Implement strict code signing policies for internal AI tools",
+        "Monitor for StealC execution artifacts and C2 communication"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "ClickFix Campaigns Using DNS Tunneling and AI-Assisted Social Engineering",
+      "description": "ClickFix has evolved to use DNS tunneling via nslookup to deliver malware (e.g., ModeloRAT, MacSync) and is increasingly using AI-generated guides and hijacked Google Ads. We should hunt for DNS exfiltration patterns, fake AI guides, and malicious nslookup commands in PowerShell/cmd.",
+      "threat_actors": [
+        "ClickFix"
+      ],
+      "industries_targeted": [
+        "General Public",
+        "Financial Services",
+        "Technology"
+      ],
+      "mitre_attack_techniques": [
+        "T1059.001 - PowerShell",
+        "T1071.004 - DNS",
+        "T1140 - Deobfuscate/Decode Files",
+        "T1566.001 - Phishing",
+        "T1584.002 - Hijack Execution Flow"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "DNS queries with encoded payloads in subdomains, nslookup commands, unusual DNS TXT/NULL record queries",
+          "tools": [
+            "Zeek, Cisco Umbrella, Palo Alto Networks"
+          ]
         },
         {
-          "tactic_name": "MIMICRAT/CastleLoader File and Registry Artifacts",
-          "description": "Search for MIMICRAT-specific indicators and CastleLoader loader behavior",
+          "source_type": "Endpoint",
+          "specific_data": "Command-line logs for nslookup, PowerShell with encoded commands, suspicious process chains",
+          "tools": [
+            "Sysmon, CrowdStrike, SentinelOne"
+          ]
+        },
+        {
+          "source_type": "Email/Web",
+          "specific_data": "Google Ads with fake AI guides, phishing emails with CAPTCHA lures, malicious PDFs",
+          "tools": [
+            "Microsoft Defender for Office 365, Google Ads Transparency Center"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "DNS Tunneling via nslookup Detection",
+          "description": "Detect DNS-based ClickFix variants using nslookup for payload delivery",
           "sample_queries": [
-            "file.path:*\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup\\castleloader.exe",
-            "process.name:castleloader.exe OR process.name:MIMICRAT.exe OR process.name:ModeloRAT.exe",
-            "registry.key:*\\Microsoft\\Windows\\CurrentVersion\\Run\\castleloader* AND registry.value:*castleloader*"
+            "index=network dest_port=53 (dns_query=\"*cmd.exe*\" OR dns_query=\"*powershell*\" OR dns_query=\"*mshta*\" OR dns_query=\"*rundll32*\")",
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\nslookup.exe\" OR Image=\"*\\cmd.exe\") AND (CommandLine=\"*nslookup*\" AND (CommandLine=\"*txt*\" OR CommandLine=\"*null*\" OR CommandLine=\"*base64*\"))",
+            "index=network dest_domain=\"*.com\" (dns_query=\"*clickfix*\" OR dns_query=\"*nslookup*\")"
           ],
-          "look_for": "CastleLoader persistence in Startup folder, MIMICRAT/ModeloRAT process execution, registry run keys for castleloader"
+          "look_for": "nslookup queries with base64-encoded payloads in subdomains, DNS TXT queries returning PowerShell commands, suspicious nslookup usage in command chains"
+        },
+        {
+          "tactic_name": "AI-Assisted Social Engineering Detection",
+          "description": "Detect fake AI guides and hijacked Google Ads used in ClickFix campaigns",
+          "sample_queries": [
+            "index=web sourcetype=proxy (url=\"*claude*\" OR url=\"*gemini*\" OR url=\"*chatgpt*\") AND (url=\"*guide*\" OR url=\"*tutorial*\" OR url=\"*fix*\") AND (url=\"*macsync*\" OR url=\"*modelorat*\")",
+            "index=google_ads (ad_destination_url=\"*clickfix*\" OR ad_destination_url=\"*nslookup*\") AND (ad_status=\"active\" OR ad_status=\"approved\")",
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\chrome.exe\" OR Image=\"*\\msedge.exe\") AND (CommandLine=\"*google.com/search*\" AND CommandLine=\"*clickfix*\")"
+          ],
+          "look_for": "Google Ads linking to fake AI guides, searches for ClickFix or nslookup guides, execution of PowerShell from browser downloads"
         }
       ],
       "iocs_and_patterns": {
         "domains": [
           "uswebzoomus[.]com",
           "forms.google.ss-o[.]com",
-          "id-v4[.]com"
+          "access-authority-2fa7abff0e[.]s3.us-east-1[.]amazonaws[.]com"
         ],
         "ips": [],
         "file_hashes": [],
         "file_names": [
-          "castleloader.exe",
-          "MIMICRAT.exe",
           "ModeloRAT.exe",
-          "StealC.exe",
-          "MacSync.exe"
-        ],
-        "registry_keys": [
-          "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\castleloader",
-          "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Shell"
-        ],
-        "process_names": [
-          "nslookup.exe",
-          "powershell.exe",
-          "castleloader.exe",
-          "mimicrat.exe",
-          "modelorat.exe"
-        ],
-        "network_patterns": [
-          "DNS TXT queries >100 chars",
-          "HTTP requests to Pastebin/Google Sites with long encoded payloads",
-          "SMB traffic from non-server hosts"
-        ],
-        "user_agent_strings": [
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
-        ],
-        "other_indicators": [
-          "Google Ads redirecting to fake Zoom/Captcha pages",
-          "Pastebin comments with PowerShell commands",
-          "Fake Claude AI guides with malicious links"
-        ]
-      },
-      "priority": "HIGH",
-      "confidence": "HIGH",
-      "estimated_detection_rate": "High",
-      "false_positive_risk": "Medium",
-      "recommended_actions": [
-        "Block nslookup.exe from executing with encoded queries",
-        "Review PowerShell script block logging for encoded commands",
-        "Hunt for CastleLoader persistence mechanisms across endpoints",
-        "Update EDR signatures for MIMICRAT and LummaStealer"
-      ]
-    },
-    {
-      "hypothesis_id": "TH-003",
-      "title": "SmartLoader and VoidLink Framework Campaigns Targeting AI Infrastructure and Financial Services via Supply Chain Compromise",
-      "description": "SmartLoader has been observed cloning legitimate Oura MCP servers to distribute StealC infostealer, while UAT-9921 uses the modular VoidLink framework to target technology and financial organizations. We should hunt for signs of AI agent compromise (OpenClaw, MCP servers), supply chain abuse in npm/PyPI, and modular malware deployment patterns.",
-      "threat_actors": [
-        "SmartLoader",
-        "UAT-9921"
-      ],
-      "industries_targeted": [
-        "Technology",
-        "Financial Services",
-        "Healthcare",
-        "AI/Cloud Providers"
-      ],
-      "mitre_attack_techniques": [
-        "T1195.001 - Supply Chain Compromise: Compromise Software Supply Chain",
-        "T1526 - Cloud Service Discovery",
-        "T1059.006 - Python",
-        "T1070.004 - Indicator Removal: File Deletion",
-        "T1565.001 - Data Manipulation: Stored Data Manipulation"
-      ],
-      "data_sources_needed": [
-        {
-          "source_type": "Endpoint",
-          "specific_data": "Python process execution, OpenClaw configuration file access, MCP server connections, file deletion events",
-          "tools": [
-            "Sysmon, Elastic EDR, SentinelOne"
-          ]
-        },
-        {
-          "source_type": "Network",
-          "specific_data": "Connections to MCP servers, npm/PyPI package downloads, suspicious API calls to cloud services",
-          "tools": [
-            "Zeek, Palo Alto Networks, Cisco Stealthwatch"
-          ]
-        },
-        {
-          "source_type": "Cloud",
-          "specific_data": "IAM role changes, S3 bucket access logs, Lambda function deployments",
-          "tools": [
-            "AWS CloudTrail, Azure AD Audit Logs, GCP Cloud Logging"
-          ]
-        }
-      ],
-      "hunting_tactics": [
-        {
-          "tactic_name": "OpenClaw and AI Agent Configuration Theft",
-          "description": "Detect infostealer attempts to exfiltrate OpenClaw configuration and identity files",
-          "sample_queries": [
-            "file.path:*\\.clawdbot* OR file.path:*\\.openclaw* OR file.path:*\\.clawdbot*",
-            "process.name:stealc.exe AND file.path:*openclaw*",
-            "process.name:python.exe AND file.path:*openclaw* AND file.path:*config.json*"
-          ],
-          "look_for": "Access to .clawdbot, .openclaw, or .clawdbot directories, StealC targeting OpenClaw config files, Python processes accessing OpenClaw directories"
-        },
-        {
-          "tactic_name": "SmartLoader MCP Server Cloning Detection",
-          "description": "Identify fake Oura MCP servers used in SmartLoader campaigns",
-          "sample_queries": [
-            "process.name:python.exe AND process.command_line:*ouramcp* AND process.command_line:*fake*",
-            "network.connection.dest_port:8080 AND process.name:python.exe AND process.command_line:*mcp*",
-            "registry.key:*ouramcp* AND registry.value:*fork*"
-          ],
-          "look_for": "Python processes referencing 'ouramcp' with suspicious arguments, MCP servers on non-standard ports, registry keys with 'fork' references"
-        },
-        {
-          "tactic_name": "VoidLink Framework Deployment",
-          "description": "Search for modular VoidLink framework components and UAT-9921 indicators",
-          "sample_queries": [
-            "process.name:voidlink* OR process.name:VoidLink*",
-            "process.parent_name:cmd.exe AND process.name:voidloader.exe",
-            "file.path:*\\AppData\\Local\\Temp\\voidlink*"
-          ],
-          "look_for": "VoidLink-related processes, voidloader.exe spawned from cmd.exe, temp directories with voidlink naming"
-        }
-      ],
-      "iocs_and_patterns": {
-        "domains": [
-          "ouramcp[.]com",
-          "ouramcp[.]net",
-          "ouramcp[.]org"
-        ],
-        "ips": [],
-        "file_hashes": [],
-        "file_names": [
-          "openclaw.json",
-          "clawdbot.json",
-          "clawdbot.json",
-          "voidlink.exe",
-          "voidloader.exe",
-          "StealC.exe",
-          "ouramcp_server.py"
-        ],
-        "registry_keys": [
-          "HKCU\\Software\\OurA\\MCP",
-          "HKLM\\SOFTWARE\\VoidLink"
-        ],
-        "process_names": [
-          "python.exe",
-          "voidlink.exe",
-          "voidloader.exe",
-          "stealc.exe",
-          "ouramcp_server.py"
-        ],
-        "network_patterns": [
-          "Connections to MCP servers on port 8080/443",
-          "npm/PyPI package downloads from non-standard registries",
-          "API calls to cloud services from non-cloud hosts"
-        ],
-        "user_agent_strings": [
-          "Python-urllib/3.11",
-          "VoidLink-Agent/1.0"
-        ],
-        "other_indicators": [
-          "Fake forks/contributors on GitHub for Oura MCP",
-          "npm packages with 'ouramcp' in name",
-          "Python scripts with 'ouramcp' and 'stealc' references"
-        ]
-      },
-      "priority": "HIGH",
-      "confidence": "MEDIUM",
-      "estimated_detection_rate": "Medium",
-      "false_positive_risk": "Medium",
-      "recommended_actions": [
-        "Hunt for OpenClaw configuration files across endpoints and cloud storage",
-        "Monitor Python processes for suspicious MCP server activity",
-        "Review npm/PyPI package history for SmartLoader-related compromises",
-        "Isolate hosts with OpenClaw configuration exfiltration attempts"
-      ]
-    },
-    {
-      "hypothesis_id": "TH-004",
-      "title": "ShinyHunters Data Extortion Campaigns Targeting Customer Data via Credential Stuffing and Third-Party Vendor Compromise",
-      "description": "ShinyHunters has been actively targeting organizations across multiple sectors, including fintech (Figure), automotive (CarGurus), telecom (Odido), and fashion (Canada Goose). Attacks often involve credential stuffing, employee phishing, or third-party vendor compromise. We should hunt for signs of credential reuse, suspicious data exfiltration to known leak sites, and patterns of credential harvesting preceding data breaches.",
-      "threat_actors": [
-        "ShinyHunters"
-      ],
-      "industries_targeted": [
-        "Financial Services",
-        "Technology",
-        "Telecommunications",
-        "Retail",
-        "Fashion"
-      ],
-      "mitre_attack_techniques": [
-        "T1110.001 - Brute Force: Password Guessing",
-        "T1110.003 - Password Spraying",
-        "T1589.002 - Credential Collection: Email Addresses",
-        "T1020 - Automated Exfiltration",
-        "T1041 - Exfiltration Over C2 Channel"
-      ],
-      "data_sources_needed": [
-        {
-          "source_type": "Identity",
-          "specific_data": "Failed login attempts, credential stuffing patterns, MFA bypass attempts, unusual geographic logins",
-          "tools": [
-            "Azure AD Identity Protection, Okta Risk-Based Policies, CrowdStrike Falcon Identity"
-          ]
-        },
-        {
-          "source_type": "Network",
-          "specific_data": "Large data transfers to external IPs, connections to known leak sites, suspicious email exfiltration",
-          "tools": [
-            "Palo Alto Networks, Zeek, Darktrace"
-          ]
-        },
-        {
-          "source_type": "Email",
-          "specific_data": "Phishing emails impersonating internal services, fake SSO login pages",
-          "tools": [
-            "Microsoft Defender for Office 365, Mimecast, Proofpoint"
-          ]
-        }
-      ],
-      "hunting_tactics": [
-        {
-          "hypothesis_id": "Credential Stuffing Detection",
-          "description": "Detect credential stuffing patterns targeting customer and employee accounts",
-          "sample_queries": [
-            "event.action:login_failure AND user.email:*@* AND event.outcome:failure AND source.ip:* AND event.dataset:authentication",
-            "event.action:login AND user.email:*@* AND source.ip:* AND event.outcome:success AND event.dataset:authentication AND event.dataset:login",
-            "user.name:* AND event.action:login_failure AND source.ip:* AND event.dataset:authentication AND event.dataset:login"
-          ],
-          "look_for": "High volume of login failures from same IP, successful logins after multiple failures, logins from unusual locations after failures"
-        },
-        {
-          "tactic_name": "Data Exfiltration to Leak Sites",
-          "description": "Search for connections to ShinyHunters' leak infrastructure and data transfer patterns",
-          "sample_queries": [
-            "network.connection.dest_domain:*shinyhunters* OR network.connection.dest_domain:*shinyhunters[.]com*",
-            "network.connection.dest_ip:185.156.73.54 OR network.connection.dest_ip:185.156.73.55",
-            "file.path:*\\temp\\* AND file.size:>100MB AND network.connection.dest_domain:*shinyhunters*"
-          ],
-          "look_for": "Connections to known ShinyHunters domains/IPs, large file transfers to external domains, files named 'shinyhunters_data.zip' or similar"
-        },
-        {
-          "tactic_name": "Third-Party Vendor Compromise Indicators",
-          "description": "Identify signs of compromise via third-party vendors (e.g., Salesforce, SSO providers)",
-          "sample_queries": [
-            "event.action:api_call AND user.name:*service_account* AND event.dataset:api AND event.dataset:oauth",
-            "network.connection.dest_domain:*salesforce* AND process.name:python.exe AND process.command_line:*salesforce*",
-            "event.action:login AND user.email:*@* AND source.ip:* AND event.dataset:authentication AND event.dataset:login AND event.dataset:oauth"
-          ],
-          "look_for": "Service account API calls to Salesforce/Okta, Python scripts accessing Salesforce APIs, OAuth token abuse from non-standard locations"
-        }
-      ],
-      "iocs_and_patterns": {
-        "domains": [
-          "shinyhunters[.]com",
-          "shinyhunters[.]onion.to",
-          "shinyhunters[.]xyz"
-        ],
-        "ips": [
-          "185.156.73.54",
-          "185.156.73.55"
-        ],
-        "file_hashes": [],
-        "file_names": [
-          "shinyhunters_data.zip",
-          "shinyhunters_dump.tar.gz",
-          "customer_data.csv",
-          "user_credentials.xlsx"
+          "MacSync.dmg",
+          "clickfix_launcher.bat",
+          "nslookup_powershell.ps1"
         ],
         "registry_keys": [],
         "process_names": [
-          "python.exe",
-          "curl.exe",
-          "wget.exe",
-          "7z.exe"
+          "nslookup.exe",
+          "cmd.exe",
+          "powershell.exe",
+          "rundll32.exe",
+          "regsvr32.exe"
         ],
         "network_patterns": [
-          "Large outbound data transfers (>100MB)",
-          "Connections to leak sites at unusual times",
-          "Email exfiltration via SMTP to non-standard ports"
+          "DNS queries with base64-encoded subdomains",
+          "HTTP/HTTPS to GitHub/GitLab with malicious scripts",
+          "Outbound connections to known C2 IPs (e.g., 185.220.101.x)"
         ],
         "user_agent_strings": [
-          "python-requests/2.28.0",
-          "ShinyHunters-Exfil/1.0"
+          "ClickFix/1.0",
+          "MacSync/1.0"
         ],
         "other_indicators": [
-          "Fake SSO login pages impersonating Okta/Microsoft",
-          "Phishing emails with 'Security Incident Report' PDFs",
-          "Password spray attempts targeting @*.com domains"
+          "Fake CAPTCHA lures with instructions to run nslookup/powershell",
+          "Google Ads with AI-themed copy but malicious destinations",
+          "Pastebin comments with encoded PowerShell"
         ]
       },
       "priority": "HIGH",
       "confidence": "HIGH",
       "estimated_detection_rate": "High",
-      "false_positive_risk": "Low",
+      "false_positive_risk": "Medium",
       "recommended_actions": [
-        "Enforce MFA for all customer and employee accounts",
-        "Review and restrict third-party API access (Salesforce, Okta)",
-        "Monitor for large data exfiltration to known leak sites",
-        "Hunt for credential stuffing patterns in identity logs"
+        "Block DNS queries with base64-encoded subdomains",
+        "Monitor for nslookup usage in command chains",
+        "Audit Google Ads for fake AI guides and malicious destinations",
+        "Implement strict browser security policies to prevent drive-by downloads"
       ]
     },
     {
       "hypothesis_id": "TH-005",
-      "title": "AI-Powered FortiGate Compromise Campaigns Using AI-Assisted Scanning and Weak Credentials",
-      "description": "A Russian-speaking threat actor used commercial generative AI tools to compromise over 600 FortiGate firewalls across 55 countries by exploiting exposed management ports and weak credentials. We should hunt for signs of AI-assisted scanning, unauthorized FortiGate access, and lateral movement from compromised firewalls to internal networks.",
+      "title": "AI Agent Compromise via OpenClaw Stealer and Open Source Registry Abuse",
+      "description": "OpenClaw, an autonomous AI agent, has been targeted by infostealers stealing its configuration files, API keys, and tokens. Attackers are also compromising open-source registries (e.g., npm, PyPI) to distribute malicious OpenClaw packages. We should hunt for OpenClaw configuration exfiltration, compromised npm packages, and AI agent abuse in CI/CD pipelines.",
       "threat_actors": [
-        "Unclassified Russian-speaking threat actor"
+        "Unattributed Cybercriminals"
       ],
       "industries_targeted": [
-        "Critical Infrastructure",
-        "Financial Services",
         "Technology",
-        "Telecommunications"
+        "Software Development",
+        "Artificial Intelligence"
       ],
       "mitre_attack_techniques": [
-        "T1190 - Exploit Public-Facing Application",
-        "T1078 - Valid Accounts",
-        "T1021.004 - Remote Services: SSH",
-        "T1090.001 - Proxy: Multi-hop Proxy",
-        "T1562.001 - Impair Defenses: Disable or Modify Tools"
+        "T1526 - Cloud Service Discovery",
+        "T1195.002 - Supply Chain Compromise",
+        "T1059.001 - PowerShell",
+        "T1055.001 - Process Injection",
+        "T1583.006 - Compromise Software Supply Chain"
       ],
       "data_sources_needed": [
         {
-          "source_type": "Network",
-          "specific_data": "FortiGate management port access (TCP 8443/443), failed login attempts, SSH connections from non-standard hosts",
-          "tools": [
-            "Zeek, Palo Alto Networks, FortiSIEM"
-          ]
-        },
-        {
           "source_type": "Endpoint",
-          "specific_data": "FortiClient process execution, unusual SSH sessions, firewall rule changes",
+          "specific_data": "File access to OpenClaw config files, process execution of OpenClaw, API key usage",
           "tools": [
-            "Sysmon, Elastic EDR, FortiEDR"
+            "CrowdStrike, SentinelOne, Elastic EDR"
           ]
         },
         {
-          "source_type": "Firewall",
-          "specific_data": "FortiGate logs, configuration changes, session logs, API access logs",
+          "source_type": "Code/Dev",
+          "specific_data": "npm/PyPI package downloads, CI/CD pipeline logs, OpenClaw usage in scripts",
           "tools": [
-            "FortiSIEM",
-            "FortiAnalyzer",
-            "Palo Alto Networks Panorama"
+            "GitHub Advanced Security, GitGuardian, Snyk, Jfrog Xray"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "API key usage, token generation, agent privilege escalations",
+          "tools": [
+            "GitGuardian, HashiCorp Vault, AWS CloudTrail"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "AI-Assisted Scanning Detection",
-          "description": "Detect AI-assisted scanning patterns targeting FortiGate management interfaces",
+          "tactic_name": "OpenClaw Configuration Exfiltration Detection",
+          "description": "Detect infostealers targeting OpenClaw configuration files and tokens",
           "sample_queries": [
-            "network.connection.dest_port:8443 AND network.connection.dest_port:443 AND source.ip:* AND event.dataset:connection AND event.dataset:firewall",
-            "network.connection.dest_port:8443 AND process.name:python.exe AND process.command_line:*requests*",
-            "network.connection.dest_port:8443 AND source.ip:* AND event.dataset:connection AND event.dataset:firewall AND event.dataset:dns"
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\infostealer*\" OR Image=\"*\\stealc*\" OR Image=\"*\\lumma*\") AND (CommandLine=\"*openclaw*\" OR CommandLine=\"*clawdbot*\" OR CommandLine=\"*clawdbot*\")",
+            "index=endpoint sourcetype=win* EventID=4656 (Object_Name=\"*\\openclaw*\" OR Object_Name=\"*\\clawdbot*\" OR Object_Name=\"*\\clawdbot*\") AND (Access_List=\"*ReadData*\" OR Access_List=\"*ReadAttributes*\")",
+            "index=network dest_domain=\"*.com\" (dns_query=\"*openclaw*\" OR dns_query=\"*clawdbot*\" OR dns_query=\"*clawdbot*\")"
           ],
-          "look_for": "Rapid sequential connections to port 8443 from same IP, Python scripts scanning FortiGate ports, DNS queries for FortiGate-related domains"
+          "look_for": "OpenClaw config files (e.g., config.json, settings.yaml), API keys in OpenClaw directories, exfiltration of OpenClaw tokens"
         },
         {
-          "tactic_name": "Unauthorized FortiGate Access",
-          "description": "Identify unauthorized access to FortiGate management interfaces",
+          "tactic_name": "Open Source Registry Compromise Detection",
+          "description": "Detect compromised npm/PyPI packages distributing OpenClaw or infostealers",
           "sample_queries": [
-            "event.action:login_failure AND event.dataset:firewall AND event.dataset:fortigate",
-            "event.action:login AND user.name:*admin* AND source.ip:* AND event.dataset:firewall AND event.dataset:fortigate",
-            "event.action:config_change AND event.dataset:firewall AND event.dataset:fortigate"
+            "index=github sourcetype=git_clone (repo_url=\"*openclaw*\" OR repo_url=\"*clawdbot*\") AND (fork_count>0 OR stars>10) AND (commit_count>50 OR created_at<\"2025-12-01\")",
+            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\node.exe\" OR Image=\"*\\python.exe\") AND (CommandLine=\"*npm install*\" OR CommandLine=\"*pip install*\") AND (CommandLine=\"*openclaw*\" OR CommandLine=\"*clawdbot*\")",
+            "index=network dest_domain=\"npmjs.com\" (dns_query=\"*openclaw*\" OR dns_query=\"*clawdbot*\")"
           ],
-          "look_for": "Failed admin logins, successful logins from non-standard IPs, configuration changes without approval"
-        },
-        {
-          "tactic_name": "Lateral Movement from Compromised Firewalls",
-          "description": "Search for lateral movement from compromised firewalls to internal networks",
-          "sample_queries": [
-            "network.connection.dest_ip:10.* AND process.name:ssh.exe AND process.command_line:*-i*",
-            "network.connection.dest_port:445 AND process.name:ssh.exe AND process.command_line:*-L*",
-            "event.action:connection AND network.connection.dest_ip:192.168.* AND process.name:python.exe"
-          ],
-          "look_for": "SSH from FortiGate to internal hosts, port forwarding via SSH, Python scripts accessing internal network ranges"
+          "look_for": "Fake OpenClaw repositories with high stars/forks, malicious npm/PyPI packages with OpenClaw names, CI/CD pipelines installing OpenClaw packages"
         }
       ],
       "iocs_and_patterns": {
-        "domains": [],
+        "domains": [
+          "openclaw[.]xyz",
+          "clawdbot[.]io",
+          "clawdbot[.]com",
+          "openclaw[.]net"
+        ],
         "ips": [],
         "file_hashes": [],
         "file_names": [
-          "fortigate_scan.py",
-          "fortigate_brute.py",
-          "fortigate_pwn.sh"
+          "config.json",
+          "settings.yaml",
+          "openclaw.exe",
+          "clawdbot.py",
+          "clawdbot.js"
         ],
         "registry_keys": [],
         "process_names": [
+          "node.exe",
           "python.exe",
-          "ssh.exe",
-          "curl.exe",
-          "wget.exe",
-          "forticlient.exe"
+          "npm.exe",
+          "pip.exe",
+          "openclaw.exe"
         ],
         "network_patterns": [
-          "Rapid connections to port 8443 (FortiGate)",
-          "SSH from FortiGate to internal hosts",
-          "Connections to internal networks from FortiGate IP"
+          "DNS queries to npmjs.com with OpenClaw/Clawdbot subdomains",
+          "HTTP/HTTPS to GitHub with malicious scripts",
+          "Outbound connections to known C2 IPs (e.g., 185.220.101.x)"
         ],
         "user_agent_strings": [
-          "python-requests/2.28.0",
-          "FortiGate-Scanner/1.0"
+          "OpenClaw/1.0",
+          "Clawdbot/1.0"
         ],
         "other_indicators": [
-          "FortiGate configuration changes at unusual times",
-          "New admin accounts created without approval",
-          "Unusual SSH sessions from FortiGate"
+          "Fake OpenClaw repositories with high stars/forks",
+          "npm packages with malicious scripts in package.json",
+          "CI/CD pipelines installing OpenClaw packages"
         ]
       },
-      "priority": "CRITICAL",
-      "confidence": "HIGH",
-      "estimated_detection_rate": "High",
+      "priority": "MEDIUM",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
       "false_positive_risk": "Medium",
       "recommended_actions": [
-        "Disable FortiGate management interfaces from public access",
-        "Enforce strong passwords and MFA for all admin accounts",
-        "Monitor FortiGate logs for configuration changes and unauthorized access",
-        "Hunt for lateral movement from FortiGate to internal networks"
+        "Audit OpenClaw configurations and revoke compromised tokens",
+        "Block npm/PyPI packages with known malicious hashes",
+        "Implement strict code signing policies for internal AI tools",
+        "Monitor for OpenClaw execution artifacts and C2 communication"
       ]
     }
   ],
   "stats": {
     "priority_breakdown": {
-      "CRITICAL": 2,
-      "HIGH": 3
+      "HIGH": 3,
+      "CRITICAL": 1,
+      "MEDIUM": 1
     },
     "confidence_breakdown": {
       "HIGH": 4,
@@ -635,59 +584,50 @@
     },
     "unique_threat_actors": [
       "SmartLoader",
+      "Unattributed Cybercriminals",
       "ClickFix",
-      "Unclassified Russian-speaking threat actor",
       "ShinyHunters",
-      "UAT-9921",
       "lazarus group"
     ],
     "unique_industries_targeted": [
-      "E-commerce",
-      "Fashion",
-      "Healthcare",
-      "Critical Infrastructure",
-      "Social Services",
-      "Crypto users",
       "Telecommunications",
+      "Software Development",
+      "Healthcare",
+      "Social Media",
+      "General Public",
+      "Artificial Intelligence",
+      "Government",
       "Technology",
-      "AI/Cloud Providers",
-      "Retail",
       "Financial Services"
     ],
     "unique_mitre_techniques": [
-      "T1566.001 - Phishing: Spearphishing Attachment",
-      "T1041 - Exfiltration Over C2 Channel",
-      "T1059.003 - Command Shell: Windows Command Shell",
+      "T1021.001 - Remote Desktop Protocol",
+      "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol",
       "T1105 - Ingress Tool Transfer",
-      "T1078.003 - Valid Accounts: Domain Accounts",
-      "T1059.001 - Command Shell: PowerShell",
-      "T1021.001 - Remote Services: SMB/Windows Admin Shares",
-      "T1565.001 - Data Manipulation: Stored Data Manipulation",
-      "T1110.001 - Brute Force: Password Guessing",
+      "T1071.004 - DNS",
+      "T1566.001 - Phishing",
+      "T1140 - Deobfuscate/Decode Files",
+      "T1021.001 - RDP",
+      "T1583.006 - Compromise Software Supply Chain",
+      "T1195.002 - Supply Chain Compromise",
       "T1486 - Data Encrypted for Impact",
-      "T1078 - Valid Accounts",
-      "T1110.003 - Password Spraying",
-      "T1190 - Exploit Public-Facing Application",
-      "T1070.004 - Indicator Removal: File Deletion",
+      "T1078.004 - Cloud Accounts",
+      "T1584.002 - Hijack Execution Flow",
       "T1526 - Cloud Service Discovery",
-      "T1090.001 - Proxy: Multi-hop Proxy",
-      "T1059.006 - Python",
-      "T1195.001 - Supply Chain Compromise: Compromise Software Supply Chain",
-      "T1562.001 - Impair Defenses: Disable or Modify Tools",
-      "T1071.001 - Application Layer Protocol: Web Protocols",
-      "T1589.002 - Credential Collection: Email Addresses",
-      "T1021.004 - Remote Services: SSH",
-      "T1020 - Automated Exfiltration"
+      "T1059.001 - PowerShell",
+      "T1110.001 - Password Spray",
+      "T1055.001 - Process Injection",
+      "T1071.001 - Web Protocols"
     ],
     "source_data_stats": {
       "top_threat_actors": [
         [
           "ShinyHunters",
-          10
+          12
         ],
         [
           "lazarus group",
-          7
+          8
         ],
         [
           "ClickFix",
