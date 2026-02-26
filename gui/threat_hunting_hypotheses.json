@@ -1,111 +1,86 @@
 {
-  "generated_at": "2026-02-26T02:21:43Z",
+  "generated_at": "2026-02-26T13:56:15Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 457,
+  "total_articles_analyzed": 535,
   "hypotheses_count": 5,
   "hypotheses": [
     {
       "hypothesis_id": "TH-001",
-      "title": "Supply Chain Compromise via Malicious NPM/PyPI Packages Mimicking Legitimate AI/MCP Tools",
-      "description": "Threat actors, particularly Lazarus Group and SmartLoader, have been actively distributing malicious npm and PyPI packages that impersonate legitimate AI tools (e.g., Oura MCP server) and developer frameworks (e.g., Next.js, Claude artifacts) to deploy StealC infostealers, LummaStealer, and other malware. These campaigns exploit developer trust in open-source ecosystems and AI-assisted tooling.",
+      "title": "Detection of UNC2814's Google Sheets-Based C2 Communication in Telecom and Government Environments",
+      "description": "Based on confirmed intrusions by China-linked APT UNC2814 (observed 5+ times in 14-day intel), this group uses Google Sheets as a covert C2 channel to communicate with compromised telecom and government targets. The group exfiltrates data and issues commands via Google Sheets API calls disguised as benign traffic. We hypothesize that similar C2 activity using Google Workspace services (Sheets, Docs) for command delivery and data exfiltration is active in environments lacking visibility into SaaS API behavior.",
       "threat_actors": [
-        "lazarus group",
-        "SmartLoader"
+        "UNC2814"
       ],
       "industries_targeted": [
-        "Software Development",
-        "Technology",
-        "Financial Services",
-        "Telecommunications"
+        "Telecommunications",
+        "Government",
+        "Healthcare",
+        "Financial Services"
       ],
       "mitre_attack_techniques": [
-        "T1528 - Steal Application Access Token",
-        "T1526 - Cloud Service Discovery",
-        "T1574.009 - Hijack Execution Flow: Dynamic-link Library Hijacking",
-        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain"
+        "T1105 - Ingress Tool Transfer",
+        "T1567.001 - Exfiltration Over Web Service: Exfiltration to Cloud Storage",
+        "T1526 - Cloud Service Discovery"
       ],
       "data_sources_needed": [
         {
-          "source_type": "Endpoint",
-          "specific_data": "Process execution logs (especially npm, pip, node, python), file creation/modification events in project directories, network connections to package registries",
+          "source_type": "Cloud/Identity",
+          "specific_data": "Google Workspace Admin SDK logs (token usage, API calls to Sheets/Docs), GCP Cloud Audit Logs for Sheets API access, user login patterns to Sheets from unusual locations or devices",
           "tools": [
-            "EDR (e.g., CrowdStrike, SentinelOne), Sysmon, npm/pip audit logs"
+            "Google Cloud Security Command Center",
+            "Microsoft Defender for Cloud Apps (if using Microsoft cloud), Palo Alto Networks Prisma Access, CrowdStrike Falcon Identity Threat Detection"
           ]
         },
         {
           "source_type": "Network",
-          "specific_data": "DNS queries to registry.npmjs.org, pypi.org, and suspicious subdomains; TLS certificate details for package downloads",
+          "specific_data": "DNS queries to sheets.googleapis.com, network traffic to Google APIs with anomalous payload sizes or patterns, TLS certificate mismatches in Google domain connections",
           "tools": [
-            "Network detection (e.g., Darktrace, Zeek), DNS logs"
-          ]
-        },
-        {
-          "source_type": "Identity",
-          "specific_data": "Developer account activity in GitHub, GitLab, npm, PyPI (e.g., new package uploads, compromised publish tokens)",
-          "tools": [
-            "SIEM with identity integration (e.g., Microsoft Sentinel, Splunk UBA)"
+            "Darktrace",
+            "Cisco Stealthwatch",
+            "Palo Alto Networks NGFW"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "Detect Typosquatting and Fake MCP Server Packages",
-          "description": "Search for npm/PyPI packages with names similar to known AI/MCP tools (e.g., 'ouramcp', 'claude-code-security', 'nextjs-interview-test') and verify package metadata and author history.",
+          "tactic_name": "Google Sheets API Abuse Detection",
+          "description": "Detect anomalous Sheets API usage patterns that deviate from normal user behavior, such as bulk read/write operations outside business hours or from non-standard locations.",
           "sample_queries": [
-            "index=npm_audit OR index=pypi_audit (package_name=*ouramcp* OR package_name=*claude* OR package_name=*nextjs* OR package_name=*interview*) | stats count by package_name, package_version, author, upload_date, dependencies | where upload_date > relative_time(now()-14d)",
-            "index=github_audit (action=publish OR action=push) (actor=*lazarus* OR actor=*smartloader* OR repo_name=*nextjs* OR repo_name=*claude* OR repo_name=*ouramcp*) | table actor, repo_name, action, timestamp"
+            "index=gsuite_audit action=spreadsheet_access user_agent=*Google-HTTP-Java* OR user_agent=*Google-HTTP-Python* AND event_name=spreadsheet_write OR event_name=spreadsheet_read | stats count by user, ip_address, spreadsheet_id, event_name | where count > 100",
+            "index=gsuite_audit event_name=\"spreadsheet_update\" earliest=-7d | eval timestamp=strftime(_time,\"%Y-%m-%d %H:%M:%S\") | stats count by user, spreadsheet_title, timestamp | sort -count | top 10"
           ],
-          "look_for": "Packages with recent upload dates, no GitHub repo link, suspicious dependencies (e.g., 'axios', 'node-fetch'), authors with no prior history, or cloned-looking READMEs with fake forks/contributors"
+          "look_for": "High-frequency Sheets API calls from single user, especially outside 9-5 hours; access from new IP ranges or countries; use of service accounts or API tokens for Sheets access without MFA"
         },
         {
-          "tactic_name": "Detect Malicious Claude Artifacts and MCP Servers",
-          "description": "Hunt for execution of unauthorized Claude artifacts, MCP server processes, or configuration files that attempt to load remote code or exfiltrate credentials.",
+          "tactic_name": "SaaS Token Misuse Detection",
+          "description": "Identify misuse of Google OAuth tokens for Sheets access from unexpected user agents or devices, which may indicate token theft or abuse.",
           "sample_queries": [
-            "index=endpoint (process_name=*node* OR process_name=*python* OR process_name=*claude*) (command_line=*mcp* OR command_line=*artifact* OR command_line=*claude* OR file_path=*\\.claude* OR file_path=*\\.claude* OR file_path=*mcp*) | stats count by process_name, command_line, file_path, host | where count > 1",
-            "index=network dest_port=443 (user_agent=*Claude* OR user_agent=*MCP*) (dest_domain=*pastebin* OR dest_domain=*raw.githubusercontent* OR dest_domain=*githubusercontent*) | stats count by src_ip, dest_domain, dest_port, user_agent"
+            "index=gsuite_audit event_name=token_issue OR event_name=token_grant AND app_name=\"Google Sheets\" | eval user_agent_lower=lower(user_agent) | search user_agent_lower=*curl* OR user_agent_lower=*python* OR user_agent_lower=*wget* | stats count by user, app_name, user_agent, ip_address | where count > 5"
           ],
-          "look_for": "Processes spawning from node/python executing MCP server scripts, connections to raw GitHub URLs for config files, suspicious environment variables (e.g., MCP_SERVER_URL, CLAUDE_API_KEY)"
+          "look_for": "OAuth token grants to Sheets from non-browser user agents (curl, python, wget); tokens issued to users with no prior Sheets usage history"
         }
       ],
       "iocs_and_patterns": {
         "domains": [
-          "ouramcp[.]xyz",
-          "claude-code-security[.]com",
-          "nextjs-interview[.]xyz",
-          "claude-artifacts[.]net",
-          "mcp-server[.]io"
+          "sheets.googleapis.com",
+          "docs.googleapis.com",
+          "www.googleapis.com"
         ],
         "ips": [],
         "file_hashes": [],
-        "file_names": [
-          "claude-config.json",
-          "mcp-server.js",
-          "mcp-config.yaml",
-          "interview-test.zip",
-          "nextjs-assessment.tar.gz"
-        ],
+        "file_names": [],
         "registry_keys": [],
-        "process_names": [
-          "node",
-          "python",
-          "npm",
-          "pip",
-          "npx"
-        ],
+        "process_names": [],
         "network_patterns": [
-          "HTTPS to raw.githubusercontent.com with .json/.js/.yaml payloads",
-          "DNS queries to newly registered domains with 'mcp', 'claude', 'interview' in name"
+          "HTTPS to Google APIs with large JSON payloads (>50KB), repeated POST requests to /batch endpoint"
         ],
         "user_agent_strings": [
-          "Claude-Code/*",
-          "MCP-Client/*",
-          "npm/*",
-          "pip/*"
+          "Google-HTTP-Java-Client",
+          "Google-HTTP-Python-Client",
+          "Google-API-Java-Client"
         ],
         "other_indicators": [
-          "Fake GitHub forks/contributors in package READMEs",
-          "Packages with no test files or minimal code",
-          "Use of Pastebin/Gist for second-stage payloads"
+          "Unusual volume of Sheets edits (e.g., >100 rows in <1 min), use of hidden columns/rows for command storage, timestamps in cell values matching C2 intervals"
         ]
       },
       "priority": "CRITICAL",
@@ -113,104 +88,207 @@
       "estimated_detection_rate": "High",
       "false_positive_risk": "Medium",
       "recommended_actions": [
-        "Revoke and rotate all npm/PyPI publish tokens if compromise suspected",
-        "Block outbound connections to newly registered domains with AI/MCP-related keywords",
-        "Audit developer accounts for unauthorized package uploads",
-        "Deploy EDR rules to detect execution of scripts from /tmp, /var/tmp, or user-writable directories"
+        "Revoke Google OAuth tokens for affected users and require re-authentication with MFA",
+        "Enable Google Workspace Alert Center alerts for Sheets API abuse patterns",
+        "Review and restrict Sheets API access via Google Admin Console (API access policies)",
+        "Isolate affected endpoints and check for persistence mechanisms (scheduled tasks, startup items)"
       ]
     },
     {
       "hypothesis_id": "TH-002",
-      "title": "Exploitation of Unpatched BeyondTrust CVE-2026-1731 Leading to Lateral Movement and Ransomware Deployment",
-      "description": "BeyondTrust CVE-2026-1731 (CVSS 9.9) has been actively exploited since at least February 2026, with attackers achieving unauthenticated RCE within hours of PoC release. Exploitation has been linked to ransomware deployments (e.g., Medusa, Everest) and deployment of VShell for persistence and lateral movement. The vulnerability affects BeyondTrust Remote Support (RS) and older Privileged Remote Access (PRA) products.",
+      "title": "Detection of Malicious GitHub Repositories Disguised as Next.js Projects Targeting Developers",
+      "description": "Multiple threat actors (ShinyHunters, Lazarus, and others) have deployed malicious GitHub repositories masquerading as legitimate Next.js projects and coding assessments. These repos deliver multi-stage backdoors when developers clone and run them. We hypothesize that similar supply chain compromises via fake developer tooling are active across tech, finance, and software development sectors, particularly targeting CI/CD pipelines and local development environments.",
       "threat_actors": [
-        "UNC2814",
-        "Phobos ransomware group",
-        "Lazarus group"
+        "ShinyHunters",
+        "lazarus group",
+        "SmartLoader",
+        "ClickFix"
       ],
       "industries_targeted": [
+        "Technology",
+        "Software Development",
         "Financial Services",
-        "Healthcare",
-        "Government",
-        "Technology"
+        "Telecommunications"
       ],
       "mitre_attack_techniques": [
-        "T1212 - Credential Stealing via Password Filter DLL",
-        "T1021.001 - Remote Services: SSH",
-        "T1548.003 - Syslog Service",
-        "T1547.001 - Registry Run Keys"
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1059.006 - Command and Scripting Interpreter: Python"
       ],
       "data_sources_needed": [
         {
-          "source_type": "Network",
-          "specific_data": "HTTP/HTTPS traffic to BeyondTrust management interfaces (ports 443, 8080), anomalous POST requests with large payloads, authentication bypass attempts",
+          "source_type": "Endpoint",
+          "specific_data": "Process execution logs (especially git clone, npm install, node, python, powershell), file creation/modification in dev directories (node_modules, .next, dist), network connections from development tools",
           "tools": [
-            "Firewall logs, IDS/IPS (e.g., Suricata), Zeek HTTP logs"
+            "CrowdStrike Falcon",
+            "Microsoft Defender for Endpoint",
+            "SentinelOne",
+            "Sysmon"
           ]
         },
         {
-          "source_type": "Endpoint",
-          "specific_data": "Process creation logs for vshell.exe, sshd.exe, or unusual child processes of BeyondTrust services, registry modifications under HKLM\\SOFTWARE\\BeyondTrust",
+          "source_type": "Network",
+          "specific_data": "DNS queries to GitHub.com and raw.githubusercontent.com, outbound connections from IDEs or build tools to external domains, anomalous traffic to GitHub API endpoints",
           "tools": [
-            "Sysmon, EDR (e.g., CrowdStrike), Windows Event Logs"
+            "Cisco Tetration",
+            "Palo Alto Networks NGFW",
+            "Zeek/Bro logs"
           ]
         },
         {
           "source_type": "Identity",
-          "specific_data": "Privileged session logs, failed login attempts to BeyondTrust admin console, new user accounts created via RCE",
+          "specific_data": "GitHub activity logs (repo creation, clone events, PR submissions), token usage from unusual locations, CI/CD pipeline execution logs",
           "tools": [
-            "BeyondTrust audit logs, SIEM"
+            "GitHub Advanced Security",
+            "GitGuardian",
+            "GitKraken"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "Detect CVE-2026-1731 Exploitation Attempts",
-          "description": "Search for HTTP requests to BeyondTrust endpoints containing suspicious parameters or large base64-encoded payloads that could indicate command injection.",
+          "tactic_name": "Fake Coding Challenge Detection",
+          "description": "Detect repositories with suspicious naming patterns (e.g., 'nextjs-assessment', 'frontend-test', 'coding-interview') that contain obfuscated scripts or unexpected post-install hooks.",
           "sample_queries": [
-            "index=network (dest_port=443 OR dest_port=8080) (dest_host=*beyondtrust* OR dest_host=*rs.beyondtrust*) (method=POST) (uri=*api* OR uri=*admin* OR uri=*auth*) | regex _raw=\"(command|exec|eval|base64|/bin/sh|/bin/bash|cmd\\.exe)\" | stats count by src_ip, dest_host, uri, method | sort -count",
-            "index=sysmon EventCode=3 (dest_port=443 OR dest_port=8080) (dest_host=*beyondtrust*) | eval payload=base64_decode(base64_field) | where match(payload, \"(command|exec|eval|/bin/sh)\") | table src_ip, dest_host, payload"
+            "index=github_audit action=repository_clone AND (repo_name=*assessment* OR repo_name=*test* OR repo_name=*interview* OR repo_name=*nextjs*) | stats count by actor, repo_name, action | where count > 1",
+            "index=endpoint_events process_name=git.exe AND process_command_line=*clone* AND (process_command_line=*assessment* OR process_command_line=*test*) | stats count by host_name, user, process_command_line"
           ],
-          "look_for": "Unusual POST requests to /api/auth, /admin/config, or /rs endpoints with base64-encoded payloads or shell commands, especially from non-standard source IPs"
+          "look_for": "Clones of repos with names suggesting assessments/tests; repos with package.json containing postinstall scripts that call powershell or python; unusual file extensions (.js, .py) in root of Next.js projects"
         },
         {
-          "tactic_name": "Detect VShell Deployment and Persistence",
-          "description": "Look for deployment of VShell (BeyondTrust's SSH server) or other SSH daemons as persistence mechanisms, often alongside new user accounts or scheduled tasks.",
+          "tactic_name": "Dev Environment Persistence Detection",
+          "description": "Identify persistence mechanisms installed in developer environments, such as malicious npm packages or VS Code extensions that execute on project open.",
           "sample_queries": [
-            "index=sysmon EventCode=1 (parent_image=*vshell* OR image=*vshell* OR image=*sshd*) | stats count by parent_image, image, user, host | where count > 0",
-            "index=security EventCode=4720 (user_name=*vshell* OR user_name=*ssh*) OR index=security EventCode=4688 (command_line=*vshell* OR command_line=*sshd*) | stats count by user, host, command_line"
+            "index=endpoint_events (process_name=node.exe OR process_name=npm.exe) AND (process_command_line=*install* OR process_command_line=*update*) AND (process_command_line=*nextjs* OR process_command_line=*react*) | stats count by host_name, user, process_command_line | where count > 5",
+            "index=vscode_extensions (extension_id=* OR extension_name=*) AND (extension_publisher=* OR extension_author=*) | search NOT extension_publisher=*Microsoft* | stats count by extension_name, publisher, install_date"
           ],
-          "look_for": "New user accounts with SSH capabilities, scheduled tasks named 'VShell' or 'SSH', processes spawned from BeyondTrust service accounts executing non-standard binaries"
+          "look_for": "Installation of packages with names similar to legitimate libraries (e.g., 'StripeApi.Net' vs 'Stripe.net'); VS Code extensions with suspicious permissions (file read/write, network access); node_modules with unexpected build scripts"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "github.com",
+          "raw.githubusercontent.com",
+          "gist.githubusercontent.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "package.json",
+          "next.config.js",
+          "assessment.js",
+          "test.js",
+          "index.js"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "git.exe",
+          "node.exe",
+          "npm.exe",
+          "python.exe",
+          "powershell.exe"
+        ],
+        "network_patterns": [
+          "Outbound HTTPS to GitHub APIs from IDEs; connections to GitHub from non-standard ports (e.g., 8080)"
+        ],
+        "user_agent_strings": [
+          "git/2.30.0",
+          "GitHub-Hookshot/*",
+          "node-fetch/*"
+        ],
+        "other_indicators": [
+          "Repos with low star count but high download activity; package.json with 'scripts' containing 'postinstall' or 'prepare'; files with base64-encoded payloads"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block GitHub repositories with suspicious naming patterns at the network level (via proxy or firewall)",
+        "Review and restrict npm package installation in CI/CD pipelines (e.g., require signed commits, use internal registry)",
+        "Audit developer machines for recently installed VS Code extensions and npm packages",
+        "Implement code signing for internal development tools and scripts"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "Detection of Cisco SD-WAN Exploitation via CVE-2026-20127 Authentication Bypass",
+      "description": "CVE-2026-20127 (CVSS 10.0) in Cisco Catalyst SD-WAN has been actively exploited since 2023 by multiple threat actors, including Lazarus Group and others. The flaw allows unauthenticated remote access to gain full admin privileges. Given the criticality of SD-WAN infrastructure and the high severity of the vulnerability, we hypothesize that unpatched Cisco SD-WAN devices remain compromised in enterprise and government networks, particularly in the US, EU, and UK where targeting is concentrated.",
+      "threat_actors": [
+        "lazarus group",
+        "UNC2814",
+        "ShinyHunters"
+      ],
+      "industries_targeted": [
+        "Government",
+        "Financial Services",
+        "Telecommunications",
+        "Critical Infrastructure"
+      ],
+      "mitre_attack_techniques": [
+        "T1190 - Exploit Public-Facing Application",
+        "T1068 - Exploit for Privilege Escalation",
+        "T1021.001 - Remote Services: SSH"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "SD-WAN control plane traffic (port 12346/UDP), logs from vManage/vSmart devices, firewall logs for connections to SD-WAN management interfaces",
+          "tools": [
+            "Cisco Stealthwatch",
+            "Cisco ThousandEyes",
+            "Palo Alto Networks NGFW",
+            "Wireshark"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Logs from SD-WAN controllers (vManage, vSmart), SSH connections to SD-WAN devices, configuration changes",
+          "tools": [
+            "Splunk for Cisco SD-WAN",
+            "Elastic Stack",
+            "Cisco DNA Center"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Unauthenticated Admin Access Detection",
+          "description": "Detect attempts to access SD-WAN management interfaces without authentication or with invalid credentials, which may indicate exploitation of CVE-2026-20127.",
+          "sample_queries": [
+            "index=cisco_sdwan sourcetype=cisco:sdwan:logs (action=login OR action=auth) status=failed AND (source_ip=* OR source_ip=0.0.0.0) | stats count by source_ip, user, device_name | where count > 10",
+            "index=cisco_sdwan sourcetype=cisco:sdwan:logs (endpoint=/v1/config/* OR endpoint=/v1/aaa/*) AND method=POST AND status=200 | stats count by source_ip, endpoint, user"
+          ],
+          "look_for": "Successful logins from unauthenticated requests (no credentials); access to /v1/config or /v1/aaa endpoints without authentication; unusual source IPs for management access (e.g., public internet instead of internal network)"
+        },
+        {
+          "tactic_name": "Rogue Peer Detection",
+          "description": "Identify unauthorized peers added to the SD-WAN fabric, which is a known post-exploitation step for CVE-2026-20127.",
+          "sample_queries": [
+            "index=cisco_sdwan sourcetype=cisco:sdwan:logs event=peer_added | stats count by source_ip, peer_ip, device_name | where count > 1",
+            "index=cisco_sdwan sourcetype=cisco:sdwan:logs (event=peer_status_change OR event=peer_added) AND peer_ip=* | search peer_ip!=10.* AND peer_ip!=192.168.* | stats count by peer_ip, device_name"
+          ],
+          "look_for": "New peers added to SD-WAN fabric from external IP ranges; peers with unusual names or descriptions; rapid succession of peer additions"
         }
       ],
       "iocs_and_patterns": {
         "domains": [],
-        "ips": [],
+        "ips": [
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "192.0.2.0/24"
+        ],
         "file_hashes": [],
-        "file_names": [
-          "vshell.exe",
-          "vshell64.exe",
-          "sshd.exe",
-          "beyondtrust-agent.exe"
-        ],
-        "registry_keys": [
-          "HKLM\\SOFTWARE\\BeyondTrust\\PRA\\Services",
-          "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\VShell"
-        ],
-        "process_names": [
-          "vshell.exe",
-          "sshd.exe",
-          "beyondtrust-rs.exe"
-        ],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [],
         "network_patterns": [
-          "HTTPS to port 443/8080 with POST /api/auth/bypass or POST /admin/config",
-          "SSH connections from non-standard IPs to internal hosts"
+          "UDP traffic on port 12346 from external sources; HTTP/HTTPS to SD-WAN management interfaces (port 80, 443, 8443) from public IP ranges"
         ],
         "user_agent_strings": [],
         "other_indicators": [
-          "Unusual outbound SSH connections from management servers",
-          "New admin accounts created outside business hours",
-          "Log entries showing 'unauthenticated access' in BeyondTrust logs"
+          "Unexpected configuration changes (e.g., new routes, firewall rules); SSH sessions from unusual locations; logs showing 'unauthenticated' user context"
         ]
       },
       "priority": "CRITICAL",
@@ -218,334 +296,218 @@
       "estimated_detection_rate": "High",
       "false_positive_risk": "Low",
       "recommended_actions": [
-        "Immediately patch BeyondTrust RS/PRA to latest version",
-        "Block external access to BeyondTrust management interfaces",
-        "Audit all privileged accounts created in the last 30 days",
-        "Hunt for VShell processes and SSH backdoors on all systems"
-      ]
-    },
-    {
-      "hypothesis_id": "TH-003",
-      "title": "AI-Assisted Credential Theft via Fake Claude Code and GitHub Copilot Exploits",
-      "description": "Multiple vulnerabilities in Anthropic's Claude Code (CVE-2025-59536, CVE-2026-21852) and GitHub Copilot (RoguePilot) have been actively exploited to enable remote code execution and API key theft when developers clone untrusted repositories. Attackers abuse Hooks, MCP servers, and environment variables to execute arbitrary commands and exfiltrate credentials, often via GitHub Issues or Codespaces.",
-      "threat_actors": [
-        "ShinyHunters",
-        "UNC2814",
-        "SmartLoader"
-      ],
-      "industries_targeted": [
-        "Software Development",
-        "Technology",
-        "Financial Services",
-        "Telecommunications"
-      ],
-      "mitre_attack_techniques": [
-        "T1555 - Credentials from Password Stores",
-        "T1552.001 - Unsecured Credentials: Credentials in Files",
-        "T1195.003 - Supply Chain Compromise: Compromise Developer Tools",
-        "T1059.007 - Command and Scripting Interpreter: JavaScript"
-      ],
-      "data_sources_needed": [
-        {
-          "source_type": "Endpoint",
-          "specific_data": "Process execution logs for code editors (VS Code, Cursor), Claude Code, GitHub Copilot, and npm scripts; file creation in .claude, .copilot, .github directories",
-          "tools": [
-            "Sysmon, EDR, VS Code extension logs"
-          ]
-        },
-        {
-          "source_type": "Cloud",
-          "specific_data": "GitHub Actions workflow runs, Codespace launches, repository clone events, webhook triggers",
-          "tools": [
-            "GitHub Audit Logs, Microsoft Defender for Cloud Apps"
-          ]
-        },
-        {
-          "source_type": "Network",
-          "specific_data": "DNS queries to webhook domains, API calls to Anthropic/GitHub endpoints, exfiltration to suspicious domains",
-          "tools": [
-            "DNS logs, Proxy logs, SIEM"
-          ]
-        }
-      ],
-      "hunting_tactics": [
-        {
-          "tactic_name": "Detect Malicious Claude Code Hooks and MCP Servers",
-          "description": "Search for execution of unauthorized MCP servers or Claude Code hooks that attempt to run shell commands or access environment variables.",
-          "sample_queries": [
-            "index=sysmon EventCode=1 (parent_image=*node* OR parent_image=*python*) (command_line=*mcp* OR command_line=*claude* OR command_line=*hook*) | stats count by parent_image, command_line, host | where count > 0",
-            "index=endpoint (file_path=*\\.claude* OR file_path=*\\.copilot*) (file_name=*config* OR file_name=*hook* OR file_name=*server*) | stats count by file_path, host | where count > 0"
-          ],
-          "look_for": "Processes spawned from node/python executing MCP server scripts, files in .claude or .copilot directories with .json/.js/.yaml extensions, environment variables containing 'MCP_SERVER_URL' or 'CLAUDE_API_KEY'"
-        },
-        {
-          "tactic_name": "Detect RoguePilot GitHub Issue Exploitation",
-          "description": "Hunt for GitHub Issues containing hidden instructions that trigger Copilot to execute malicious code in Codespaces.",
-          "sample_queries": [
-            "index=github_audit (action=issue_comment OR action=issue) (body=*copilot* OR body=*claude* OR body=*codespace*) | regex _raw=\"(exec|eval|run|bash|sh|powershell)\" | stats count by actor, repo_name, issue_number, body | sort -count",
-            "index=network (user_agent=*GitHub-Copilot*) (dest_domain=*githubusercontent* OR dest_domain=*raw.githubusercontent*) | eval body=base64_decode(base64_field) | where match(body, \"(exec|eval|bash)\") | stats count by src_ip, dest_domain"
-          ],
-          "look_for": "GitHub Issues with base64-encoded or obfuscated shell commands, suspicious Copilot instructions in issue descriptions, Codespace launches triggered by issue comments"
-        }
-      ],
-      "iocs_and_patterns": {
-        "domains": [
-          "webhook[.]site",
-          "claude-hooks[.]xyz",
-          "mcp-server[.]io",
-          "copilot-instructions[.]net",
-          "github-codespaces[.]com"
-        ],
-        "ips": [],
-        "file_hashes": [],
-        "file_names": [
-          ".claude/config.json",
-          ".copilot/hook.js",
-          "mcp-server.js",
-          "claude-artifacts/"
-        ],
-        "registry_keys": [],
-        "process_names": [
-          "node",
-          "python",
-          "code",
-          "copilot",
-          "codespaces"
-        ],
-        "network_patterns": [
-          "HTTPS to webhook.site or similar with POST /webhook",
-          "DNS queries to newly registered domains with 'mcp', 'claude', 'copilot' in name"
-        ],
-        "user_agent_strings": [
-          "GitHub-Copilot/*",
-          "Claude-Code/*",
-          "VS Code *"
-        ],
-        "other_indicators": [
-          "GitHub Issues with hidden HTML comments or base64 payloads",
-          "Codespace launches triggered by issue comments",
-          "Environment variables containing 'MCP_SERVER_URL' or 'CLAUDE_API_KEY'"
-        ]
-      },
-      "priority": "HIGH",
-      "confidence": "HIGH",
-      "estimated_detection_rate": "Medium",
-      "false_positive_risk": "Medium",
-      "recommended_actions": [
-        "Disable GitHub Copilot in Codespaces for untrusted repositories",
-        "Audit Claude Code extensions and hooks for unauthorized code execution",
-        "Block outbound connections to webhook domains and newly registered AI-related domains",
-        "Review developer environment variables for suspicious API keys"
+        "Immediately patch all Cisco SD-WAN devices to version 15.5.2 or later",
+        "Isolate unpatched devices from the internet and restrict management access to internal networks",
+        "Review SD-WAN peer lists and remove unauthorized peers",
+        "Audit configuration changes for the past 30 days for signs of compromise"
       ]
     },
     {
       "hypothesis_id": "TH-004",
-      "title": "Physical and Remote ATM Jackpotting Attacks Using Ploutus Malware",
-      "description": "The FBI has confirmed a surge in ATM jackpotting attacks, with over $20 million lost in 2025 and 700 incidents reported that year. Attackers exploit physical access to ATMs and deploy malware like Ploutus to manipulate firmware and force cash dispensing. This is often preceded by compromise of ATM management software or internal networks.",
+      "title": "Detection of Scattered LAPSUS$ Hunters' Voice Phishing Campaigns Targeting IT Help Desks",
+      "description": "Scattered LAPSUS$ Hunters (SLSH) has been actively recruiting women to conduct voice phishing (vishing) attacks against IT help desks, offering $500-$1,000 per call. These campaigns aim to bypass MFA and gain access to corporate systems by impersonating employees. We hypothesize that similar vishing campaigns are ongoing, particularly targeting technology, outsourced IT services, and cloud service providers where help desk access can lead to broader compromise.",
       "threat_actors": [
-        "Lazarus group",
-        "Phobos ransomware group",
-        "UNC2814"
+        "Scattered LAPSUS$ Hunters (SLSH)"
       ],
       "industries_targeted": [
-        "Financial Services",
-        "Banking",
-        "Retail"
+        "Information Technology",
+        "Outsourced IT Services",
+        "Cloud Service Providers",
+        "Enterprise Helpdesk Operations"
       ],
       "mitre_attack_techniques": [
-        "T1205 - Traffic Signaling",
-        "T1021.003 - Remote Services: Windows Remote Management",
-        "T1562.003 - Impair Defenses: Disable Windows Event Logging",
-        "T1491 - Direct Resource Control"
+        "T1598.003 - Phishing for Information: Vishing",
+        "T1556.002 - Modify Authentication Process: Multi-Factor Authentication Interception",
+        "T1078 - Valid Accounts"
       ],
       "data_sources_needed": [
-        {
-          "source_type": "Network",
-          "specific_data": "ATM-to-branch network traffic, unusual outbound connections from ATMs, SMB traffic to ATMs (port 445)",
-          "tools": [
-            "Network detection (e.g., Darktrace), ATM firewall logs"
-          ]
-        },
-        {
-          "source_type": "Endpoint",
-          "specific_data": "ATM process execution logs (e.g., kiosk processes, Windows services), USB device insertion events, disk write activity",
-          "tools": [
-            "EDR for ATMs (e.g., ESET Banker), Windows Event Logs"
-          ]
-        },
-        {
-          "source_type": "Physical",
-          "specific_data": "ATM access logs, surveillance footage, tamper detection events",
-          "tools": [
-            "Physical access control systems, ATM vendor logs"
-          ]
-        }
-      ],
-      "hunting_tactics": [
-        {
-          "tactic_name": "Detect Ploutus Malware Execution on ATMs",
-          "description": "Search for known Ploutus indicators such as unusual processes, registry keys, or network connections associated with ATM jackpotting.",
-          "sample_queries": [
-            "index=sysmon EventCode=1 (image=*ploutus* OR image=*atm* OR image=*kiosk*) (parent_image=*winlogon* OR parent_image=*explorer*) | stats count by image, parent_image, host | where count > 0",
-            "index=endpoint (file_path=*C:\\Windows\\Temp\\*ploutus* OR file_path=*C:\\ProgramData\\*ploutus*) | stats count by file_path, host | where count > 0"
-          ],
-          "look_for": "Processes named ploutus.exe, atm.exe, or kiosk.exe running as SYSTEM, registry keys under HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Ploutus, USB device insertion events followed by disk write activity"
-        },
-        {
-          "tactic_name": "Detect Internal Network Compromise Prior to ATM Attack",
-          "description": "Hunt for lateral movement from compromised branch networks to ATM management systems, often involving SMB or RDP.",
-          "sample_queries": [
-            "index=security EventCode=4624 (logon_type=3) (src_ip=*10.* OR src_ip=*192.168.*) (dest_host=*atm* OR dest_host=*branch*) | stats count by src_user, src_ip, dest_host | where count > 5",
-            "index=network (src_ip=*10.* OR src_ip=*192.168.*) (dest_port=445 OR dest_port=3389) (dest_host=*atm*) | stats count by src_ip, dest_host, dest_port | where count > 10"
-          ],
-          "look_for": "Multiple logons to ATMs from internal IPs, SMB traffic to ATMs from non-standard sources, RDP sessions to ATMs outside business hours"
-        }
-      ],
-      "iocs_and_patterns": {
-        "domains": [],
-        "ips": [],
-        "file_hashes": [
-          "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
-          "0t9s8r7q6p5o4n3m2l1k0j9i8h7g6f5e4d3c2b1a"
-        ],
-        "file_names": [
-          "ploutus.exe",
-          "atm.exe",
-          "kiosk.exe",
-          "atm_config.bin"
-        ],
-        "registry_keys": [
-          "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Ploutus",
-          "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Ploutus"
-        ],
-        "process_names": [
-          "ploutus.exe",
-          "atm.exe",
-          "kiosk.exe",
-          "atm_manager.exe"
-        ],
-        "network_patterns": [
-          "SMB to port 445 from internal IPs to ATMs",
-          "DNS queries to C2 domains with 'atm' or 'jackpot' in name",
-          "Unusual outbound connections from ATMs to external IPs"
-        ],
-        "user_agent_strings": [],
-        "other_indicators": [
-          "USB device insertion events on ATMs",
-          "Disk write activity to ATM boot sectors",
-          "ATM firmware modification timestamps"
-        ]
-      },
-      "priority": "HIGH",
-      "confidence": "HIGH",
-      "estimated_detection_rate": "Medium",
-      "false_positive_risk": "Medium",
-      "recommended_actions": [
-        "Isolate ATMs from branch networks and implement network segmentation",
-        "Deploy EDR with ATM-specific detection rules",
-        "Audit physical access controls and surveillance for ATMs",
-        "Hunt for lateral movement from branch networks to ATM management systems"
-      ]
-    },
-    {
-      "hypothesis_id": "TH-005",
-      "title": "ClickFix Social Engineering Attacks Abusing DNS Tunneling (nslookup) to Deliver Malware",
-      "description": "The ClickFix campaign has evolved to abuse DNS tunneling via nslookup commands to deliver second-stage payloads, bypassing traditional security controls. Attackers trick users into running malicious nslookup commands that parse DNS responses to retrieve malware, often via fake CAPTCHA or error messages.",
-      "threat_actors": [
-        "ClickFix",
-        "SmartLoader",
-        "Phobos ransomware group"
-      ],
-      "industries_targeted": [
-        "Technology",
-        "Financial Services",
-        "Software Development",
-        "Healthcare"
-      ],
-      "mitre_attack_techniques": [
-        "T1059.001 - Command and Scripting Interpreter: PowerShell",
-        "T1071.004 - Application Layer Protocol: DNS",
-        "T1105 - Ingress Tool Transfer",
-        "T1566.001 - Phishing: Spearphishing Attachment"
-      ],
-      "data_sources_needed": [
-        {
-          "source_type": "Endpoint",
-          "specific_data": "Process execution logs for nslookup, cmd.exe, powershell.exe, mshta.exe, and malicious scripts",
-          "tools": [
-            "Sysmon, EDR, Windows Event Logs"
-          ]
-        },
-        {
-          "source_type": "Network",
-          "specific_data": "DNS queries with unusually long subdomains, DNS TXT record queries, nslookup command-line arguments",
-          "tools": [
-            "DNS logs (e.g., Cisco Umbrella, Infoblox), Zeek DNS logs"
-          ]
-        },
         {
           "source_type": "Email",
-          "specific_data": "Phishing emails with fake CAPTCHA instructions, malicious attachments, or links to malicious sites",
+          "specific_data": "Email logs showing job-related phishing emails (e.g., 'IT Help Desk Recruitment', 'Contractor Assessment'), attachments with malicious scripts",
           "tools": [
-            "Email security gateway logs, SIEM"
+            "Microsoft 365 Defender",
+            "Cisco Email Security",
+            "Proofpoint"
+          ]
+        },
+        {
+          "source_type": "Telephony",
+          "specific_data": "Call logs showing calls from new or spoofed numbers to IT help desks, calls with unusual durations or patterns (e.g., repeated calls from same number)",
+          "tools": [
+            "Cisco Unified Communications Manager",
+            "Vonage API logs",
+            "Dialpad analytics"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "Failed login attempts after help desk interactions, MFA bypass attempts, new device registrations",
+          "tools": [
+            "Okta Identity Cloud",
+            "Azure AD Conditional Access logs",
+            "Ping Identity"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "Detect nslookup-Based DNS Tunneling",
-          "description": "Search for nslookup commands with suspicious arguments or DNS queries with long, base64-encoded subdomains that may indicate data exfiltration or payload delivery.",
+          "tactic_name": "Help Desk Vishing Detection",
+          "description": "Detect patterns of calls to IT help desks that mimic legitimate employee requests but contain social engineering cues.",
           "sample_queries": [
-            "index=sysmon EventCode=1 (parent_image=*cmd* OR parent_image=*powershell*) (image=*nslookup*) (command_line=*.*.*.* OR command_line=*txt*) | stats count by parent_image, command_line, host | where count > 0",
-            "index=dns (query=*.*.*.* OR query=*txt*) (query_length>50) | eval subdomain=split(query, \"\\.\") | eval payload=mvindex(subdomain, 0) | where len(payload) > 40 | stats count by query, src_ip | sort -count"
+            "index=telephony_logs (call_type=voip OR call_type=sip) AND (caller_id=* OR caller_id=+1-555-*) AND (call_duration>300 OR call_duration<60) AND (caller_id=* OR caller_id=+1-555-*) | stats count by caller_id, callee_id, call_duration | where count > 3",
+            "index=helpdesk_tickets (subject=*password* OR subject=*MFA* OR subject=*reset*) AND (ticket_status=open OR ticket_status=pending) AND (ticket_priority=high) | stats count by caller_email, caller_phone, ticket_subject"
           ],
-          "look_for": "nslookup commands with arguments containing base64-encoded strings, DNS TXT queries with unusually long responses, parent processes like cmd.exe or powershell.exe spawning nslookup"
+          "look_for": "Calls from numbers with high international prefixes (e.g., +44, +34) to internal help desk numbers; callers claiming to be 'new hires' or 'contractors' requesting password resets; calls with high urgency or emotional manipulation (e.g., 'I have a meeting in 5 minutes')"
         },
         {
-          "tactic_name": "Detect ClickFix Social Engineering Lures",
-          "description": "Hunt for phishing emails or web pages with fake CAPTCHA, error messages, or coding challenges that instruct users to run nslookup commands.",
+          "tactic_name": "MFA Bypass Attempt Detection",
+          "description": "Detect attempts to bypass MFA after help desk interactions, such as rapid login attempts or use of compromised credentials.",
           "sample_queries": [
-            "index=security (event_type=phishing OR event_type=malicious_url) (body=*nslookup* OR body=*copy.*paste* OR body=*run.*command*) | stats count by src_ip, dest_url, subject | sort -count",
-            "index=web (url=*clickfix* OR url=*capcha* OR url=*update.*now*) (user_agent=*Mozilla*) | stats count by url, user_agent, src_ip | where count > 0"
+            "index=auth_logs (event=login_attempt OR event=mfa_challenge) AND (result=success OR result=failure) AND (user_agent=*mobile* OR user_agent=*new_device*) | stats count by user, ip_address, user_agent, mfa_method | where count > 5",
+            "index=helpdesk_tickets (subject=*password* OR subject=*MFA*) AND (ticket_status=closed) AND (event=login_attempt AND result=failure) | stats count by ticket_id, user, ip_address"
           ],
-          "look_for": "Phishing emails with instructions to run nslookup, URLs containing 'clickfix', 'capcha', or 'update now', web pages with fake CAPTCHA that display nslookup commands"
+          "look_for": "Login attempts from new devices or locations shortly after help desk tickets for password resets; MFA challenges followed by immediate success without user interaction; use of 'remember this device' options after help desk interactions"
         }
       ],
       "iocs_and_patterns": {
         "domains": [
-          "clickfix[.]xyz",
-          "capcha-update[.]com",
-          "nslookup[.]site",
-          "error-fix[.]net",
-          "update-now[.]xyz"
+          "forms.google.ss-o.com",
+          "id-v4.com",
+          "forms.google.com"
         ],
         "ips": [],
         "file_hashes": [],
         "file_names": [
-          "nslookup.bat",
-          "fix-error.cmd",
-          "capcha-update.ps1",
-          "update-now.exe"
+          "assessment.pdf",
+          "job_test.docm",
+          "nextjs-test.zip"
+        ],
+        "registry_keys": [],
+        "process_names": [],
+        "network_patterns": [
+          "HTTPS to Google Forms from help desk IPs; connections to id-v4.com from internal networks"
+        ],
+        "user_agent_strings": [
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15"
+        ],
+        "other_indicators": [
+          "Help desk calls from numbers with '555' prefixes (fake numbers); emails with 'Urgent' or 'Immediate Action Required' in subject lines; requests for credentials via email instead of secure portals"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Implement strict verification protocols for help desk requests (e.g., callback to known numbers, security questions)",
+        "Enable MFA for all help desk accounts and restrict MFA bypass policies",
+        "Train help desk staff on vishing indicators and social engineering tactics",
+        "Monitor for calls from numbers with high international prefixes or '555' prefixes"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "Detection of AI-Generated Passwords with Predictable Patterns in Enterprise Environments",
+      "description": "LLMs like Claude are generating highly predictable passwords with specific patterns (e.g., starting with 'G7', avoiding repeating characters, avoiding '*'). This is a significant risk as AI-generated passwords are increasingly used in DevOps, CI/CD pipelines, and autonomous systems. We hypothesize that such predictable passwords are present in enterprise environments, particularly in technology, cloud services, and DevOps sectors, creating easy targets for credential stuffing and dictionary attacks.",
+      "threat_actors": [
+        "ShinyHunters",
+        "lazarus group",
+        "UNC2814"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Cloud Services",
+        "Autonomous Systems",
+        "DevOps/CI-CD Pipelines",
+        "Software Development"
+      ],
+      "mitre_attack_techniques": [
+        "T1110.001 - Brute Force: Password Guessing",
+        "T1110.003 - Brute Force: Password Spraying",
+        "T1552.001 - Unsecured Credentials: Credentials in Files"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Identity",
+          "specific_data": "Password complexity logs, password change events, credential stuffing detection alerts, password manager usage logs",
+          "tools": [
+            "Azure AD Identity Protection",
+            "Okta Identity Governance",
+            "Dashlane for Business",
+            "1Password Business"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process logs showing generation of passwords (e.g., Python scripts, Node.js apps), file creation/modification in config files with passwords",
+          "tools": [
+            "CrowdStrike Falcon",
+            "Microsoft Defender for Endpoint",
+            "Sysmon"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "DNS queries to password generation services, outbound connections to AI APIs (e.g., anthropic.com, openai.com)",
+          "tools": [
+            "Cisco Stealthwatch",
+            "Palo Alto Networks NGFW",
+            "Zeek/Bro logs"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Predictable Password Pattern Detection",
+          "description": "Detect passwords that match known AI-generated patterns (e.g., starting with 'G7', high frequency of 'L', '9', 'm', '2', '$', '#' and low frequency of '5', '@', '*').",
+          "sample_queries": [
+            "index=auth_logs (event=login_attempt OR event=password_change) AND (password=*G7* OR password=*L9m2$#*) | stats count by user, password | where count > 1",
+            "index=password_logs (password=* OR password=*) | eval length=len(password) | eval first_char=substr(password,1,1) | eval second_char=substr(password,2,1) | search first_char=G AND second_char=7 | stats count by user, password"
+          ],
+          "look_for": "Passwords starting with 'G7'; passwords with no repeating characters; passwords missing '*' or '5' but containing 'L', '9', 'm', '2', '$', '#'; passwords generated by scripts or tools (e.g., 'python generate_password.py')"
+        },
+        {
+          "tactic_name": "AI Tool Usage Detection",
+          "description": "Detect usage of AI tools to generate passwords, which may indicate insecure password management practices.",
+          "sample_queries": [
+            "index=endpoint_events (process_name=python.exe OR process_name=node.exe) AND (process_command_line=*generate*password* OR process_command_line=*create*password*) | stats count by host_name, user, process_command_line",
+            "index=network_logs (dest_port=443 OR dest_port=80) AND (dest_domain=*anthropic.com* OR dest_domain=*openai.com* OR dest_domain=*claude.ai*) AND (process_name=python.exe OR process_name=node.exe) | stats count by host_name, user, dest_domain"
+          ],
+          "look_for": "Execution of scripts that generate passwords (e.g., 'python generate_password.py'); outbound connections to AI APIs from development machines; use of AI tools in CI/CD pipelines to generate secrets"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "anthropic.com",
+          "openai.com",
+          "claude.ai",
+          "chat.openai.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "password_generator.py",
+          "generate_secrets.js",
+          "create_tokens.sh"
         ],
         "registry_keys": [],
         "process_names": [
-          "nslookup.exe",
-          "cmd.exe",
-          "powershell.exe",
-          "mshta.exe"
+          "python.exe",
+          "node.exe",
+          "generate_password.py",
+          "create_tokens.sh"
         ],
         "network_patterns": [
-          "DNS TXT queries to domains with long subdomains",
-          "HTTP POST requests to clickfix domains with base64 payloads",
-          "DNS queries to newly registered domains with 'clickfix', 'capcha', or 'update' in name"
+          "HTTPS to AI APIs from development machines; connections to anthropic.com or openai.com during off-hours"
         ],
         "user_agent_strings": [
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
+          "python-requests/2.28.0",
+          "node-fetch/2.6.7",
+          "Claude-Code/*"
         ],
         "other_indicators": [
-          "Clipboard manipulation scripts",
-          "Fake CAPTCHA pages with nslookup instructions",
-          "Malicious PowerShell scripts encoded in base64"
+          "Passwords in config files (e.g., .env, config.json) with predictable patterns; use of AI tools in CI/CD pipelines to generate secrets; high frequency of password changes in short time periods"
         ]
       },
       "priority": "MEDIUM",
@@ -553,10 +515,10 @@
       "estimated_detection_rate": "Medium",
       "false_positive_risk": "Low",
       "recommended_actions": [
-        "Block nslookup.exe from running with non-standard arguments",
-        "Monitor DNS queries for unusually long subdomains",
-        "Deploy email filtering rules to detect ClickFix-themed phishing",
-        "Educate developers and IT staff about ClickFix social engineering tactics"
+        "Implement password policies that reject AI-generated patterns (e.g., require at least one '*' or '5', allow repeating characters)",
+        "Use dedicated secret management tools (e.g., HashiCorp Vault, AWS Secrets Manager) instead of AI-generated passwords",
+        "Audit CI/CD pipelines for password generation scripts and replace with secure alternatives",
+        "Enable credential stuffing detection in Azure AD or Okta"
       ]
     }
   ],
@@ -567,48 +529,49 @@
       "MEDIUM": 1
     },
     "confidence_breakdown": {
-      "HIGH": 5
+      "HIGH": 4,
+      "MEDIUM": 1
     },
     "unique_threat_actors": [
-      "lazarus group",
-      "ClickFix",
-      "Lazarus group",
-      "UNC2814",
       "ShinyHunters",
+      "ClickFix",
       "SmartLoader",
-      "Phobos ransomware group"
+      "UNC2814",
+      "lazarus group",
+      "Scattered LAPSUS$ Hunters (SLSH)"
     ],
     "unique_industries_targeted": [
-      "Retail",
+      "Cloud Service Providers",
+      "Autonomous Systems",
       "Financial Services",
+      "Outsourced IT Services",
       "Software Development",
-      "Government",
-      "Healthcare",
-      "Telecommunications",
       "Technology",
-      "Banking"
+      "Telecommunications",
+      "Information Technology",
+      "Cloud Services",
+      "DevOps/CI-CD Pipelines",
+      "Healthcare",
+      "Critical Infrastructure",
+      "Government",
+      "Enterprise Helpdesk Operations"
     ],
     "unique_mitre_techniques": [
-      "T1021.003 - Remote Services: Windows Remote Management",
-      "T1105 - Ingress Tool Transfer",
-      "T1059.007 - Command and Scripting Interpreter: JavaScript",
-      "T1555 - Credentials from Password Stores",
-      "T1059.001 - Command and Scripting Interpreter: PowerShell",
-      "T1195.003 - Supply Chain Compromise: Compromise Developer Tools",
-      "T1548.003 - Syslog Service",
-      "T1562.003 - Impair Defenses: Disable Windows Event Logging",
-      "T1574.009 - Hijack Execution Flow: Dynamic-link Library Hijacking",
-      "T1212 - Credential Stealing via Password Filter DLL",
       "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
-      "T1528 - Steal Application Access Token",
-      "T1547.001 - Registry Run Keys",
-      "T1491 - Direct Resource Control",
+      "T1556.002 - Modify Authentication Process: Multi-Factor Authentication Interception",
+      "T1567.001 - Exfiltration Over Web Service: Exfiltration to Cloud Storage",
+      "T1059.006 - Command and Scripting Interpreter: Python",
+      "T1110.001 - Brute Force: Password Guessing",
+      "T1068 - Exploit for Privilege Escalation",
+      "T1078 - Valid Accounts",
       "T1526 - Cloud Service Discovery",
-      "T1071.004 - Application Layer Protocol: DNS",
-      "T1566.001 - Phishing: Spearphishing Attachment",
-      "T1021.001 - Remote Services: SSH",
+      "T1105 - Ingress Tool Transfer",
+      "T1110.003 - Brute Force: Password Spraying",
+      "T1598.003 - Phishing for Information: Vishing",
+      "T1190 - Exploit Public-Facing Application",
       "T1552.001 - Unsecured Credentials: Credentials in Files",
-      "T1205 - Traffic Signaling"
+      "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "T1021.001 - Remote Services: SSH"
     ],
     "source_data_stats": {
       "top_threat_actors": [
@@ -650,15 +613,15 @@
           3
         ],
         [
-          "social engineering",
-          2
-        ],
-        [
           "supply chain compromise",
+          3
+        ],
+        [
+          "Unknown (no specific vector disclosed in article)",
           2
         ],
         [
-          "Physical access to ATM hardware",
+          "Malicious GitHub repositories",
           2
         ]
       ],

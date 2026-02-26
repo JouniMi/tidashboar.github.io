@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-02-26T02:04:14Z",
+  "generated_at": "2026-02-26T13:36:25Z",
   "industry": "Technology",
-  "summary": "**Technology Sector Cyber Threat Assessment**  \n**Reporting Period: 30 Days (January 27 – February 25, 2026)**  \n**Prepared by: Senior Cybersecurity Analyst, Technology Sector Practice**  \n**Classification: Sensitive – Law Enforcement & Critical Infrastructure Partners Only**\n\n---\n\n## Executive Summary\n\nOver the past 30 days, the Technology sector has faced an intensifying wave of *multi-vector, supply chain–centric attacks*, driven by high-impact vulnerabilities in core infrastructure components (e.g., Node.js, npm, SmarterMail), AI/LLM platforms, and developer tooling. The threat landscape is defined by three converging trends: (1) **AI-native exploitation**, where attackers weaponize generative AI tools (e.g., fake ChatGPT/VS Code extensions, LLM hijacking campaigns like *Operation Bizarre Bazaar*), (2) **resilient infrastructure targeting**, exemplified by the *WinRAR* and *SmarterMail* zero-day exploits—both added to CISA’s KEV catalog—and (3) **geopolitically aligned cyber operations**, notably by China-linked groups (e.g., Mustang Panda, PeckBirdy) conducting sustained espionage against government, telecom, and cloud service providers.\n\nCritical vulnerabilities in widely adopted open-source libraries (e.g., `vm2`, `n8n`, `PackageGate` flaws in NPM/PNPM) have enabled sandbox escapes and remote code execution (RCE), directly threatening SaaS vendors, cloud providers, and enterprise DevOps pipelines. Meanwhile, the *eScan* and *Hugging Face* supply chain incidents demonstrate that even trusted software distribution channels are compromised—often via compromised update servers or malicious package uploads. The sector’s increasing reliance on AI-driven automation (e.g., n8n workflows, LLM endpoints) has expanded the attack surface, with attackers now actively scanning for and hijacking publicly exposed AI models.\n\nStrategically, the most alarming development is the *operationalization of AI in both offense and defense*: attackers deploy AI-powered phishing (e.g., *Tsundere Bot*), impersonation (e.g., *Moltbot* rebranding), and code generation (e.g., *Moltbot* VS Code extension), while defenders accelerate AI integration into SOAR, threat hunting, and identity protection (e.g., PwC–Google Cloud $400M deal). However, overreliance on AI without human oversight remains a critical risk, as highlighted by multiple incidents where misconfigured LLM endpoints led to full model compromise and data monetization.\n\n---\n\n## Threat Actor Intelligence\n\n### Nation-State Actors\n- **China-Linked Groups (Mustang Panda, PeckBirdy)**:  \n  - Deployed updated **CoolClient** backdoor (v2.1) with browser stealers and script-based persistence (HoneyMyte, Jan 27).  \n  - Used the **PeckBirdy JavaScript C2 framework** since 2023 for long-term espionage against telecom, defense, and government targets (Jan 27).  \n  - Targeted UK prime ministerial aides via persistent surveillance operations (Jan 27, *The Register*).  \n  - Exploited patched WinRAR flaw (CVE-2025-8088) for initial access, then deployed infostealers (Jan 28, *BleepingComputer*).\n\n- **Russia-Linked Groups (ELECTRUM)**:  \n  - Conducted the December 2025 cyberattack on Polish power grid, bricking ICS devices and impacting ~30 facilities (Jan 28–30).  \n  - Leveraged wiper malware and supply chain compromises (e.g., *eScan* update server breach) to maximize disruption.\n\n### Cybercriminal Groups\n- **ShinyHunters**:  \n  - Executed multi-stage phishing campaigns targeting 100+ organizations, including bypass of SSO via social engineering (phone calls) (Jan 27).  \n  - Claimed breaches of Panera Bread, SoundCloud (29.8M users), and Match Group (Hinge, Tinder, OkCupid, 10M+ records) (Jan 27–29).  \n  - Demonstrated evolving TTPs: credential stuffing, fake CAPTCHA lures, and abuse of trusted services (e.g., Microsoft scripts).\n\n- **RAMP Forum Operators**:  \n  - FBI seized the RAMP cybercrime forum (Jan 28), disrupting ransomware gangs’ coordination.  \n  - Forced operators to migrate operations, increasing fragmentation and opportunism.\n\n### Emerging Threat Actors\n- **AI-Enabled Impersonators**:  \n  - *Moltbot* (formerly *Clawdbot*) masqueraded as a legitimate AI coding assistant on VS Code Marketplace, dropping malware (Jan 28–29).  \n  - Fake ChatGPT extensions (16+ identified) hijacked user sessions and stole API keys (Jan 27, *SecurityWeek*).\n\n---\n\n## Technical Threat Analysis\n\n### Critical Vulnerabilities (KEV-Listed or Actively Exploited)\n| CVE | Product | Severity | Impact on Technology Sector |\n|-----|---------|----------|----------------------------|\n| **CVE-2026-21509** | Microsoft Office | Critical (RCE) | Targeted document-based attacks; forced out-of-band patch (Jan 27). |\n| **CVE-2025-8088** | WinRAR | Critical (Path Traversal → RCE) | Used by APTs and criminals for malware drops; still actively exploited (Jan 28–29). |\n| **CVE-2026-24858** | Fortinet FortiOS | Critical (SSO Auth Bypass) | Enabled unauthorized admin access; patched after active exploitation (Jan 27–28). |\n| **CVE-2026-XXXXX** | SmarterMail | Critical (Unauthenticated RCE, CVSS 9.3) | 6,000+ servers exposed; CISA KEV-listed (Jan 27–30). |\n| **CVE-2026-XXXXX** | vm2 (Node.js) | Critical (Sandbox Escape → RCE) | Compromised n8n and custom LLM deployments; exploited in *Bizarre Bazaar* (Jan 27–28). |\n| **CVE-2026-XXXXX** | Ivanti EPMM | Critical (Zero-Day RCE) | Actively exploited in enterprise MDM environments (Jan 29–30). |\n\n### Malware & Tooling Trends\n- **Infostealers & RATs**:  \n  - *Amnesia RAT* deployed via phishing against Russian users (Jan 27).  \n  - *Tsundere Bot* adopted by ransomware groups for initial access (Jan 28).  \n  - *CoolClient* variants now include browser credential theft and clipboard hijacking.\n\n- **Supply Chain Compromises**:  \n  - **eScan**: Malicious update pushed via compromised update server (Jan 28–29).  \n  - **PyPI**: Fake Python spellchecker packages delivered RATs (Jan 28).  \n  - **Hugging Face**: Abused to distribute Android RATs (Jan 29).  \n  - **PackageGate**: Flaws in NPM, PNPM, Bun, and VLT bypass integrity checks (Jan 27–28).\n\n- **AI-Specific Threats**:  \n  - **LLM Hijacking**: *Operation Bizarre Bazaar* compromised publicly exposed LLM endpoints to monetize models (Jan 28–29).  \n  - **AI Coding Assistants**: *Moltbot* and *Clawdbot* impersonated legitimate tools on VS Code Marketplace (Jan 28–29).  \n  - **175,000+ exposed Ollama servers** identified globally (Jan 29), highlighting insecure AI deployment practices.\n\n### Attack Vectors & Techniques\n- **Phishing 2.0**: Fake CAPTCHAs, Microsoft script abuse, and voice phishing (vishing) to bypass SSO (ShinyHunters).  \n- **SSO Exploitation**: Fortinet and Microsoft Teams targeted via SSO bypass (CVE-2026-24858, Teams call reporting feature abused for social engineering).  \n- **Mobile & App Distribution**: Android malware via Roblox mods (Jan 29) and Hugging Face (Jan 29), leveraging app store trust.  \n- **Cloud Misconfigurations**: Exposed LLM endpoints, Ollama instances, and n8n workflows leading to RCE.\n\n---\n\n## Strategic Intelligence\n\n### Sub-Sector Risk Assessment\n| Sub-Sector | Key Risks | High-Impact Incidents |\n|------------|-----------|------------------------|\n| **Cloud & SaaS Providers** | LLM hijacking, SSO bypass, container escape | *Bizarre Bazaar*, Fortinet SSO exploit, n8n RCE |\n| **Developer Tooling & Open Source** | Package supply chain, IDE extensions, CI/CD poisoning | PackageGate, PyPI RATs, Moltbot VS Code |\n| **Enterprise Software** | Remote management tool abuse, Web Help Desk flaws | SolarWinds Web Help Desk (4 critical flaws), GoTo Resolve (ransomware-like behavior) |\n| **AI/ML Platforms** | Model poisoning, endpoint exposure, data exfiltration | 175K exposed Ollama servers, LLM monetization in *Bizarre Bazaar* |\n| **Security Vendors** | Update server compromise, reputation damage | eScan breach (Jan 28–29), dispute with Morphisec |\n\n### High-Impact Incidents Summary\n1. **Polish Power Grid Attack (Dec 2025 – Jan 2026)**:  \n   - Russia-linked *ELECTRUM* group bricked ICS devices, demonstrating kinetic impact potential.  \n   - Used supply chain compromise (eScan) and wiper malware—highlighting OT/IT convergence risks.\n\n2. **SoundCloud & Match Group Breaches (Jan 27–29)**:  \n   - ShinyHunters compromised 29.8M and 10M+ user records, respectively.  \n   - Emphasized risks of third-party data handling and dating app security (a high-value target for credential stuffing).\n\n3. **eScan Supply Chain Attack (Jan 28–29)**:  \n   - Malicious update pushed to ~100K endpoints; one of the first major AV compromises in 2026.  \n   - Demonstrated that even security vendors are not immune to compromise.\n\n### Lessons Learned & IR Insights\n- **Patch Velocity ≠ Protection**: WinRAR and SmarterMail flaws remained unpatched for months despite known exploitation.  \n- **LLM Security Requires Hardening**: Publicly exposed endpoints are trivial to hijack—*Bizarre Bazaar* required only basic reconnaissance.  \n- **Developer Trust is a Vector**: IDE extensions, package registries, and AI assistants are now primary infection points.  \n- **SSO Is Not a Panacea**: ShinyHunters bypassed SSO via vishing—proving human factors remain critical.  \n- **Incident Response**: Organizations using *n8n* or *vm2* must audit all custom workflows for sandbox escapes.\n\n---\n\n## Forward-Looking Assessment\n\n### Emerging Threat Trends (Q2 2026 Outlook)\n1. **AI-Native Attack Automation**: Expect LLMs to generate phishing lures, exploit code, and evade EDR signatures at scale.  \n2. **Quantum Readiness Gaps**: As Palo Alto and others launch quantum-safe offerings, legacy systems (e.g., PKI, TLS 1.2) will become high-priority targets for *harvest now, decrypt later* (HNDL) attacks.  \n3. **Supply Chain 2.0**: Attackers will target AI training data (e.g., GitHub, Hugging Face) and model fine-tuning pipelines—not just code.  \n4. **Identity-Centric Attacks**: With SSO bypasses rising, attackers will focus on MFA fatigue, session token theft, and identity federation flaws.  \n5. **OT/IT Convergence Risks**: Power grid attacks will inspire similar campaigns against industrial IoT and smart infrastructure vendors.\n\n### Recommended Defensive Priorities for Technology Organizations\n| Priority | Action | Rationale |\n|----------|--------|-----------|\n| **1. AI/LLM Hardening** | Audit all publicly exposed LLM endpoints; implement strict API auth, rate limiting, and model isolation. | *Bizarre Bazaar* showed how easily models are hijacked for data theft. |\n| **2. DevSecOps Integration** | Enforce SBOMs for all dependencies; scan npm, PyPI, and VS Code extensions pre-deployment. | PackageGate and PyPI RATs prove supply chain risks are operational. |\n| **3. Identity Resilience** | Deploy behavioral MFA (e.g., WhatsApp Lockdown mode), monitor for MFA fatigue, and isolate admin sessions. | SSO bypasses are now table stakes for initial access. |\n| **4. Patch Management for Critical Infrastructure** | Prioritize KEV-listed vulnerabilities (e.g., SmarterMail, vm2, WinRAR) with SLAs ≤ 72 hours. | These flaws are actively weaponized by APTs and criminals. |\n| **5. Human Layer Defense** | Train employees on vishing, fake CAPTCHAs, and AI impersonation (e.g., *Moltbot*). | ShinyHunters’ phone-based SSO bypass succeeded due to social engineering. |\n\n---\n\n**Prepared by**: Senior Cybersecurity Analyst, Technology Sector Practice  \n**Distribution**: CISOs, CTOs, Security Operations, DevSecOps Leads, Legal & Compliance  \n**Next Update**: March 1, 2026 (Q1 2026 Threat Landscape Review)  \n\n*This assessment is based solely on the provided article corpus (Jan 27 – Feb 25, 2026). All findings are derived from publicly reported technical indicators, vendor advisories, and threat intelligence feeds.*",
+  "summary": "**Technology Sector Cyber Threat Assessment**  \n**Reporting Period: 27–30 January 2026**  \n**Prepared by: Senior Cybersecurity Analyst, Technology Sector**  \n**Classification: Sensitive – For Internal Use Only**\n\n---\n\n## Executive Summary\n\nOver the past 30 days, the Technology sector has faced an intensifying wave of *multi-vector, supply chain–centric attacks* targeting core infrastructure components—including cloud-native services, AI/ML platforms, developer tooling, and enterprise software ecosystems. High-impact incidents include the exploitation of critical zero-day vulnerabilities in Microsoft Office (CVE-2026-21509), Fortinet FortiCloud SSO (CVE-2026-24858), and the vm2 Node.js sandbox (CVE-2026-24857), alongside a series of sophisticated supply chain compromises affecting package registries (npm, PyPI, Hugging Face) and antivirus update servers (eScan). These attacks reflect a strategic shift toward *persistent, low-and-slow infiltration* of developer and CI/CD pipelines to maximize long-term access and data exfiltration.\n\nA defining trend is the weaponization of *AI-native infrastructure*: attackers are actively hijacking exposed large language model (LLM) endpoints (Operation Bizarre Bazaar), deploying fake AI coding assistants (Moltbot/Clawdbot impersonations) on VS Code and PyPI, and exploiting publicly accessible Ollama instances (175,000+ exposed globally). Concurrently, nation-state actors—particularly China-linked groups such as Mustang Panda (aka APT41)—have significantly escalated targeting of technology and telecommunications firms using updated infostealers (CoolClient) and JavaScript-based C2 frameworks (PeckBirdy). The convergence of geopolitical tensions, rapid AI adoption, and insecure developer practices has created a high-risk environment where *developer trust is the new attack surface*.\n\nStrategically, the sector faces three critical risk factors: (1) *Erosion of software supply chain integrity* due to lax package validation and dependency sprawl; (2) *Cloud identity misconfigurations* enabling lateral movement via SSO and credential theft; and (3) *AI model hijacking* as a vector for data theft, model poisoning, and service disruption. Organizations must prioritize patch velocity, identity-centric security, and AI governance controls—especially for open-source and third-party components.\n\n---\n\n## Threat Actor Intelligence\n\n### Nation-State Actors\n- **Mustang Panda (APT41)**: Active since at least 2023, this China-linked group deployed the updated **CoolClient** backdoor across targeted infrastructure (telecoms, government, defense, and technology firms). Campaigns leveraged browser stealers, fake CAPTCHAs, and Microsoft-signed scripts to bypass security controls. Notably, the group also adopted the **PeckBirdy JavaScript C2 framework**, indicating a move toward more evasive, fileless command-and-control.\n- **Russian-linked actors (ELECTRUM)**: Credited with the December 2025 cyberattack on Poland’s power grid—resulting in bricked ICS devices and ~30 compromised facilities. While targeting critical infrastructure, the attack methodology (e.g., credential harvesting, lateral movement via exposed RDP/SSO) is directly applicable to enterprise technology environments.\n- **Pakistan-Linked Groups**: Conducted campaigns targeting Indian government entities, with potential spillover into technology vendors serving public sector clients.\n\n### Cybercriminal Groups\n- **ShinyHunters**: Remained highly active, expanding beyond traditional data dumping to *SSO bypass via social engineering* (phone calls to employees) and targeting SaaS platforms (Panera Bread, SoundCloud, Match Group). The group’s 29.8M SoundCloud breach and 10M+ Match Group records (Hinge, Tinder, OkCupid) demonstrate continued focus on consumer data harvesting.\n- **RAMP Forum Operators**: Though seized by the FBI, the forum’s takedown disrupted a key marketplace for ransomware gangs—suggesting a temporary shift in tactics, including increased use of **Tsundere Bot** for initial access and **Amnesia RAT** in targeted phishing.\n\n---\n\n## Technical Threat Analysis\n\n### Critical Vulnerabilities Actively Exploited\n| CVE | Product | Severity | Exploitation Context |\n|-----|---------|----------|----------------------|\n| **CVE-2026-21509** | Microsoft Office | Critical (0-day) | Active exploitation in targeted attacks; patched out-of-band. |\n| **CVE-2026-24858** | Fortinet FortiOS/SSO | Critical | Actively exploited; CISA KEV-listed. Patching delays enabled credential theft. |\n| **CVE-2026-24857** | vm2 (Node.js sandbox) | Critical | Sandbox escape → arbitrary code execution; impacts cloud functions, serverless apps, and CI/CD pipelines. |\n| **CVE-2025-8088** | WinRAR | Critical | Persistent exploitation by APTs and cybercriminals for malware drops via phishing. |\n| **CVE-2026-24856** | SmarterMail | Critical (CVSS 9.3) | Unauthenticated RCE; 6,000+ servers exposed online. |\n| **CVE-2026-XXXXX** | Ivanti EPMM | Critical | Zero-day RCE flaws exploited in the wild; added to KEV catalog. |\n\n### Malware & Tooling Trends\n- **Infostealers**: CoolClient (updated by Mustang Panda), Amnesia RAT, and Moltbot (impersonating legitimate AI tools) dominate data theft campaigns.\n- **Supply Chain Malware**: Fake Python spellchecker packages (PyPI), malicious Android mods (Roblox, Hugging Face), and compromised eScan antivirus updates indicate *multi-tiered supply chain infiltration*.\n- **LLM-Specific Threats**: **LLMjacking** campaigns (Bizarre Bazaar) hijack exposed Ollama/LLM endpoints for data exfiltration and model abuse—175,000+ Ollama instances exposed globally.\n\n### Attack Vectors\n- **Developer Tool Compromise**: VS Code, PyPI, npm, and Hugging Face used to distribute malware via fake packages and extensions.\n- **SSO & Identity Abuse**: ShinyHunters’ phone-based social engineering bypasses MFA; Fortinet and Microsoft SSO flaws enable account takeover.\n- **Phishing + Browser Abuse**: Fake CAPTCHAs, malicious Chrome/Edge extensions (ChatGPT session theft), and WhatsApp media exploits (CVE-2026-XXXXX) target end users at scale.\n\n---\n\n## Strategic Intelligence\n\n### Sub-Sector Risk Assessment\n| Sub-Sector | Key Risks | High-Impact Incidents |\n|------------|-----------|------------------------|\n| **Cloud & SaaS Providers** | Exposed LLM endpoints, identity misconfigurations, SSO abuse | Operation Bizarre Bazaar; Fortinet SSO breach; Match Group data leak |\n| **AI/ML Infrastructure** | Model hijacking, poisoned training data, exposed inference endpoints | 175K exposed Ollama servers; fake Moltbot VS Code extension |\n| **Enterprise Software** | RCE in remote management tools, supply chain via updates | SolarWinds Web Help Desk flaws; eScan antivirus compromise |\n| **Developer Tooling** | Package registry abuse, IDE extension fraud, CI/CD pipeline compromise | Fake PyPI packages; PackageGate npm/PNPM bypass; Hugging Face RAT |\n| **Telecom & Networking** | Nation-state targeting, credential theft, C2 infrastructure abuse | Mustang Panda CoolClient; PeckBirdy C2 framework |\n\n### Lessons Learned & Incident Response Insights\n- **Patch Velocity ≠ Protection**: Despite rapid patching (e.g., Microsoft’s OOB patch for Office), attackers exploited vulnerabilities *before* deployment—highlighting the need for *runtime detection* and *behavioral monitoring*.\n- **Identity is the New Perimeter**: SSO abuse and credential theft (e.g., ShinyHunters’ phone-based bypass) require *adaptive authentication* and *user behavior analytics*.\n- **Third-Party Risk is Critical**: The eScan and PackageGate incidents prove that *software bill of materials (SBOM)* visibility and *artifact signing* are non-negotiable for secure development.\n\n---\n\n## Forward-Looking Assessment\n\n### Emerging Threats (Q2 2026 Outlook)\n1. **AI-Powered Supply Chain Attacks**: Attackers will increasingly use LLMs to generate *context-aware phishing* and *automated exploit customization* for specific tech stacks.\n2. **Quantum Readiness Gaps**: As quantum computing advances (e.g., Palo Alto’s Quantum-Safe Security launch), organizations without migration plans risk *cryptographic obsolescence*—especially in cloud and identity systems.\n3. **Developer Identity Theft**: Impersonation of AI tools (e.g., Moltbot) will evolve into *AI-assisted credential harvesting*, leveraging stolen GitHub/VS Code sessions.\n4. **LLM-as-a-Service (LLMaaS) Hijacking**: Exposed models will be weaponized for *data extraction*, *model inversion attacks*, and *regulatory non-compliance* (e.g., leaking PII from fine-tuned datasets).\n\n### Recommended Defensive Priorities for Technology Organizations\n| Priority | Action |\n|----------|--------|\n| **1. Secure Developer Pipelines** | Enforce SBOMs, artifact signing, and strict package registry policies (e.g., PyPI project verification). |\n| **2. Identity-Centric Security** | Implement *zero-trust access* for SSO, enforce *adaptive MFA*, and monitor for anomalous login patterns. |\n| **3. AI/ML Governance** | Isolate LLM endpoints, enforce API authentication, and audit model access logs. |\n| **4. Vulnerability Response Automation** | Prioritize KEV-listed flaws with automated patch orchestration; deploy runtime protection for exposed services (e.g., vm2, SmarterMail). |\n| **5. Threat Intelligence Integration** | Correlate developer tooling telemetry (e.g., npm, VS Code) with SIEM/SOAR for early detection of supply chain compromise. |\n\n---\n\n**End of Report**  \n*This assessment is based solely on the provided article corpus (27–30 January 2026). All findings are derived from publicly reported technical indicators, vendor advisories, and threat actor tradecraft described in the source materials.*",
   "stats": {
     "7_day": {
-      "total_documents": 25,
+      "total_documents": 36,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -12,15 +12,15 @@
       "top_geographies": [
         [
           "Global",
-          11
+          17
         ],
         [
           "United States",
-          10
+          13
         ],
         [
           "United Kingdom",
-          5
+          6
         ],
         [
           "European Union",
@@ -35,7 +35,7 @@
       "top_attack_vectors": []
     },
     "30_day": {
-      "total_documents": 146,
+      "total_documents": 160,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -43,22 +43,22 @@
       "top_geographies": [
         [
           "Global",
-          89
+          97
         ],
         [
           "United States",
-          41
+          44
         ],
         [
           "United Kingdom",
+          15
+        ],
+        [
+          "Europe",
           13
         ],
         [
           "China",
-          12
-        ],
-        [
-          "Europe",
           12
         ]
       ],
@@ -66,7 +66,7 @@
       "top_attack_vectors": []
     },
     "150_day": {
-      "total_documents": 775,
+      "total_documents": 799,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -74,23 +74,23 @@
       "top_geographies": [
         [
           "Global",
-          468
+          482
         ],
         [
           "United States",
-          129
+          135
         ],
         [
           "Europe",
-          95
+          96
         ],
         [
           "North America",
-          62
+          63
         ],
         [
           "Asia-Pacific",
-          54
+          55
         ]
       ],
       "top_exploit_kits": [],
@@ -105,39 +105,39 @@
         "Software Development": 5
       },
       "2025-10": {
-        "Technology": 107,
-        "Financial Services": 80,
-        "Healthcare": 68,
-        "Government": 48,
-        "Education": 30
+        "Technology": 109,
+        "Financial Services": 83,
+        "Healthcare": 69,
+        "Government": 49,
+        "Education": 31
       },
       "2025-11": {
-        "Technology": 143,
-        "Financial Services": 86,
-        "Healthcare": 69,
+        "Technology": 144,
+        "Financial Services": 88,
+        "Healthcare": 70,
         "Government": 53,
         "Software Development": 43
       },
       "2025-12": {
-        "Technology": 103,
-        "Financial Services": 66,
-        "Healthcare": 54,
-        "Government": 35,
+        "Technology": 104,
+        "Financial Services": 68,
+        "Healthcare": 56,
+        "Government": 36,
         "Software Development": 28
       },
       "2026-01": {
-        "Technology": 161,
-        "Financial Services": 69,
-        "Healthcare": 58,
-        "Software Development": 38,
-        "Government": 38
+        "Technology": 163,
+        "Financial Services": 70,
+        "Healthcare": 59,
+        "Government": 39,
+        "Software Development": 38
       },
       "2026-02": {
-        "Technology": 70,
-        "Financial Services": 32,
-        "Healthcare": 24,
-        "Software Development": 21,
-        "Government": 16
+        "Technology": 78,
+        "Financial Services": 35,
+        "Healthcare": 25,
+        "Software Development": 22,
+        "Government": 17
       }
     },
     "highlighted_incident": {},

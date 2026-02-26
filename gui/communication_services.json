@@ -1,10 +1,10 @@
 {
-  "generated_at": "2026-02-26T02:06:17Z",
+  "generated_at": "2026-02-26T13:38:49Z",
   "industry": "Communication Services",
-  "summary": "**COMMUNICATION SERVICES CYBERSECURITY THREAT ASSESSMENT**  \n**Reporting Period: 27 January – 30 January 2026**  \n**Prepared by: Senior Cybersecurity Intelligence Unit – Communication Services Sector**  \n\n---\n\n## **Executive Summary**\n\nOver the past 30 days, the Communication Services sector has faced a heightened threat landscape characterized by **targeted espionage, supply chain compromises, and exploitation of critical infrastructure vulnerabilities**, with a notable surge in attacks leveraging messaging platforms (e.g., WhatsApp, Microsoft Teams) and email/Office-based vectors. Threat actors—including China-linked groups such as Mustang Panda (APT41-affiliated)—have increasingly weaponized **browser-based stealers (e.g., CoolClient), infostealers, and zero-day exploits in widely deployed communication tools**, indicating a strategic pivot toward compromising user trust and intercepting sensitive enterprise and consumer communications.\n\nCritical vulnerabilities in **SmarterMail (CVE-2026-XXXX, CVSS 9.3)**, **Microsoft Office (CVE-2026-21509)**, and **Fortinet FortiCloud SSO (CVE-2026-24858)** were actively exploited and added to CISA’s Known Exploited Vulnerabilities (KEV) catalog—posing severe operational and reputational risks for telecom operators, ISPs, and cloud communications providers. Cross-sector threats such as the **WinRAR path traversal flaw (CVE-2025-8088)** and **PackageGate supply chain compromises in JavaScript ecosystems (NPM, Bun)** directly impact Communication Services through compromised endpoints, remote workforce tools, and third-party software dependencies.\n\nStrategically, the sector is under mounting pressure from **nation-state actors conducting long-term surveillance** (e.g., targeting UK PM aides), **ransomware groups pivoting to voice phishing (vishing) to bypass SSO**, and **criminal marketplaces (e.g., RAMP) being dismantled—forcing adversaries to adopt more隐蔽 tactics**. The sector’s heavy reliance on unified communications, cloud telephony (e.g., Twilio, Zoom), and mobile infrastructure creates an expansive attack surface, especially where legacy systems coexist with modern SaaS platforms.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Nation-State Actors**\n- **Mustang Panda (APT41-linked, China)**: Actively deployed updated **CoolClient backdoor** and infostealers (e.g., **Amnesia RAT**) in campaigns targeting **telecommunications, government, and defense** sectors. Recent activity includes exploitation of Microsoft Office zero-days and browser-based credential theft—indicating focus on intercepting enterprise communications and exfiltrating PII.\n- **Russia-linked groups (e.g., ELECTRUM)**: Linked to the December 2025 cyberattack on Poland’s power grid, which bricked ICS devices and disrupted critical infrastructure. While energy-focused, this demonstrates capability to conduct **multi-vector, high-impact attacks on interconnected critical infrastructure**, including telecom backbones that support grid control systems.\n- **China-linked actors using PeckBirdy C2 framework**: Since 2023, this JavaScript-based C2 has been used for persistent access—particularly relevant for Communication Services providers running JavaScript-heavy web portals and internal collaboration tools.\n\n### **Cybercriminal Groups**\n- **ShinyHunters**: Expanded operations to target **telecom-adjacent services**, including:\n  - **Panera Bread** (credential reuse attacks)\n  - **Match Group** (Hinge, Tinder, OkCupid breach exposing 10M+ records)\n  - **SoundCloud** (29.8M accounts)\n  - **SSO bypass via vishing campaigns**—a direct threat to enterprise communications platforms (e.g., Microsoft Teams, Zoom).\n- **RAMP forum operators**: FBI seizure (28 Jan) disrupted a major ransomware ecosystem, but actors have shifted to **decentralized platforms and impersonation tactics** (e.g., Moltbot rename campaign), increasing risk of targeted phishing in enterprise comms.\n\n### **Supply Chain Risks**\n- **eScan Antivirus supply chain attack**: Malicious updates pushed via compromised update server—highlighting risk to **endpoint security tools used by telecom NOCs and CSOCs**.\n- **PackageGate flaws in NPM/PNPM/Bun**: Allow attackers to bypass package integrity checks—threatening **developer toolchains and CI/CD pipelines** used to build internal comms apps, VoIP clients, and network management software.\n- **Hugging Face abuse**: Android malware variants (RATs) distributed via model downloads—relevant for **mobile-first communication providers** deploying AI-driven voice assistants or customer support bots.\n\n---\n\n## **Technical Threat Analysis**\n\n### **Vulnerabilities with High Sector Impact**\n| CVE | Product | Severity | Relevance to Communication Services |\n|-----|---------|----------|-------------------------------------|\n| **CVE-2026-21509** | Microsoft Office | Critical (0-day) | Phishing via malicious docs remains top initial access vector for telecom credential theft and lateral movement. |\n| **CVE-2026-24858** | Fortinet FortiOS (SSO) | Critical | SSO bypass enables unauthorized access to internal comms portals, ticketing systems, and cloud PBX (e.g., Avaya, Cisco Webex). |\n| **CVE-2025-8088** | WinRAR | Critical | Used in phishing lures to drop RATs—exploited across campaigns targeting telecom employees and contractors. |\n| **SmarterMail RCE (CVSS 9.3)** | SmarterTools SmarterMail | Critical | 6,000+ exposed servers; allows full server compromise—direct threat to **self-hosted email and collaboration platforms** used by regional ISPs and carriers. |\n| **vm2 Node.js sandbox escape** | vm2 library | Critical | Affects internal tools built on Node.js (e.g., API gateways, chatbots, monitoring dashboards). |\n\n### **Malware & Tools**\n- **CoolClient**: Updated by Mustang Panda to steal browser credentials and cookies—targets **enterprise SSO sessions** across cloud communications platforms.\n- **Amnesia RAT**: Deployed in multi-stage phishing against Russian users, but methodology (e.g., fake CAPTCHA, trusted web services) is transferable to global telecom phishing.\n- **Tsundere Bot**: New initial access tool for ransomware—may target **contact center agents** via social engineering to gain access to CRM and customer data platforms.\n- **Moltbot (ex-Clawdbot)**: AI coding assistant impersonation campaign—risks **developer environment compromise**, leading to supply chain injection into communication APIs.\n\n### **Attack Vectors**\n- **Voice Phishing (Vishing)**: ShinyHunters bypass SSO via phone calls—**critical for contact centers and unified communications**.\n- **Malicious Media in WhatsApp Groups**: Exploits media parsing flaws to spread malware—impacts **consumer messaging platforms and enterprise WhatsApp Business API integrations**.\n- **LLMjacking (Operation Bizarre Bazaar)**: Hijacked LLM endpoints to monetize AI services—threatens **AI-powered customer support bots and internal comms assistants** deployed by telecoms.\n\n---\n\n## **Strategic Intelligence**\n\n### **Sub-Sector Risk Assessment**\n| Sub-Sector | Key Risks | High-Impact Incidents |\n|------------|-----------|------------------------|\n| **Mobile Network Operators (MNOs)** | SIM swap fraud, SMS interception, device-level spyware (e.g., Pegasus-style) | WhatsApp lockdown features rolled out (27–28 Jan) in response to spyware targeting high-risk users—indicates active exploitation. |\n| **ISP & Broadband Providers** | SmarterMail exposure, home gateway firmware vulnerabilities | Shadowserver report: 6,000+ vulnerable SmarterMail servers—many operated by regional ISPs. |\n| **Cloud Communications (CPaaS)** | API abuse, LLMjacking, supply chain in dev tools | PackageGate flaws in NPM/Bun affect Node.js-based CPaaS SDKs (e.g., Twilio, Vonage). |\n| **Enterprise UCaaS/VoIP** | SSO bypass (Fortinet, Ivanti), vishing, Teams call reporting abuse | Fortinet SSO exploit + ShinyHunters vishing = high risk for hybrid work comms. |\n\n### **Lessons Learned & IR Insights**\n- **Patch velocity is insufficient**: SmarterMail, Fortinet, and Ivanti flaws were exploited *before* patch release—emphasizing need for **runtime protection (e.g., EDR, network segmentation)** for legacy comms infrastructure.\n- **Identity is the new perimeter**: SSO bypass (Fortinet, Ivanti) + vishing = **MFA fatigue attacks are now obsolete; attackers target session tokens directly**.\n- **Consumer trust erosion**: WhatsApp and Microsoft Teams security enhancements (e.g., “report suspicious calls”) reflect reputational damage from spyware and phishing—**security features must be user-facing and transparent**.\n\n---\n\n## **Forward-Looking Assessment**\n\n### **Emerging Threats (Q2 2026 Outlook)**\n1. **Quantum Readiness Gaps**: As highlighted in *Cyber Insights 2026*, telecoms are critical to quantum-safe migration—but many lack **post-quantum cryptography (PQC) roadmaps** for signaling protocols (e.g., SIP, Diameter).\n2. **AI-Powered Social Engineering**: Impersonation of executives via voice cloning (e.g., Moltbot) will target **internal comms and customer service workflows**.\n3. **5G Core Exploitation**: Increased focus on **SS7/Diameter vulnerabilities** as attackers seek to intercept SMS-based 2FA and location tracking—especially post-WinRAR/Office campaigns establishing persistence.\n4. **Supply Chain Weaponization**: PackageGate and Hugging Face abuse signal shift toward **developer and AI model compromise**—telecom dev teams must adopt SBOMs and artifact signing.\n\n### **Recommended Defensive Priorities**\n| Priority | Action |\n|----------|--------|\n| **1. Identity & Session Security** | • Deploy session token validation (e.g., JWT binding to device fingerprint)<br>• Enforce strict SSO session timeouts for comms portals<br>• Monitor for anomalous SSO logins (e.g., new AS/ASN, geolocation) |\n| **2. Critical Infrastructure Patching** | • Isolate SmarterMail, Ivanti EPMM, and Fortinet devices from public internet<br>• Prioritize patching of KEV-listed flaws (Office, SmarterMail, Linux Kernel) within 72 hours |\n| **3. Messaging Platform Hardening** | • Enable WhatsApp Lockdown Mode for high-risk users (execs, CSOC)<br>• Implement media file sanitization for WhatsApp Business API<br>• Train agents on vishing indicators (e.g., caller ID spoofing, urgency tactics) |\n| **4. Supply Chain Defense** | • Require SBOMs for all Node.js/Python dependencies<br>• Scan CI/CD pipelines for PackageGate-style bypasses<br>• Audit AI model repositories (e.g., Hugging Face) for malicious artifacts |\n| **5. Quantum Readiness** | • Begin inventory of cryptographic assets in signaling and billing systems<br>• Engage NIST PQC standardization efforts for early migration planning |\n\n---\n\n**Conclusion**: The Communication Services sector remains a high-value target for nation-state espionage and criminal disruption. The convergence of **exploited vulnerabilities in comms infrastructure**, **supply chain compromises**, and **AI-augmented social engineering** demands a shift from perimeter-based to **identity- and session-centric security**. Proactive hardening of messaging platforms, rapid patching of KEV flaws, and investment in quantum-safe protocols are now strategic imperatives—not best practices.\n\n*End of Report*",
+  "summary": "**COMMUNICATION SERVICES CYBERSECURITY THREAT ASSESSMENT**  \n**Reporting Period: 27–30 January 2026**  \n**Prepared by: Senior Cybersecurity Intelligence Unit – Communication Services Sector**  \n\n---\n\n## **Executive Summary**\n\nOver the past 30 days, the Communication Services sector faces a confluence of high-impact, high-velocity threats—centered on supply chain compromise, exploitation of critical infrastructure vulnerabilities, and targeted espionage campaigns leveraging messaging platforms. Notably, multiple articles confirm active targeting of telecom infrastructure through unpatched mail servers (SmarterMail), mobile messaging apps (WhatsApp), and enterprise collaboration tools (Microsoft Teams, Microsoft Office). The most significant trend is the weaponization of *trusted communication vectors*: phishing via carrier-branded SMS (e.g., “AT&T Rewards”), exploitation of zero-days in widely deployed email and collaboration software, and abuse of legitimate remote support tools (e.g., GoTo Resolve) mimicking ransomware tradecraft.\n\nCross-industry threats with direct impact on Communication Services include the **WinRAR path traversal flaw (CVE-2025-8088)**—actively exploited by APTs and cybercriminals for initial access—and the **Microsoft Office zero-day (CVE-2026-21509)**, patched out-of-band after active exploitation. While the WinRAR and Office flaws affect all sectors, their exploitation in *phishing lures targeting enterprise users* directly compromises communication service providers’ (CSPs’) workforce and customer bases. Additionally, the **eScan supply chain attack**—where an AV vendor’s update server was breached to push malicious updates—demonstrates how third-party software vendors pose systemic risk to CSPs relying on endpoint security suites.\n\nStrategically, the sector’s exposure is amplified by its role as a *platform enabler*: CSPs host critical infrastructure (5G core, SMS/MMS gateways, VoIP platforms) and serve as conduits for national-scale communications. This makes them high-value targets for nation-state actors (e.g., Mustang Panda, ELECTRUM) seeking intelligence, disruption, or future-positioning for escalation. The recent **UK prime ministers’ aides espionage campaign** and **Polish power grid attack (ELECTRUM)** underscore the risk of cascading failures—where attacks on energy infrastructure (via compromised CSP-managed networks) could trigger national security crises.\n\nCritical security topics include:  \n- **Messaging app hardening** (WhatsApp’s new “Lockdown” and “Strict Account” modes)  \n- **SSO and identity governance** (Fortinet FortiCloud SSO bypass, ShinyHunters’ phone-call SSO bypass)  \n- **Supply chain integrity** (SmarterMail, eScan, vm2, n8n, PackageGate)  \n- **AI/LLM exposure** (Bizarre Bazaar operation hijacking exposed LLM endpoints)  \n\nThe sector’s risk profile is elevated by its hybrid legacy-modern architecture, making patch velocity and segmentation critical—and currently lagging.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Nation-State Actors Targeting Communication Services**\n- **Mustang Panda (APTs related to China)**:  \n  - Deployed updated **COOLCLIENT backdoor** (Jan 28) and **infostealers via CoolClient** (Jan 27) in campaigns targeting *government, defense, and telecommunications*.  \n  - Used the **PeckBirdy JavaScript C2 framework** since 2023—designed for stealthy, low-and-slow data exfiltration over HTTPS, ideal for targeting CSPs’ internal networks.  \n  - *Relevance*: CSPs are explicitly listed as targets; backdoors like CoolClient can be embedded in compromised software updates or phishing payloads targeting enterprise users.\n\n- **ELECTRUM (Russia-linked APT)**:  \n  - Credited with the **December 2025 cyberattack on Polish power grid**, bricking ICS devices and impacting ~30 facilities (Jan 28–30).  \n  - *Relevance*: While targeting energy, the attack likely leveraged compromised CSP-managed networks (e.g., for SCADA telemetry or remote access). CSPs providing connectivity to critical infrastructure are now high-priority targets for future disruption.\n\n- **China-Linked Group (UK Aides Espionage)**:  \n  - Conducted *years-long* surveillance of UK prime ministers’ aides via phone compromise (Jan 27).  \n  - *Relevance*: Indicates advanced mobile device targeting (MDM bypass, zero-click exploits), directly threatening CSPs’ subscriber security and regulatory compliance (e.g., GDPR, NIS2).\n\n### **Cybercriminal Groups**\n- **ShinyHunters**:  \n  - Targeted 100+ organizations via **phone-call SSO bypass** (Jan 27), exploiting social engineering to override MFA.  \n  - Breached **Match Group** (Hinge, Tinder, OkCupid), exposing 10M+ records (Jan 29).  \n  - *Relevance*: CSPs are prime targets for credential harvesting and identity-based attacks due to their access to subscriber PII and enterprise customer data.\n\n- **RAMP Forum Operators**:  \n  - FBI seized the RAMP forum (Jan 28), disrupting ransomware groups’ coordination.  \n  - *Relevance*: Ransomware gangs increasingly target CSPs for high-impact, high-reward attacks (e.g., SMS hub disruption, network-wide encryption).\n\n---\n\n## **Technical Threat Analysis**\n\n### **Critical Vulnerabilities with Direct Impact**\n| Vulnerability | CVE | CVSS | Affected Product | Exploitation Status | Communication Services Impact |\n|---------------|-----|------|------------------|---------------------|------------------------------|\n| SmarterMail RCE | — | 9.3 | SmarterTools SmarterMail | Actively exploited (CISA KEV) | **Critical**: SmarterMail is widely used by CSPs for internal email. 6,000+ exposed servers (Jan 27) enable full server compromise, credential theft, and lateral movement. |\n| Microsoft Office Zero-Day | CVE-2026-21509 | 8.8 | Microsoft Office | Actively exploited (OOB patch) | **High**: Malicious documents bypass security checks; used in phishing to compromise CSP employees. |\n| Fortinet FortiCloud SSO Bypass | CVE-2026-24858 | 9.8 | FortiOS | Actively exploited (CISA KEV) | **High**: Enables unauthorized access to CSPs’ SSO-protected cloud services (e.g., Azure, AWS, Okta). |\n| Ivanti EPMM Zero-Days | — | 9.8 | Ivanti Endpoint Manager | Actively exploited (CISA KEV) | **High**: Compromises mobile device management (MDM) systems—critical for CSPs managing BYOD/enterprise mobile fleets. |\n| vm2 Sandbox Escape | — | 9.8 | vm2 (Node.js) | Actively exploited | **Medium-High**: Affects CSPs using Node.js-based APIs (e.g., SMS gateways, API gateways, cloud functions). |\n\n### **Malware & Attack Vectors**\n- **Amnesia RAT**: Deployed in multi-stage phishing against Russian users (Jan 27). While regionally focused, the TTPs (e.g., fake CAPTCHA lures, trusted web services abuse) are adopted globally.  \n- **Tsundere Bot**: New initial access tool for ransomware (Jan 28); likely to replace older bots in CSP-targeted campaigns due to evasion capabilities.  \n- **WinRAR Exploitation**: Still widespread (Google, CISA alerts, Jan 27–29); used to drop RATs via malicious archives in phishing. CSPs with legacy file-sharing workflows remain vulnerable.  \n- **WhatsApp Media Exploit**: Malicious media files spread via group chats (Jan 27); WhatsApp’s new “Lockdown Mode” (Jan 28–29) is a direct response—CSPs must urge enterprise customers to adopt it.\n\n### **Supply Chain Risks**\n- **eScan Antivirus Breach**: Malicious update pushed via compromised server (Jan 29). CSPs using eScan for endpoint protection are at immediate risk.  \n- **PackageGate (NPM/PNPM)**: Flaws bypassing package integrity checks (Jan 28); threatens CSPs’ internal tooling (e.g., CI/CD pipelines, DevOps scripts).  \n- **Fake VS Code Extensions (Moltbot)**: AI coding assistant impersonation drops malware (Jan 28); impacts CSP developers using VS Code.\n\n---\n\n## **Strategic Intelligence**\n\n### **Sub-Sector Risk Assessment**\n| Sub-Sector | Key Risks | Critical Assets at Risk |\n|------------|-----------|-------------------------|\n| **Mobile Network Operators (MNOs)** | - SMS/MMS gateway abuse<br>- MDM/UEM compromise (Ivanti EPMM)<br>- Subscriber data theft (e.g., Match Group-style breach) | - Core Network (5G AAA, HSS)<br>- SMS Center (SMSC)<br>- Subscriber databases |\n| **Fixed-Line & Broadband Providers** | - SmarterMail/SMB email compromise<br>- Home gateway firmware exploits<br>- Ransomware via remote support tools (GoTo Resolve) | - BNG/RADIUS servers<br>- Customer premises equipment (CPE)<br>- Billing systems |\n| **Cloud & Unified Communications Providers** | - LLM hijacking (Bizarre Bazaar)<br>- Teams/Zoom/Skype exploitation<br>- SSO bypass (Fortinet, ShinyHunters) | - UCaaS platforms<br>- Cloud PBX<br>- AI-driven analytics services |\n| **Telecom Equipment Vendors** | - Supply chain attacks (PackageGate, vm2)<br>- Firmware backdoors in RAN/core nodes | - Network function virtualization (NFV)<br>- SD-WAN controllers<br>- 5G RAN software |\n\n### **High-Impact Incidents**\n- **Polish Power Grid Attack (ELECTRUM)**: Bricked ICS devices; likely used CSP-managed networks for command-and-control. Demonstrates *cascading risk* to critical infrastructure.  \n- **SmarterMail Mass Compromise**: 6,000+ servers exposed; automated hijacking attacks possible. CSPs using SmarterMail for internal comms are vulnerable to full network takeover.  \n- **WhatsApp Media Exploit**: Enables zero-click infection in group chats—threatens both consumer and enterprise users.\n\n### **Lessons Learned & IR Insights**\n- **SSO is the new perimeter**: ShinyHunters’ phone-call SSO bypass proves MFA alone is insufficient. CSPs must enforce *context-aware access* (device health, location, behavior).  \n- **Patch velocity is non-negotiable**: SmarterMail, Fortinet, and Ivanti flaws were exploited *before* patch release. CSPs need *real-time vulnerability intelligence* integrated into patch workflows.  \n- **Mobile is the weakest link**: WhatsApp’s new Lockdown Mode is a stopgap—CSPs should mandate it for high-risk users (executives, network ops) and integrate with EDR for mobile.\n\n---\n\n## **Forward-Looking Assessment**\n\n### **Emerging Threats & Trends**\n1. **AI-Powered Phishing at Scale**:  \n   - Fake ChatGPT extensions (Jan 27–28) and Moltbot impersonation (Jan 29) show AI used to craft hyper-realistic lures. Expect CSPs to be targeted with *personalized SMS phishing* using subscriber data (e.g., “Your plan is expiring—click to renew”).\n\n2. **LLMjacking as a Service**:  \n   - Bizarre Bazaar operation (Jan 28–29) hijacked exposed LLM endpoints for data theft and model poisoning. CSPs offering AI-driven network analytics or customer service chatbots must secure LLM endpoints.\n\n3. **Residential Proxy Networks for OPSEC**:  \n   - Google disrupted IPIDEA (Jan 29), a massive proxy network used to hide C2 traffic. Future attacks will use *legitimate residential IPs* (e.g., compromised home routers) to bypass geo-blocks and evade detection.\n\n4. **Quantum Readiness Gaps**:  \n   - CISA’s Quantum-Safe Security push (Palo Alto, Jan 27) highlights urgency. CSPs must inventory *long-life data* (e.g., subscriber PII, network keys) and begin PQC migration.\n\n### **Recommended Defensive Priorities**\n| Priority | Action | Rationale |\n|----------|--------|-----------|\n| **1. Mobile Platform Hardening** | Mandate WhatsApp Lockdown Mode for all high-risk users; deploy EDR for mobile (e.g., SentinelOne, CrowdStrike). | WhatsApp is the #1 attack vector for CSPs; Lockdown Mode blocks all media in group chats. |\n| **2. SmarterMail & Email Security** | Isolate SmarterMail instances; apply patch immediately; deploy DMARC/DKIM/SPF enforcement. | SmarterMail is a high-impact, high-prevalence vulnerability. |\n| **3. SSO & Identity Governance** | Implement FIDO2/WebAuthn; enforce conditional access policies; monitor for anomalous SSO attempts. | ShinyHunters’ phone-call bypass proves traditional MFA is insufficient. |\n| **4. Supply Chain Integrity** | Audit all third-party software (especially Node.js, Python, Java); use SBOMs; restrict package registry access. | PackageGate, eScan, and vm2 show supply chain is the fastest-growing vector. |\n| **5. LLM & AI Security** | Inventory all exposed LLM endpoints; implement network segmentation; deploy AI-based anomaly detection. | Bizarre Bazaar proves LLMs are a new attack surface for data theft. |\n\n---\n\n**Conclusion**: The Communication Services sector is at a tipping point—its critical role in national infrastructure and daily life makes it a top-tier target for nation-states and cybercriminals. While technical threats (SmarterMail, WinRAR, Office) are immediate, the strategic risk lies in *systemic disruption*: attacks that cascade from CSP networks into energy, finance, and public safety. CSPs must prioritize *proactive hardening* of mobile platforms, identity systems, and supply chains—not just reactive patching. The next 90 days will likely see weaponization of AI for phishing and LLMjacking; preparation must begin now.\n\n*— End of Report —*",
   "stats": {
     "7_day": {
-      "total_documents": 10,
+      "total_documents": 14,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -15,27 +15,27 @@
           4
         ],
         [
-          "European Union",
-          2
+          "Global",
+          4
         ],
         [
-          "Global",
-          2
+          "United States",
+          3
+        ],
+        [
+          "European Union",
+          3
         ],
         [
           "Spain",
           2
-        ],
-        [
-          "Middle East",
-          1
         ]
       ],
       "top_exploit_kits": [],
       "top_attack_vectors": []
     },
     "30_day": {
-      "total_documents": 49,
+      "total_documents": 58,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -43,19 +43,19 @@
       "top_geographies": [
         [
           "Global",
-          17
+          21
         ],
         [
           "United States",
-          15
+          17
         ],
         [
           "United Kingdom",
-          11
+          12
         ],
         [
           "European Union",
-          10
+          11
         ],
         [
           "Europe",
@@ -66,7 +66,7 @@
       "top_attack_vectors": []
     },
     "150_day": {
-      "total_documents": 245,
+      "total_documents": 262,
       "top_threat_actors": [],
       "top_vulnerabilities": [],
       "top_incidents": [],
@@ -74,19 +74,19 @@
       "top_geographies": [
         [
           "Global",
-          93
+          100
         ],
         [
           "United States",
-          61
+          65
         ],
         [
           "European Union",
-          36
+          37
         ],
         [
           "United Kingdom",
-          33
+          35
         ],
         [
           "Europe",
@@ -105,37 +105,37 @@
         "Media & Entertainment": 1
       },
       "2025-10": {
-        "Financial Services": 32,
-        "Telecommunications": 31,
-        "Government": 18,
+        "Telecommunications": 34,
+        "Financial Services": 34,
+        "Government": 19,
         "Technology": 17,
         "E‑Commerce": 12
       },
       "2025-11": {
-        "Telecommunications": 16,
-        "Financial Services": 10,
+        "Telecommunications": 17,
+        "Financial Services": 11,
         "Technology": 8,
         "E‑Commerce": 7,
         "Media & Entertainment": 5
       },
       "2025-12": {
-        "Telecommunications": 24,
+        "Telecommunications": 25,
         "Financial Services": 16,
         "Technology": 11,
         "Government": 9,
         "Media": 9
       },
       "2026-01": {
-        "Technology": 27,
-        "Telecommunications": 26,
+        "Telecommunications": 31,
+        "Technology": 28,
         "Social Media": 24,
-        "Government": 10,
-        "Financial Services": 9
+        "Financial Services": 12,
+        "Government": 10
       },
       "2026-02": {
-        "Telecommunications": 15,
-        "Social Media": 11,
-        "Technology": 10,
+        "Telecommunications": 16,
+        "Social Media": 14,
+        "Technology": 13,
         "Financial Services": 7,
         "Online Platforms": 4
       }
