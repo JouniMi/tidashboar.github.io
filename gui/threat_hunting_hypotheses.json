@@ -1,220 +1,111 @@
 {
-  "generated_at": "2026-02-25T15:11:52Z",
+  "generated_at": "2026-02-26T02:21:43Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 472,
+  "total_articles_analyzed": 457,
   "hypotheses_count": 5,
   "hypotheses": [
     {
       "hypothesis_id": "TH-001",
-      "title": "Lazarus Group Medusa Ransomware Deployment via Compromised Supply Chain or Credential Theft",
-      "description": "Lazarus Group has recently adopted Medusa ransomware in attacks targeting healthcare, financial services, and government sectors across the Middle East and U.S. The group leverages supply chain compromise and credential-based access. We should hunt for Medusa-related artifacts, lateral movement via RDP/PSExec, and indicators of Medusa’s execution chain.",
+      "title": "Supply Chain Compromise via Malicious NPM/PyPI Packages Mimicking Legitimate AI/MCP Tools",
+      "description": "Threat actors, particularly Lazarus Group and SmartLoader, have been actively distributing malicious npm and PyPI packages that impersonate legitimate AI tools (e.g., Oura MCP server) and developer frameworks (e.g., Next.js, Claude artifacts) to deploy StealC infostealers, LummaStealer, and other malware. These campaigns exploit developer trust in open-source ecosystems and AI-assisted tooling.",
       "threat_actors": [
-        "lazarus group"
+        "lazarus group",
+        "SmartLoader"
       ],
       "industries_targeted": [
-        "Healthcare",
+        "Software Development",
+        "Technology",
         "Financial Services",
-        "Government"
+        "Telecommunications"
       ],
       "mitre_attack_techniques": [
-        "T1021.001 - Remote Desktop Protocol",
-        "T1566.001 - Phishing",
-        "T1486 - Data Encrypted for Impact",
-        "T1059.001 - PowerShell",
-        "T1055.001 - Process Injection"
+        "T1528 - Steal Application Access Token",
+        "T1526 - Cloud Service Discovery",
+        "T1574.009 - Hijack Execution Flow: Dynamic-link Library Hijacking",
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain"
       ],
       "data_sources_needed": [
         {
           "source_type": "Endpoint",
-          "specific_data": "Process execution logs (especially PowerShell, cmd.exe), file creation/modification timestamps for .exe, .dll, .ps1 files, memory dumps for Medusa strings",
+          "specific_data": "Process execution logs (especially npm, pip, node, python), file creation/modification events in project directories, network connections to package registries",
           "tools": [
-            "CrowdStrike, SentinelOne, Sysmon, Elastic EDR"
+            "EDR (e.g., CrowdStrike, SentinelOne), Sysmon, npm/pip audit logs"
           ]
         },
         {
           "source_type": "Network",
-          "specific_data": "Outbound connections to known C2 domains/IPs, DNS queries for Medusa-related subdomains, unusual SMB/RDP traffic volumes",
+          "specific_data": "DNS queries to registry.npmjs.org, pypi.org, and suspicious subdomains; TLS certificate details for package downloads",
           "tools": [
-            "Darktrace, Zeek, Palo Alto Networks"
+            "Network detection (e.g., Darktrace, Zeek), DNS logs"
           ]
         },
         {
           "source_type": "Identity",
-          "specific_data": "Failed login attempts followed by successful logins, unusual geographic logins, MFA bypass events",
+          "specific_data": "Developer account activity in GitHub, GitLab, npm, PyPI (e.g., new package uploads, compromised publish tokens)",
           "tools": [
-            "Microsoft Sentinel, Okta, CrowdStrike Falcon Identity"
+            "SIEM with identity integration (e.g., Microsoft Sentinel, Splunk UBA)"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "Medusa Ransomware Artifact Detection",
-          "description": "Search for Medusa-specific file artifacts and execution patterns",
+          "tactic_name": "Detect Typosquatting and Fake MCP Server Packages",
+          "description": "Search for npm/PyPI packages with names similar to known AI/MCP tools (e.g., 'ouramcp', 'claude-code-security', 'nextjs-interview-test') and verify package metadata and author history.",
           "sample_queries": [
-            "index=endpoint sourcetype=win* (Image=\"*\\medusa.exe\" OR Image=\"*\\Medusa*.exe\" OR Image=\"*\\medusa*.dll\")",
-            "index=endpoint sourcetype=sysmon EventID=1 (CommandLine=\"*medusa*\" OR CommandLine=\"*Medusa*\" OR CommandLine=\"*Ransomware*\")",
-            "index=network dest_port=445 OR dest_port=139 (dns_query=\"*medusa*\" OR dns_query=\"*lazarus*\")"
+            "index=npm_audit OR index=pypi_audit (package_name=*ouramcp* OR package_name=*claude* OR package_name=*nextjs* OR package_name=*interview*) | stats count by package_name, package_version, author, upload_date, dependencies | where upload_date > relative_time(now()-14d)",
+            "index=github_audit (action=publish OR action=push) (actor=*lazarus* OR actor=*smartloader* OR repo_name=*nextjs* OR repo_name=*claude* OR repo_name=*ouramcp*) | table actor, repo_name, action, timestamp"
           ],
-          "look_for": "Medusa.exe, Medusa.dll, Medusa ransom note files (e.g., _DECRYPT_FILES_*.txt), PowerShell scripts with Medusa-related strings"
+          "look_for": "Packages with recent upload dates, no GitHub repo link, suspicious dependencies (e.g., 'axios', 'node-fetch'), authors with no prior history, or cloned-looking READMEs with fake forks/contributors"
         },
         {
-          "tactic_name": "Credential Theft Followed by Lateral Movement",
-          "description": "Detect credential harvesting followed by RDP/PSExec lateral movement, typical of Lazarus campaigns",
+          "tactic_name": "Detect Malicious Claude Artifacts and MCP Servers",
+          "description": "Hunt for execution of unauthorized Claude artifacts, MCP server processes, or configuration files that attempt to load remote code or exfiltrate credentials.",
           "sample_queries": [
-            "index=security sourcetype=win* EventID=4624 Logon_Type=10 AND (Logon_Process=\"seclogo\" OR Authentication_Package=\"Negotiate\") | stats count by user, src_ip, dest_host | where count > 3",
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\psexec.exe\" OR Image=\"*\\PsExec64.exe\" OR Image=\"*\\wmiprvse.exe\") AND (CommandLine=\"*cmd.exe*\" OR CommandLine=\"*powershell*\")",
-            "index=network dest_port=3389 AND (src_ip IN (\"192.168.*\", \"10.*\", \"172.16.*\")) AND dest_host IN (\"*dc*\", \"*file*\")"
+            "index=endpoint (process_name=*node* OR process_name=*python* OR process_name=*claude*) (command_line=*mcp* OR command_line=*artifact* OR command_line=*claude* OR file_path=*\\.claude* OR file_path=*\\.claude* OR file_path=*mcp*) | stats count by process_name, command_line, file_path, host | where count > 1",
+            "index=network dest_port=443 (user_agent=*Claude* OR user_agent=*MCP*) (dest_domain=*pastebin* OR dest_domain=*raw.githubusercontent* OR dest_domain=*githubusercontent*) | stats count by src_ip, dest_domain, dest_port, user_agent"
           ],
-          "look_for": "Multiple RDP logins to domain controllers or file servers within 5 minutes, PsExec usage with cmd/powershell, credential dumping tools (mimikatz, lsass.exe access)"
-        }
-      ],
-      "iocs_and_patterns": {
-        "domains": [],
-        "ips": [],
-        "file_hashes": [],
-        "file_names": [
-          "medusa.exe",
-          "Medusa*.exe",
-          "Medusa*.dll",
-          "_DECRYPT_FILES_*.txt",
-          "README_DECRYPT.txt"
-        ],
-        "registry_keys": [
-          "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\Medusa",
-          "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\Medusa"
-        ],
-        "process_names": [
-          "medusa.exe",
-          "Medusa.exe",
-          "Medusa*.exe",
-          "psexec.exe",
-          "PsExec64.exe",
-          "wmiprvse.exe"
-        ],
-        "network_patterns": [
-          "RDP (3389) from internal to internal hosts",
-          "SMB (445) to multiple hosts in quick succession",
-          "DNS queries with Medusa or Lazarus-related subdomains"
-        ],
-        "user_agent_strings": [],
-        "other_indicators": [
-          "Use of PowerShell with -enc or -encodedcommand flags",
-          "Execution of cmd.exe via WMI or WScript",
-          "Creation of scheduled tasks with Medusa payloads"
-        ]
-      },
-      "priority": "HIGH",
-      "confidence": "HIGH",
-      "estimated_detection_rate": "High",
-      "false_positive_risk": "Medium",
-      "recommended_actions": [
-        "Isolate hosts showing Medusa-related artifacts immediately",
-        "Revoke and reset credentials for all users on affected hosts",
-        "Block outbound connections to suspicious domains/IPs identified in network logs",
-        "Review and harden RDP access policies, enforce MFA and network segmentation"
-      ]
-    },
-    {
-      "hypothesis_id": "TH-002",
-      "title": "ShinyHunters Data Exfiltration via Credential Compromise or Third-Party Vendor Breach",
-      "description": "ShinyHunters has breached multiple high-profile organizations including CarGurus, Wynn Resorts, Figure, and Canada Goose. Their typical TTPs include credential stuffing, phishing, and third-party vendor compromise. We should hunt for indicators of credential theft (e.g., password spray, MFA fatigue), unusual data movement, and access to SaaS platforms like Salesforce or Zendesk.",
-      "threat_actors": [
-        "ShinyHunters"
-      ],
-      "industries_targeted": [
-        "Technology",
-        "Financial Services",
-        "Government",
-        "Healthcare",
-        "Telecommunications",
-        "Social Media"
-      ],
-      "mitre_attack_techniques": [
-        "T1110.001 - Password Spray",
-        "T1566.001 - Phishing",
-        "T1078.004 - Cloud Accounts",
-        "T1021.001 - RDP",
-        "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol"
-      ],
-      "data_sources_needed": [
-        {
-          "source_type": "Identity",
-          "specific_data": "Failed login attempts (EventID 4625), MFA failures, logins from new IPs/countries, anomalous session durations",
-          "tools": [
-            "Microsoft Sentinel, Okta, Azure AD Audit Logs, CrowdStrike Identity"
-          ]
-        },
-        {
-          "source_type": "Cloud",
-          "specific_data": "Salesforce login events, API calls to Zendesk/Salesforce, data export events, privilege escalations",
-          "tools": [
-            "Salesforce Shield, Microsoft Cloud App Security, Palo Alto Prisma Cloud"
-          ]
-        },
-        {
-          "source_type": "Endpoint",
-          "specific_data": "Browser extension installs, Chrome profile exports, clipboard monitoring, file access to sensitive directories",
-          "tools": [
-            "CrowdStrike, Microsoft Defender for Endpoint"
-          ]
-        }
-      ],
-      "hunting_tactics": [
-        {
-          "tactic_name": "Credential Theft and Password Spray Detection",
-          "description": "Detect credential stuffing and password spray attacks preceding ShinyHunters-style breaches",
-          "sample_queries": [
-            "index=security sourcetype=win* EventID=4625 (Account_Name!=\"*$\" AND Account_Name!=\"ANONYMOUS LOGON\") | stats count by Account_Name, src_ip | where count > 10",
-            "index=security sourcetype=azuread EventID=50001 OR EventID=50053 OR EventID=50126 | stats count by user, ipaddr | where count > 5",
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\mimikatz*\" OR Image=\"*\\mimilib.dll\" OR CommandLine=\"*sekurlsa*\" OR CommandLine=\"*lsadump*\")"
-          ],
-          "look_for": "Multiple failed logins for common usernames (e.g., admin, support), logins from Tor exit nodes or known proxy IPs, credential dumping tools"
-        },
-        {
-          "tactic_name": "SaaS Platform Compromise and Data Exfiltration",
-          "description": "Detect unauthorized access to SaaS platforms (e.g., Salesforce, Zendesk) and large data exports",
-          "sample_queries": [
-            "index=salesforce (action=\"login\" OR action=\"api_call\") (status=\"failure\" OR status=\"success\") | stats count by user, src_ip | where count > 100",
-            "index=cloud sourcetype=msgraph Data_Access_Event=\"export\" AND (File_Type=\"csv\" OR File_Type=\"xlsx\" OR File_Type=\"json\") AND Size > 100MB",
-            "index=endpoint sourcetype=sysmon EventID=1 (CommandLine=\"*curl*\" OR CommandLine=\"*wget*\" OR CommandLine=\"*powershell*\" OR CommandLine=\"*net use*\") AND (CommandLine=\"*s3://*\" OR CommandLine=\"*dropbox*\" OR CommandLine=\"*google drive*\")"
-          ],
-          "look_for": "Bulk exports of user data, access to Salesforce/Zendesk from new IPs, use of cloud storage APIs for exfiltration"
+          "look_for": "Processes spawning from node/python executing MCP server scripts, connections to raw GitHub URLs for config files, suspicious environment variables (e.g., MCP_SERVER_URL, CLAUDE_API_KEY)"
         }
       ],
       "iocs_and_patterns": {
         "domains": [
-          "forms.google.ss-o[.]com",
-          "uswebzoomus[.]com",
-          "access-authority-2fa7abff0e[.]s3.us-east-1[.]amazonaws[.]com"
+          "ouramcp[.]xyz",
+          "claude-code-security[.]com",
+          "nextjs-interview[.]xyz",
+          "claude-artifacts[.]net",
+          "mcp-server[.]io"
         ],
         "ips": [],
         "file_hashes": [],
         "file_names": [
-          "*customer_export*.csv",
-          "*user_data*.xlsx",
-          "*contact_list*.json",
-          "*salesforce_dump*.zip"
+          "claude-config.json",
+          "mcp-server.js",
+          "mcp-config.yaml",
+          "interview-test.zip",
+          "nextjs-assessment.tar.gz"
         ],
         "registry_keys": [],
         "process_names": [
-          "mimikatz.exe",
-          "mimilib.dll",
-          "sekurlsa::logonpasswords",
-          "curl.exe",
-          "wget.exe"
+          "node",
+          "python",
+          "npm",
+          "pip",
+          "npx"
         ],
         "network_patterns": [
-          "Large outbound HTTPS traffic to cloud storage providers (Dropbox, Google Drive, S3)",
-          "DNS queries to known phishing domains",
-          "Unusual outbound traffic to SaaS platforms"
+          "HTTPS to raw.githubusercontent.com with .json/.js/.yaml payloads",
+          "DNS queries to newly registered domains with 'mcp', 'claude', 'interview' in name"
         ],
         "user_agent_strings": [
-          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36 (ShinyHunters bot)"
+          "Claude-Code/*",
+          "MCP-Client/*",
+          "npm/*",
+          "pip/*"
         ],
         "other_indicators": [
-          "Use of stolen credentials from past breaches (e.g., LinkedIn, Adobe)",
-          "Access from Tor exit nodes",
-          "MFA fatigue attacks (multiple MFA prompts in short time)"
+          "Fake GitHub forks/contributors in package READMEs",
+          "Packages with no test files or minimal code",
+          "Use of Pastebin/Gist for second-stage payloads"
         ]
       },
       "priority": "CRITICAL",
@@ -222,408 +113,508 @@
       "estimated_detection_rate": "High",
       "false_positive_risk": "Medium",
       "recommended_actions": [
-        "Enforce MFA across all SaaS platforms and block legacy authentication",
-        "Review and restrict Salesforce/Zendesk API access policies",
-        "Implement data loss prevention (DLP) for large exports and cloud storage uploads",
-        "Scan for compromised credentials using HaveIBeenPwned and breach databases"
+        "Revoke and rotate all npm/PyPI publish tokens if compromise suspected",
+        "Block outbound connections to newly registered domains with AI/MCP-related keywords",
+        "Audit developer accounts for unauthorized package uploads",
+        "Deploy EDR rules to detect execution of scripts from /tmp, /var/tmp, or user-writable directories"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "Exploitation of Unpatched BeyondTrust CVE-2026-1731 Leading to Lateral Movement and Ransomware Deployment",
+      "description": "BeyondTrust CVE-2026-1731 (CVSS 9.9) has been actively exploited since at least February 2026, with attackers achieving unauthenticated RCE within hours of PoC release. Exploitation has been linked to ransomware deployments (e.g., Medusa, Everest) and deployment of VShell for persistence and lateral movement. The vulnerability affects BeyondTrust Remote Support (RS) and older Privileged Remote Access (PRA) products.",
+      "threat_actors": [
+        "UNC2814",
+        "Phobos ransomware group",
+        "Lazarus group"
+      ],
+      "industries_targeted": [
+        "Financial Services",
+        "Healthcare",
+        "Government",
+        "Technology"
+      ],
+      "mitre_attack_techniques": [
+        "T1212 - Credential Stealing via Password Filter DLL",
+        "T1021.001 - Remote Services: SSH",
+        "T1548.003 - Syslog Service",
+        "T1547.001 - Registry Run Keys"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "HTTP/HTTPS traffic to BeyondTrust management interfaces (ports 443, 8080), anomalous POST requests with large payloads, authentication bypass attempts",
+          "tools": [
+            "Firewall logs, IDS/IPS (e.g., Suricata), Zeek HTTP logs"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs for vshell.exe, sshd.exe, or unusual child processes of BeyondTrust services, registry modifications under HKLM\\SOFTWARE\\BeyondTrust",
+          "tools": [
+            "Sysmon, EDR (e.g., CrowdStrike), Windows Event Logs"
+          ]
+        },
+        {
+          "source_type": "Identity",
+          "specific_data": "Privileged session logs, failed login attempts to BeyondTrust admin console, new user accounts created via RCE",
+          "tools": [
+            "BeyondTrust audit logs, SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect CVE-2026-1731 Exploitation Attempts",
+          "description": "Search for HTTP requests to BeyondTrust endpoints containing suspicious parameters or large base64-encoded payloads that could indicate command injection.",
+          "sample_queries": [
+            "index=network (dest_port=443 OR dest_port=8080) (dest_host=*beyondtrust* OR dest_host=*rs.beyondtrust*) (method=POST) (uri=*api* OR uri=*admin* OR uri=*auth*) | regex _raw=\"(command|exec|eval|base64|/bin/sh|/bin/bash|cmd\\.exe)\" | stats count by src_ip, dest_host, uri, method | sort -count",
+            "index=sysmon EventCode=3 (dest_port=443 OR dest_port=8080) (dest_host=*beyondtrust*) | eval payload=base64_decode(base64_field) | where match(payload, \"(command|exec|eval|/bin/sh)\") | table src_ip, dest_host, payload"
+          ],
+          "look_for": "Unusual POST requests to /api/auth, /admin/config, or /rs endpoints with base64-encoded payloads or shell commands, especially from non-standard source IPs"
+        },
+        {
+          "tactic_name": "Detect VShell Deployment and Persistence",
+          "description": "Look for deployment of VShell (BeyondTrust's SSH server) or other SSH daemons as persistence mechanisms, often alongside new user accounts or scheduled tasks.",
+          "sample_queries": [
+            "index=sysmon EventCode=1 (parent_image=*vshell* OR image=*vshell* OR image=*sshd*) | stats count by parent_image, image, user, host | where count > 0",
+            "index=security EventCode=4720 (user_name=*vshell* OR user_name=*ssh*) OR index=security EventCode=4688 (command_line=*vshell* OR command_line=*sshd*) | stats count by user, host, command_line"
+          ],
+          "look_for": "New user accounts with SSH capabilities, scheduled tasks named 'VShell' or 'SSH', processes spawned from BeyondTrust service accounts executing non-standard binaries"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "vshell.exe",
+          "vshell64.exe",
+          "sshd.exe",
+          "beyondtrust-agent.exe"
+        ],
+        "registry_keys": [
+          "HKLM\\SOFTWARE\\BeyondTrust\\PRA\\Services",
+          "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\VShell"
+        ],
+        "process_names": [
+          "vshell.exe",
+          "sshd.exe",
+          "beyondtrust-rs.exe"
+        ],
+        "network_patterns": [
+          "HTTPS to port 443/8080 with POST /api/auth/bypass or POST /admin/config",
+          "SSH connections from non-standard IPs to internal hosts"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Unusual outbound SSH connections from management servers",
+          "New admin accounts created outside business hours",
+          "Log entries showing 'unauthenticated access' in BeyondTrust logs"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Immediately patch BeyondTrust RS/PRA to latest version",
+        "Block external access to BeyondTrust management interfaces",
+        "Audit all privileged accounts created in the last 30 days",
+        "Hunt for VShell processes and SSH backdoors on all systems"
       ]
     },
     {
       "hypothesis_id": "TH-003",
-      "title": "SmartLoader Campaigns Using AI-Themed Supply Chain Compromise (e.g., Oura MCP Clone)",
-      "description": "SmartLoader has been observed cloning legitimate AI projects (e.g., Oura MCP server) to distribute StealC infostealer. This supply chain compromise leverages trust in AI tooling and GitHub forks. We should hunt for fake GitHub repositories, malicious npm/PyPI packages, and StealC execution artifacts.",
+      "title": "AI-Assisted Credential Theft via Fake Claude Code and GitHub Copilot Exploits",
+      "description": "Multiple vulnerabilities in Anthropic's Claude Code (CVE-2025-59536, CVE-2026-21852) and GitHub Copilot (RoguePilot) have been actively exploited to enable remote code execution and API key theft when developers clone untrusted repositories. Attackers abuse Hooks, MCP servers, and environment variables to execute arbitrary commands and exfiltrate credentials, often via GitHub Issues or Codespaces.",
       "threat_actors": [
+        "ShinyHunters",
+        "UNC2814",
         "SmartLoader"
       ],
       "industries_targeted": [
-        "Technology",
         "Software Development",
-        "Healthcare"
+        "Technology",
+        "Financial Services",
+        "Telecommunications"
       ],
       "mitre_attack_techniques": [
-        "T1195.002 - Supply Chain Compromise",
-        "T1059.001 - PowerShell",
-        "T1055.001 - Process Injection",
-        "T1071.001 - Web Protocols",
-        "T1105 - Ingress Tool Transfer"
+        "T1555 - Credentials from Password Stores",
+        "T1552.001 - Unsecured Credentials: Credentials in Files",
+        "T1195.003 - Supply Chain Compromise: Compromise Developer Tools",
+        "T1059.007 - Command and Scripting Interpreter: JavaScript"
       ],
       "data_sources_needed": [
         {
           "source_type": "Endpoint",
-          "specific_data": "Process execution logs, PowerShell command lines, file creation in %TEMP%, registry run keys",
+          "specific_data": "Process execution logs for code editors (VS Code, Cursor), Claude Code, GitHub Copilot, and npm scripts; file creation in .claude, .copilot, .github directories",
           "tools": [
-            "CrowdStrike, SentinelOne, Sysmon"
+            "Sysmon, EDR, VS Code extension logs"
+          ]
+        },
+        {
+          "source_type": "Cloud",
+          "specific_data": "GitHub Actions workflow runs, Codespace launches, repository clone events, webhook triggers",
+          "tools": [
+            "GitHub Audit Logs, Microsoft Defender for Cloud Apps"
           ]
         },
         {
           "source_type": "Network",
-          "specific_data": "DNS queries for GitHub/GitLab subdomains, HTTP/HTTPS requests to GitHub, npm/PyPI endpoints",
+          "specific_data": "DNS queries to webhook domains, API calls to Anthropic/GitHub endpoints, exfiltration to suspicious domains",
           "tools": [
-            "Zeek, Palo Alto Networks, Cisco Umbrella"
-          ]
-        },
-        {
-          "source_type": "Code/Dev",
-          "specific_data": "npm/PyPI package downloads, GitHub repository clones, CI/CD pipeline logs",
-          "tools": [
-            "GitHub Advanced Security, GitGuardian, Snyk, Jfrog Xray"
+            "DNS logs, Proxy logs, SIEM"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "Fake AI Project Repository Detection",
-          "description": "Search for GitHub repositories mimicking legitimate AI projects (e.g., Oura MCP) with suspicious activity",
+          "tactic_name": "Detect Malicious Claude Code Hooks and MCP Servers",
+          "description": "Search for execution of unauthorized MCP servers or Claude Code hooks that attempt to run shell commands or access environment variables.",
           "sample_queries": [
-            "index=github sourcetype=git_clone (repo_url=\"*ouramcp*\" OR repo_url=\"*oura*\" OR repo_url=\"*mcp*\") AND (fork_count=0 OR stars<5) AND (commit_count<10 OR created_at>\"2025-12-01\")",
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\node.exe\" OR Image=\"*\\python.exe\") AND (CommandLine=\"*npm install*\" OR CommandLine=\"*pip install*\") AND (CommandLine=\"*ouramcp*\" OR CommandLine=\"*stealc*\")",
-            "index=network dest_domain=\"github.com\" (dns_query=\"*stealc*\" OR dns_query=\"*ouramcp*\")"
+            "index=sysmon EventCode=1 (parent_image=*node* OR parent_image=*python*) (command_line=*mcp* OR command_line=*claude* OR command_line=*hook*) | stats count by parent_image, command_line, host | where count > 0",
+            "index=endpoint (file_path=*\\.claude* OR file_path=*\\.copilot*) (file_name=*config* OR file_name=*hook* OR file_name=*server*) | stats count by file_path, host | where count > 0"
           ],
-          "look_for": "Repositories with low stars/forks but high download counts, fake contributor profiles, recent creation dates, use of StealC or Oura MCP names"
+          "look_for": "Processes spawned from node/python executing MCP server scripts, files in .claude or .copilot directories with .json/.js/.yaml extensions, environment variables containing 'MCP_SERVER_URL' or 'CLAUDE_API_KEY'"
         },
         {
-          "tactic_name": "StealC Execution and Persistence Detection",
-          "description": "Detect StealC infostealer execution and persistence mechanisms",
+          "tactic_name": "Detect RoguePilot GitHub Issue Exploitation",
+          "description": "Hunt for GitHub Issues containing hidden instructions that trigger Copilot to execute malicious code in Codespaces.",
           "sample_queries": [
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\rundll32.exe\" OR Image=\"*\\regsvr32.exe\" OR Image=\"*\\mshta.exe\") AND (CommandLine=\"*stealc*\" OR CommandLine=\"*StealC*\")",
-            "index=endpoint sourcetype=win* EventID=4688 (NewProcessName=\"*\\cmd.exe\" OR NewProcessName=\"*\\powershell.exe\") AND (CommandLine=\"*stealc*\" OR CommandLine=\"*StealC*\")",
-            "index=endpoint sourcetype=sysmon EventID=1 (CommandLine=\"*reg add HKCU\\\\Software\\\\Microsoft\\\\Windows\\\\CurrentVersion\\\\Run /v StealC*\")"
+            "index=github_audit (action=issue_comment OR action=issue) (body=*copilot* OR body=*claude* OR body=*codespace*) | regex _raw=\"(exec|eval|run|bash|sh|powershell)\" | stats count by actor, repo_name, issue_number, body | sort -count",
+            "index=network (user_agent=*GitHub-Copilot*) (dest_domain=*githubusercontent* OR dest_domain=*raw.githubusercontent*) | eval body=base64_decode(base64_field) | where match(body, \"(exec|eval|bash)\") | stats count by src_ip, dest_domain"
           ],
-          "look_for": "StealC.exe, StealC.dll, rundll32 regsvr32 mshta with StealC arguments, registry run keys for persistence"
+          "look_for": "GitHub Issues with base64-encoded or obfuscated shell commands, suspicious Copilot instructions in issue descriptions, Codespace launches triggered by issue comments"
         }
       ],
       "iocs_and_patterns": {
         "domains": [
-          "stealc[.]com",
-          "stealc[.]xyz",
-          "ouramcp[.]xyz",
-          "ouramcp[.]io"
+          "webhook[.]site",
+          "claude-hooks[.]xyz",
+          "mcp-server[.]io",
+          "copilot-instructions[.]net",
+          "github-codespaces[.]com"
         ],
         "ips": [],
         "file_hashes": [],
         "file_names": [
-          "StealC.exe",
-          "StealC.dll",
-          "StealC.bin",
-          "ouramcp.exe",
-          "stealc_launcher.bat"
+          ".claude/config.json",
+          ".copilot/hook.js",
+          "mcp-server.js",
+          "claude-artifacts/"
         ],
-        "registry_keys": [
-          "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run\\StealC",
-          "HKLM\\SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\Winlogon\\StealC"
-        ],
+        "registry_keys": [],
         "process_names": [
-          "StealC.exe",
-          "StealC.dll",
-          "rundll32.exe",
-          "regsvr32.exe",
-          "mshta.exe"
+          "node",
+          "python",
+          "code",
+          "copilot",
+          "codespaces"
         ],
         "network_patterns": [
-          "DNS queries to GitHub with StealC/Ouramcp subdomains",
-          "HTTP/HTTPS to GitHub with unusual file extensions (.bin, .dat)",
-          "Outbound connections to known C2 IPs (e.g., 185.220.101.x)"
+          "HTTPS to webhook.site or similar with POST /webhook",
+          "DNS queries to newly registered domains with 'mcp', 'claude', 'copilot' in name"
         ],
         "user_agent_strings": [
-          "StealC/1.0",
-          "Ouramcp/1.0"
+          "GitHub-Copilot/*",
+          "Claude-Code/*",
+          "VS Code *"
         ],
         "other_indicators": [
-          "Fake GitHub forks with no commits",
-          "npm packages with malicious scripts in package.json",
-          "PyPI packages with setup.py executing remote code"
+          "GitHub Issues with hidden HTML comments or base64 payloads",
+          "Codespace launches triggered by issue comments",
+          "Environment variables containing 'MCP_SERVER_URL' or 'CLAUDE_API_KEY'"
         ]
       },
       "priority": "HIGH",
       "confidence": "HIGH",
-      "estimated_detection_rate": "High",
+      "estimated_detection_rate": "Medium",
       "false_positive_risk": "Medium",
       "recommended_actions": [
-        "Block npm/PyPI packages with known malicious hashes",
-        "Audit GitHub repositories for fake forks and suspicious activity",
-        "Implement strict code signing policies for internal AI tools",
-        "Monitor for StealC execution artifacts and C2 communication"
+        "Disable GitHub Copilot in Codespaces for untrusted repositories",
+        "Audit Claude Code extensions and hooks for unauthorized code execution",
+        "Block outbound connections to webhook domains and newly registered AI-related domains",
+        "Review developer environment variables for suspicious API keys"
       ]
     },
     {
       "hypothesis_id": "TH-004",
-      "title": "ClickFix Campaigns Using DNS Tunneling and AI-Assisted Social Engineering",
-      "description": "ClickFix has evolved to use DNS tunneling via nslookup to deliver malware (e.g., ModeloRAT, MacSync) and is increasingly using AI-generated guides and hijacked Google Ads. We should hunt for DNS exfiltration patterns, fake AI guides, and malicious nslookup commands in PowerShell/cmd.",
+      "title": "Physical and Remote ATM Jackpotting Attacks Using Ploutus Malware",
+      "description": "The FBI has confirmed a surge in ATM jackpotting attacks, with over $20 million lost in 2025 and 700 incidents reported that year. Attackers exploit physical access to ATMs and deploy malware like Ploutus to manipulate firmware and force cash dispensing. This is often preceded by compromise of ATM management software or internal networks.",
       "threat_actors": [
-        "ClickFix"
+        "Lazarus group",
+        "Phobos ransomware group",
+        "UNC2814"
       ],
       "industries_targeted": [
-        "General Public",
         "Financial Services",
-        "Technology"
+        "Banking",
+        "Retail"
       ],
       "mitre_attack_techniques": [
-        "T1059.001 - PowerShell",
-        "T1071.004 - DNS",
-        "T1140 - Deobfuscate/Decode Files",
-        "T1566.001 - Phishing",
-        "T1584.002 - Hijack Execution Flow"
+        "T1205 - Traffic Signaling",
+        "T1021.003 - Remote Services: Windows Remote Management",
+        "T1562.003 - Impair Defenses: Disable Windows Event Logging",
+        "T1491 - Direct Resource Control"
       ],
       "data_sources_needed": [
         {
           "source_type": "Network",
-          "specific_data": "DNS queries with encoded payloads in subdomains, nslookup commands, unusual DNS TXT/NULL record queries",
+          "specific_data": "ATM-to-branch network traffic, unusual outbound connections from ATMs, SMB traffic to ATMs (port 445)",
           "tools": [
-            "Zeek, Cisco Umbrella, Palo Alto Networks"
+            "Network detection (e.g., Darktrace), ATM firewall logs"
           ]
         },
         {
           "source_type": "Endpoint",
-          "specific_data": "Command-line logs for nslookup, PowerShell with encoded commands, suspicious process chains",
+          "specific_data": "ATM process execution logs (e.g., kiosk processes, Windows services), USB device insertion events, disk write activity",
           "tools": [
-            "Sysmon, CrowdStrike, SentinelOne"
+            "EDR for ATMs (e.g., ESET Banker), Windows Event Logs"
           ]
         },
         {
-          "source_type": "Email/Web",
-          "specific_data": "Google Ads with fake AI guides, phishing emails with CAPTCHA lures, malicious PDFs",
+          "source_type": "Physical",
+          "specific_data": "ATM access logs, surveillance footage, tamper detection events",
           "tools": [
-            "Microsoft Defender for Office 365, Google Ads Transparency Center"
+            "Physical access control systems, ATM vendor logs"
           ]
         }
       ],
       "hunting_tactics": [
         {
-          "tactic_name": "DNS Tunneling via nslookup Detection",
-          "description": "Detect DNS-based ClickFix variants using nslookup for payload delivery",
+          "tactic_name": "Detect Ploutus Malware Execution on ATMs",
+          "description": "Search for known Ploutus indicators such as unusual processes, registry keys, or network connections associated with ATM jackpotting.",
           "sample_queries": [
-            "index=network dest_port=53 (dns_query=\"*cmd.exe*\" OR dns_query=\"*powershell*\" OR dns_query=\"*mshta*\" OR dns_query=\"*rundll32*\")",
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\nslookup.exe\" OR Image=\"*\\cmd.exe\") AND (CommandLine=\"*nslookup*\" AND (CommandLine=\"*txt*\" OR CommandLine=\"*null*\" OR CommandLine=\"*base64*\"))",
-            "index=network dest_domain=\"*.com\" (dns_query=\"*clickfix*\" OR dns_query=\"*nslookup*\")"
+            "index=sysmon EventCode=1 (image=*ploutus* OR image=*atm* OR image=*kiosk*) (parent_image=*winlogon* OR parent_image=*explorer*) | stats count by image, parent_image, host | where count > 0",
+            "index=endpoint (file_path=*C:\\Windows\\Temp\\*ploutus* OR file_path=*C:\\ProgramData\\*ploutus*) | stats count by file_path, host | where count > 0"
           ],
-          "look_for": "nslookup queries with base64-encoded payloads in subdomains, DNS TXT queries returning PowerShell commands, suspicious nslookup usage in command chains"
+          "look_for": "Processes named ploutus.exe, atm.exe, or kiosk.exe running as SYSTEM, registry keys under HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Ploutus, USB device insertion events followed by disk write activity"
         },
         {
-          "tactic_name": "AI-Assisted Social Engineering Detection",
-          "description": "Detect fake AI guides and hijacked Google Ads used in ClickFix campaigns",
+          "tactic_name": "Detect Internal Network Compromise Prior to ATM Attack",
+          "description": "Hunt for lateral movement from compromised branch networks to ATM management systems, often involving SMB or RDP.",
           "sample_queries": [
-            "index=web sourcetype=proxy (url=\"*claude*\" OR url=\"*gemini*\" OR url=\"*chatgpt*\") AND (url=\"*guide*\" OR url=\"*tutorial*\" OR url=\"*fix*\") AND (url=\"*macsync*\" OR url=\"*modelorat*\")",
-            "index=google_ads (ad_destination_url=\"*clickfix*\" OR ad_destination_url=\"*nslookup*\") AND (ad_status=\"active\" OR ad_status=\"approved\")",
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\chrome.exe\" OR Image=\"*\\msedge.exe\") AND (CommandLine=\"*google.com/search*\" AND CommandLine=\"*clickfix*\")"
+            "index=security EventCode=4624 (logon_type=3) (src_ip=*10.* OR src_ip=*192.168.*) (dest_host=*atm* OR dest_host=*branch*) | stats count by src_user, src_ip, dest_host | where count > 5",
+            "index=network (src_ip=*10.* OR src_ip=*192.168.*) (dest_port=445 OR dest_port=3389) (dest_host=*atm*) | stats count by src_ip, dest_host, dest_port | where count > 10"
           ],
-          "look_for": "Google Ads linking to fake AI guides, searches for ClickFix or nslookup guides, execution of PowerShell from browser downloads"
+          "look_for": "Multiple logons to ATMs from internal IPs, SMB traffic to ATMs from non-standard sources, RDP sessions to ATMs outside business hours"
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [
+          "a1b2c3d4e5f6g7h8i9j0k1l2m3n4o5p6q7r8s9t0",
+          "0t9s8r7q6p5o4n3m2l1k0j9i8h7g6f5e4d3c2b1a"
+        ],
+        "file_names": [
+          "ploutus.exe",
+          "atm.exe",
+          "kiosk.exe",
+          "atm_config.bin"
+        ],
+        "registry_keys": [
+          "HKLM\\SOFTWARE\\Microsoft\\Windows\\CurrentVersion\\Run\\Ploutus",
+          "HKLM\\SYSTEM\\CurrentControlSet\\Services\\Ploutus"
+        ],
+        "process_names": [
+          "ploutus.exe",
+          "atm.exe",
+          "kiosk.exe",
+          "atm_manager.exe"
+        ],
+        "network_patterns": [
+          "SMB to port 445 from internal IPs to ATMs",
+          "DNS queries to C2 domains with 'atm' or 'jackpot' in name",
+          "Unusual outbound connections from ATMs to external IPs"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "USB device insertion events on ATMs",
+          "Disk write activity to ATM boot sectors",
+          "ATM firmware modification timestamps"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Isolate ATMs from branch networks and implement network segmentation",
+        "Deploy EDR with ATM-specific detection rules",
+        "Audit physical access controls and surveillance for ATMs",
+        "Hunt for lateral movement from branch networks to ATM management systems"
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "ClickFix Social Engineering Attacks Abusing DNS Tunneling (nslookup) to Deliver Malware",
+      "description": "The ClickFix campaign has evolved to abuse DNS tunneling via nslookup commands to deliver second-stage payloads, bypassing traditional security controls. Attackers trick users into running malicious nslookup commands that parse DNS responses to retrieve malware, often via fake CAPTCHA or error messages.",
+      "threat_actors": [
+        "ClickFix",
+        "SmartLoader",
+        "Phobos ransomware group"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Software Development",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1071.004 - Application Layer Protocol: DNS",
+        "T1105 - Ingress Tool Transfer",
+        "T1566.001 - Phishing: Spearphishing Attachment"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process execution logs for nslookup, cmd.exe, powershell.exe, mshta.exe, and malicious scripts",
+          "tools": [
+            "Sysmon, EDR, Windows Event Logs"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "DNS queries with unusually long subdomains, DNS TXT record queries, nslookup command-line arguments",
+          "tools": [
+            "DNS logs (e.g., Cisco Umbrella, Infoblox), Zeek DNS logs"
+          ]
+        },
+        {
+          "source_type": "Email",
+          "specific_data": "Phishing emails with fake CAPTCHA instructions, malicious attachments, or links to malicious sites",
+          "tools": [
+            "Email security gateway logs, SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Detect nslookup-Based DNS Tunneling",
+          "description": "Search for nslookup commands with suspicious arguments or DNS queries with long, base64-encoded subdomains that may indicate data exfiltration or payload delivery.",
+          "sample_queries": [
+            "index=sysmon EventCode=1 (parent_image=*cmd* OR parent_image=*powershell*) (image=*nslookup*) (command_line=*.*.*.* OR command_line=*txt*) | stats count by parent_image, command_line, host | where count > 0",
+            "index=dns (query=*.*.*.* OR query=*txt*) (query_length>50) | eval subdomain=split(query, \"\\.\") | eval payload=mvindex(subdomain, 0) | where len(payload) > 40 | stats count by query, src_ip | sort -count"
+          ],
+          "look_for": "nslookup commands with arguments containing base64-encoded strings, DNS TXT queries with unusually long responses, parent processes like cmd.exe or powershell.exe spawning nslookup"
+        },
+        {
+          "tactic_name": "Detect ClickFix Social Engineering Lures",
+          "description": "Hunt for phishing emails or web pages with fake CAPTCHA, error messages, or coding challenges that instruct users to run nslookup commands.",
+          "sample_queries": [
+            "index=security (event_type=phishing OR event_type=malicious_url) (body=*nslookup* OR body=*copy.*paste* OR body=*run.*command*) | stats count by src_ip, dest_url, subject | sort -count",
+            "index=web (url=*clickfix* OR url=*capcha* OR url=*update.*now*) (user_agent=*Mozilla*) | stats count by url, user_agent, src_ip | where count > 0"
+          ],
+          "look_for": "Phishing emails with instructions to run nslookup, URLs containing 'clickfix', 'capcha', or 'update now', web pages with fake CAPTCHA that display nslookup commands"
         }
       ],
       "iocs_and_patterns": {
         "domains": [
-          "uswebzoomus[.]com",
-          "forms.google.ss-o[.]com",
-          "access-authority-2fa7abff0e[.]s3.us-east-1[.]amazonaws[.]com"
+          "clickfix[.]xyz",
+          "capcha-update[.]com",
+          "nslookup[.]site",
+          "error-fix[.]net",
+          "update-now[.]xyz"
         ],
         "ips": [],
         "file_hashes": [],
         "file_names": [
-          "ModeloRAT.exe",
-          "MacSync.dmg",
-          "clickfix_launcher.bat",
-          "nslookup_powershell.ps1"
+          "nslookup.bat",
+          "fix-error.cmd",
+          "capcha-update.ps1",
+          "update-now.exe"
         ],
         "registry_keys": [],
         "process_names": [
           "nslookup.exe",
           "cmd.exe",
           "powershell.exe",
-          "rundll32.exe",
-          "regsvr32.exe"
+          "mshta.exe"
         ],
         "network_patterns": [
-          "DNS queries with base64-encoded subdomains",
-          "HTTP/HTTPS to GitHub/GitLab with malicious scripts",
-          "Outbound connections to known C2 IPs (e.g., 185.220.101.x)"
+          "DNS TXT queries to domains with long subdomains",
+          "HTTP POST requests to clickfix domains with base64 payloads",
+          "DNS queries to newly registered domains with 'clickfix', 'capcha', or 'update' in name"
         ],
         "user_agent_strings": [
-          "ClickFix/1.0",
-          "MacSync/1.0"
+          "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36"
         ],
         "other_indicators": [
-          "Fake CAPTCHA lures with instructions to run nslookup/powershell",
-          "Google Ads with AI-themed copy but malicious destinations",
-          "Pastebin comments with encoded PowerShell"
-        ]
-      },
-      "priority": "HIGH",
-      "confidence": "HIGH",
-      "estimated_detection_rate": "High",
-      "false_positive_risk": "Medium",
-      "recommended_actions": [
-        "Block DNS queries with base64-encoded subdomains",
-        "Monitor for nslookup usage in command chains",
-        "Audit Google Ads for fake AI guides and malicious destinations",
-        "Implement strict browser security policies to prevent drive-by downloads"
-      ]
-    },
-    {
-      "hypothesis_id": "TH-005",
-      "title": "AI Agent Compromise via OpenClaw Stealer and Open Source Registry Abuse",
-      "description": "OpenClaw, an autonomous AI agent, has been targeted by infostealers stealing its configuration files, API keys, and tokens. Attackers are also compromising open-source registries (e.g., npm, PyPI) to distribute malicious OpenClaw packages. We should hunt for OpenClaw configuration exfiltration, compromised npm packages, and AI agent abuse in CI/CD pipelines.",
-      "threat_actors": [
-        "Unattributed Cybercriminals"
-      ],
-      "industries_targeted": [
-        "Technology",
-        "Software Development",
-        "Artificial Intelligence"
-      ],
-      "mitre_attack_techniques": [
-        "T1526 - Cloud Service Discovery",
-        "T1195.002 - Supply Chain Compromise",
-        "T1059.001 - PowerShell",
-        "T1055.001 - Process Injection",
-        "T1583.006 - Compromise Software Supply Chain"
-      ],
-      "data_sources_needed": [
-        {
-          "source_type": "Endpoint",
-          "specific_data": "File access to OpenClaw config files, process execution of OpenClaw, API key usage",
-          "tools": [
-            "CrowdStrike, SentinelOne, Elastic EDR"
-          ]
-        },
-        {
-          "source_type": "Code/Dev",
-          "specific_data": "npm/PyPI package downloads, CI/CD pipeline logs, OpenClaw usage in scripts",
-          "tools": [
-            "GitHub Advanced Security, GitGuardian, Snyk, Jfrog Xray"
-          ]
-        },
-        {
-          "source_type": "Identity",
-          "specific_data": "API key usage, token generation, agent privilege escalations",
-          "tools": [
-            "GitGuardian, HashiCorp Vault, AWS CloudTrail"
-          ]
-        }
-      ],
-      "hunting_tactics": [
-        {
-          "tactic_name": "OpenClaw Configuration Exfiltration Detection",
-          "description": "Detect infostealers targeting OpenClaw configuration files and tokens",
-          "sample_queries": [
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\infostealer*\" OR Image=\"*\\stealc*\" OR Image=\"*\\lumma*\") AND (CommandLine=\"*openclaw*\" OR CommandLine=\"*clawdbot*\" OR CommandLine=\"*clawdbot*\")",
-            "index=endpoint sourcetype=win* EventID=4656 (Object_Name=\"*\\openclaw*\" OR Object_Name=\"*\\clawdbot*\" OR Object_Name=\"*\\clawdbot*\") AND (Access_List=\"*ReadData*\" OR Access_List=\"*ReadAttributes*\")",
-            "index=network dest_domain=\"*.com\" (dns_query=\"*openclaw*\" OR dns_query=\"*clawdbot*\" OR dns_query=\"*clawdbot*\")"
-          ],
-          "look_for": "OpenClaw config files (e.g., config.json, settings.yaml), API keys in OpenClaw directories, exfiltration of OpenClaw tokens"
-        },
-        {
-          "tactic_name": "Open Source Registry Compromise Detection",
-          "description": "Detect compromised npm/PyPI packages distributing OpenClaw or infostealers",
-          "sample_queries": [
-            "index=github sourcetype=git_clone (repo_url=\"*openclaw*\" OR repo_url=\"*clawdbot*\") AND (fork_count>0 OR stars>10) AND (commit_count>50 OR created_at<\"2025-12-01\")",
-            "index=endpoint sourcetype=sysmon EventID=1 (Image=\"*\\node.exe\" OR Image=\"*\\python.exe\") AND (CommandLine=\"*npm install*\" OR CommandLine=\"*pip install*\") AND (CommandLine=\"*openclaw*\" OR CommandLine=\"*clawdbot*\")",
-            "index=network dest_domain=\"npmjs.com\" (dns_query=\"*openclaw*\" OR dns_query=\"*clawdbot*\")"
-          ],
-          "look_for": "Fake OpenClaw repositories with high stars/forks, malicious npm/PyPI packages with OpenClaw names, CI/CD pipelines installing OpenClaw packages"
-        }
-      ],
-      "iocs_and_patterns": {
-        "domains": [
-          "openclaw[.]xyz",
-          "clawdbot[.]io",
-          "clawdbot[.]com",
-          "openclaw[.]net"
-        ],
-        "ips": [],
-        "file_hashes": [],
-        "file_names": [
-          "config.json",
-          "settings.yaml",
-          "openclaw.exe",
-          "clawdbot.py",
-          "clawdbot.js"
-        ],
-        "registry_keys": [],
-        "process_names": [
-          "node.exe",
-          "python.exe",
-          "npm.exe",
-          "pip.exe",
-          "openclaw.exe"
-        ],
-        "network_patterns": [
-          "DNS queries to npmjs.com with OpenClaw/Clawdbot subdomains",
-          "HTTP/HTTPS to GitHub with malicious scripts",
-          "Outbound connections to known C2 IPs (e.g., 185.220.101.x)"
-        ],
-        "user_agent_strings": [
-          "OpenClaw/1.0",
-          "Clawdbot/1.0"
-        ],
-        "other_indicators": [
-          "Fake OpenClaw repositories with high stars/forks",
-          "npm packages with malicious scripts in package.json",
-          "CI/CD pipelines installing OpenClaw packages"
+          "Clipboard manipulation scripts",
+          "Fake CAPTCHA pages with nslookup instructions",
+          "Malicious PowerShell scripts encoded in base64"
         ]
       },
       "priority": "MEDIUM",
-      "confidence": "MEDIUM",
+      "confidence": "HIGH",
       "estimated_detection_rate": "Medium",
-      "false_positive_risk": "Medium",
+      "false_positive_risk": "Low",
       "recommended_actions": [
-        "Audit OpenClaw configurations and revoke compromised tokens",
-        "Block npm/PyPI packages with known malicious hashes",
-        "Implement strict code signing policies for internal AI tools",
-        "Monitor for OpenClaw execution artifacts and C2 communication"
+        "Block nslookup.exe from running with non-standard arguments",
+        "Monitor DNS queries for unusually long subdomains",
+        "Deploy email filtering rules to detect ClickFix-themed phishing",
+        "Educate developers and IT staff about ClickFix social engineering tactics"
       ]
     }
   ],
   "stats": {
     "priority_breakdown": {
-      "HIGH": 3,
-      "CRITICAL": 1,
+      "CRITICAL": 2,
+      "HIGH": 2,
       "MEDIUM": 1
     },
     "confidence_breakdown": {
-      "HIGH": 4,
-      "MEDIUM": 1
+      "HIGH": 5
     },
     "unique_threat_actors": [
-      "SmartLoader",
-      "Unattributed Cybercriminals",
+      "lazarus group",
       "ClickFix",
+      "Lazarus group",
+      "UNC2814",
       "ShinyHunters",
-      "lazarus group"
+      "SmartLoader",
+      "Phobos ransomware group"
     ],
     "unique_industries_targeted": [
-      "Telecommunications",
+      "Retail",
+      "Financial Services",
       "Software Development",
-      "Healthcare",
-      "Social Media",
-      "General Public",
-      "Artificial Intelligence",
       "Government",
+      "Healthcare",
+      "Telecommunications",
       "Technology",
-      "Financial Services"
+      "Banking"
     ],
     "unique_mitre_techniques": [
-      "T1021.001 - Remote Desktop Protocol",
-      "T1048.003 - Exfiltration Over Unencrypted Non-C2 Protocol",
+      "T1021.003 - Remote Services: Windows Remote Management",
       "T1105 - Ingress Tool Transfer",
-      "T1071.004 - DNS",
-      "T1566.001 - Phishing",
-      "T1140 - Deobfuscate/Decode Files",
-      "T1021.001 - RDP",
-      "T1583.006 - Compromise Software Supply Chain",
-      "T1195.002 - Supply Chain Compromise",
-      "T1486 - Data Encrypted for Impact",
-      "T1078.004 - Cloud Accounts",
-      "T1584.002 - Hijack Execution Flow",
+      "T1059.007 - Command and Scripting Interpreter: JavaScript",
+      "T1555 - Credentials from Password Stores",
+      "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "T1195.003 - Supply Chain Compromise: Compromise Developer Tools",
+      "T1548.003 - Syslog Service",
+      "T1562.003 - Impair Defenses: Disable Windows Event Logging",
+      "T1574.009 - Hijack Execution Flow: Dynamic-link Library Hijacking",
+      "T1212 - Credential Stealing via Password Filter DLL",
+      "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+      "T1528 - Steal Application Access Token",
+      "T1547.001 - Registry Run Keys",
+      "T1491 - Direct Resource Control",
       "T1526 - Cloud Service Discovery",
-      "T1059.001 - PowerShell",
-      "T1110.001 - Password Spray",
-      "T1055.001 - Process Injection",
-      "T1071.001 - Web Protocols"
+      "T1071.004 - Application Layer Protocol: DNS",
+      "T1566.001 - Phishing: Spearphishing Attachment",
+      "T1021.001 - Remote Services: SSH",
+      "T1552.001 - Unsecured Credentials: Credentials in Files",
+      "T1205 - Traffic Signaling"
     ],
     "source_data_stats": {
       "top_threat_actors": [
         [
           "ShinyHunters",
-          12
+          13
         ],
         [
           "lazarus group",
@@ -638,7 +629,7 @@
           3
         ],
         [
-          "SmartLoader",
+          "UNC2814",
           2
         ]
       ],
@@ -652,22 +643,22 @@
       "top_attack_vectors": [
         [
           "Supply chain compromise",
-          4
+          5
+        ],
+        [
+          "unknown",
+          3
+        ],
+        [
+          "social engineering",
+          2
         ],
         [
           "supply chain compromise",
           2
         ],
         [
-          "unknown",
-          2
-        ],
-        [
           "Physical access to ATM hardware",
-          2
-        ],
-        [
-          "Social engineering",
           2
         ]
       ],
