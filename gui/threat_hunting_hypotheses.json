@@ -1,15 +1,562 @@
 {
-  "generated_at": "2026-02-28T05:14:36Z",
+  "generated_at": "2026-02-28T15:47:57Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 547,
-  "hypotheses_count": 0,
-  "hypotheses": [],
+  "total_articles_analyzed": 556,
+  "hypotheses_count": 5,
+  "hypotheses": [
+    {
+      "hypothesis_id": "TH-001",
+      "title": "ClickFix DNS Tunneling via nslookup for Malware Staging",
+      "description": "Threat actors are evolving the ClickFix social engineering campaign to use the built-in Windows `nslookup` utility to retrieve malicious payloads via DNS TXT records, bypassing traditional PowerShell and `mshta` blocks. This hypothesis hunts for users executing `nslookup` commands against suspicious domains followed by immediate PowerShell or script execution, indicating a staged malware delivery.",
+      "threat_actors": [
+        "ClickFix",
+        "ModeloRAT operators"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Healthcare",
+        "General Public"
+      ],
+      "mitre_attack_techniques": [
+        "T1566.001 - Phishing: Spearphishing Attachment",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1071.001 - Application Layer Protocol: Web Protocols",
+        "T1105 - Ingress Tool Transfer"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs, command-line arguments, parent-child process relationships",
+          "tools": [
+            "EDR (CrowdStrike, SentinelOne, Microsoft Defender)",
+            "Sysmon"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "DNS query logs (TXT records), DNS response sizes",
+          "tools": [
+            "SIEM",
+            "DNS Firewall",
+            "Zeek"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Command-Line Argument Analysis",
+          "description": "Search for `nslookup` executions where the query type is TXT and the domain is not a standard internal or known external service, followed by PowerShell execution.",
+          "sample_queries": [
+            "Splunk SPL: index=endpoint_logs ProcessName=\"nslookup.exe\" | search CommandLine=\"* -type=txt *\" | stats count by User, Host, CommandLine | where count > 1",
+            "KQL (Sentinel): DeviceProcessEvents | where ProcessName == \"nslookup.exe\" | where CommandLine contains \"-type=txt\" | join kind=leftouter (DeviceProcessEvents | where ProcessName == \"powershell.exe\" | where TimeGenerated > ago(5m)) on $left.User == $right.User | project TimeGenerated, User, CommandLine"
+          ],
+          "look_for": "Users running `nslookup` with `-type=txt` against random-looking domains, immediately followed by `powershell.exe` or `cmd.exe` spawning a script."
+        },
+        {
+          "tactic_name": "DNS TXT Record Anomaly Detection",
+          "description": "Identify DNS TXT queries that return unusually large payloads (base64 encoded scripts) which are typical for this staging technique.",
+          "sample_queries": [
+            "Splunk SPL: index=dns_logs qtype=\"TXT\" | eval payload_len=len(qry) | where payload_len > 200 | stats count by src_ip, qry",
+            "Elasticsearch: GET /dns-logs/_search { \"query\": { \"bool\": { \"must\": [ { \"match\": { \"qtype\": \"TXT\" } }, { \"range\": { \"response_size\": { \"gt\": 200 } } } ] } }"
+          ],
+          "look_for": "TXT record responses containing Base64 strings or executable code snippets."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "*ss-o[.]com",
+          "*id-v4[.]com",
+          "Randomly generated subdomains"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "ModeloRAT.exe",
+          "payload.ps1",
+          "stage2.dll"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "nslookup.exe",
+          "powershell.exe",
+          "cmd.exe"
+        ],
+        "network_patterns": [
+          "DNS TXT queries > 200 bytes",
+          "DNS queries to non-standard TLDs"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Social engineering prompts asking users to 'copy and paste' commands into Run dialog"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Isolate affected endpoints immediately.",
+        "Block DNS TXT queries to unknown external domains at the firewall.",
+        "Scan for ModeloRAT or similar RAT artifacts on the host.",
+        "Reset credentials for the compromised user account."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "Supply Chain Compromise via Malicious OpenClaw and AI Agent Configurations",
+      "description": "Attackers are targeting the emerging ecosystem of local AI agents (specifically OpenClaw) by distributing malicious 'skills' or compromised npm packages (e.g., Cline CLI) that install infostealers. This hypothesis hunts for the installation of unauthorized AI agent configurations, exfiltration of AI identity files, and connections to known malicious C2 infrastructure associated with these tools.",
+      "threat_actors": [
+        "SmartLoader",
+        "Hudson Rock identified actors",
+        "OpenClaw attackers"
+      ],
+      "industries_targeted": [
+        "Software Development",
+        "Technology",
+        "Financial Services",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+        "T1567.002 - Exfiltration Over Web Service: Web Service",
+        "T1055.012 - Process Injection: Process Hollowing",
+        "T1071.001 - Application Layer Protocol: Web Protocols"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "File system changes, new processes spawning from npm/node, network connections from AI agent processes",
+          "tools": [
+            "EDR",
+            "File Integrity Monitoring (FIM)"
+          ]
+        },
+        {
+          "source_type": "Cloud",
+          "specific_data": "NPM package installation logs, CI/CD pipeline logs",
+          "tools": [
+            "Cloud Security Posture Management (CSPM)",
+            "SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "AI Agent Configuration Exfiltration",
+          "description": "Search for processes accessing or exfiltrating files associated with OpenClaw or similar AI agents (e.g., config files, API keys, memory dumps).",
+          "sample_queries": [
+            "Splunk SPL: index=endpoint_logs (ProcessName=\"node.exe\" OR ProcessName=\"python.exe\") | search CommandLine=\"*OpenClaw*\" OR CommandLine=\"*clawdbot*\" | stats count by User, Host",
+            "KQL: DeviceFileEvents | where FileName has \"OpenClaw\" or FileName has \"clawdbot\" | where Operation == \"Write\" or Operation == \"Delete\" | project TimeGenerated, FileName, User, DeviceName"
+          ],
+          "look_for": "Unusual file access patterns targeting `~/.openclaw`, `~/.clawdbot`, or similar directories, especially followed by network egress."
+        },
+        {
+          "tactic_name": "Malicious NPM Package Installation",
+          "description": "Identify installations of known malicious packages (e.g., fake Oura MCP servers, compromised Cline CLI) or packages with suspicious dependencies.",
+          "sample_queries": [
+            "Splunk SPL: index=ci_cd_logs | search action=\"install\" AND (package=\"cline\" OR package=\"oura-mcp\" OR package=\"openclaw\") | stats count by user, repository",
+            "KQL: DeviceProcessEvents | where ProcessName == \"npm\" or ProcessName == \"yarn\" | where CommandLine contains \"install\" | where CommandLine contains \"openclaw\" or CommandLine contains \"cline\" | project TimeGenerated, CommandLine, User"
+          ],
+          "look_for": "Installation of packages named 'cline', 'oura-mcp', or 'openclaw' from non-official registries or by non-authorized developers."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "openclaw.ai",
+          "cline.dev (fake)",
+          "oura-mcp-server.com (fake)"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "OpenClaw",
+          "clawdbot",
+          "cline",
+          "oura-mcp-server",
+          "StealC"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "node.exe",
+          "python.exe",
+          "npm",
+          "yarn"
+        ],
+        "network_patterns": [
+          "Outbound connections to AI agent C2 domains",
+          "POST requests to AI provider APIs with stolen tokens"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Exfiltration of `.env` files containing AI API keys",
+          "Modification of `package.json` to include malicious dependencies"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block network access to known malicious AI agent C2 domains.",
+        "Audit all developer machines for unauthorized npm packages.",
+        "Revoke and rotate any exposed AI API keys or tokens.",
+        "Isolate systems showing signs of OpenClaw configuration theft."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "Active Exploitation of BeyondTrust and Ivanti RCE Vulnerabilities",
+      "description": "CISA has added critical vulnerabilities in BeyondTrust (CVE-2026-1731) and Ivanti (CVE-2026-1281, CVE-2026-1340) to the Known Exploited Vulnerabilities (KEV) catalog. Threat actors are actively exploiting these flaws to deploy VShell, SparkRAT, and other backdoors. This hypothesis focuses on detecting unauthenticated access attempts and subsequent lateral movement from these specific management consoles.",
+      "threat_actors": [
+        "UNC2814",
+        "Lazarus Group",
+        "Ransomware Groups (Phobos, LockBit)"
+      ],
+      "industries_targeted": [
+        "Government",
+        "Critical Infrastructure",
+        "Healthcare",
+        "Financial Services"
+      ],
+      "mitre_attack_techniques": [
+        "T1190 - Exploit Public-Facing Application",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1021.001 - Remote Services: Remote Desktop Protocol",
+        "T1078 - Valid Accounts"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Authentication logs, process creation from management consoles, web shell uploads",
+          "tools": [
+            "EDR",
+            "Web Application Firewall (WAF)",
+            "SIEM"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "HTTP/S traffic to management ports (8443, 443), SQL injection patterns",
+          "tools": [
+            "NDR",
+            "Proxy Logs"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Unauthenticated RCE Attempt Detection",
+          "description": "Monitor for HTTP requests to BeyondTrust or Ivanti endpoints that result in 200 OK responses without prior authentication, indicating a successful exploit.",
+          "sample_queries": [
+            "Splunk SPL: index=web_logs (host=\"beyondtrust\" OR host=\"ivanti\") | search status=200 AND (uri=\"/api/*\" OR uri=\"/rest/*\") | where NOT (user_agent=\"*Mozilla*\" OR user_agent=\"*Chrome*\") | stats count by src_ip, uri",
+            "KQL: CommonSecurityLog | where ProductName == \"BeyondTrust\" or ProductName == \"Ivanti\" | where Result == \"Success\" and AuthenticationStatus == \"Unauthenticated\" | project TimeGenerated, SourceIP, TargetIP, Action"
+          ],
+          "look_for": "Successful HTTP requests to sensitive API endpoints without valid session tokens or cookies."
+        },
+        {
+          "tactic_name": "Post-Exploitation Web Shell Detection",
+          "description": "Search for the creation of suspicious files (web shells) in web directories of management servers immediately following an exploit attempt.",
+          "sample_queries": [
+            "Splunk SPL: index=endpoint_logs (ProcessName=\"iis.exe\" OR ProcessName=\"apache2\") | search FileName=\"*.php\" OR FileName=\"*.asp\" OR FileName=\"*.jsp\" | where Directory=\"*webroot*\" OR Directory=\"*htdocs*\" | stats count by FileName, Host",
+            "KQL: DeviceFileEvents | where FileName has \"vshell\" or FileName has \"sparkrat\" or FileName has \"webshell\" | where Path contains \"inetpub\" or Path contains \"htdocs\" | project TimeGenerated, FileName, Path, User"
+          ],
+          "look_for": "New PHP, ASP, or JSP files created in web directories, specifically named `vshell`, `sparkrat`, or generic names like `admin.php`."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "vshell",
+          "sparkrat",
+          "webshell.php",
+          "admin.asp",
+          "cmd.jsp"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "iis.exe",
+          "apache2",
+          "httpd",
+          "java"
+        ],
+        "network_patterns": [
+          "POST requests to /api/v1/auth",
+          "SQL injection patterns in URI"
+        ],
+        "user_agent_strings": [
+          "curl",
+          "python-requests",
+          "Go-http-client"
+        ],
+        "other_indicators": [
+          "CVE-2026-1731",
+          "CVE-2026-1281",
+          "CVE-2026-1340"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Immediately patch BeyondTrust and Ivanti systems to the latest versions.",
+        "Block all inbound traffic to management ports from untrusted networks.",
+        "Scan web directories for web shells and remove them.",
+        "Reset all administrative credentials for these systems."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "Fake Job Recruitment Campaigns Targeting Developers with Malicious Repos",
+      "description": "Threat actors (including Lazarus Group) are using fake job recruitment lures to distribute malicious npm and PyPI packages or GitHub repositories. These lures often appear as technical assessments or Next.js projects that, when cloned or installed, execute backdoors or steal secrets. This hypothesis hunts for developers interacting with suspicious repositories or installing packages from unknown sources.",
+      "threat_actors": [
+        "Lazarus Group",
+        "UNC2814",
+        "SmartLoader"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Software Development",
+        "Financial Services",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1566.001 - Phishing: Spearphishing Attachment",
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1071.001 - Application Layer Protocol: Web Protocols"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Git clone commands, npm install logs, execution of scripts from temp directories",
+          "tools": [
+            "EDR",
+            "SIEM"
+          ]
+        },
+        {
+          "source_type": "Email",
+          "specific_data": "Phishing emails containing job offers, links to GitHub/npm",
+          "tools": [
+            "Email Security Gateway",
+            "SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Suspicious Repository Cloning",
+          "description": "Identify developers cloning repositories with names related to job interviews, assessments, or popular frameworks (Next.js) from non-official sources.",
+          "sample_queries": [
+            "Splunk SPL: index=endpoint_logs ProcessName=\"git.exe\" | search CommandLine=\"*clone*\" AND (CommandLine=\"*job*\" OR CommandLine=\"*assessment*\" OR CommandLine=\"*nextjs*\" OR CommandLine=\"*interview*\") | stats count by User, Host, CommandLine",
+            "KQL: DeviceProcessEvents | where ProcessName == \"git.exe\" | where CommandLine contains \"clone\" | where CommandLine contains \"job\" or CommandLine contains \"assessment\" | project TimeGenerated, CommandLine, User, DeviceName"
+          ],
+          "look_for": "Git clone commands targeting repositories with names like 'nextjs-job-test', 'coding-challenge', or 'assessment' from suspicious domains."
+        },
+        {
+          "tactic_name": "Malicious Package Installation",
+          "description": "Detect the installation of npm or PyPI packages that are typosquatted or have suspicious dependencies, often linked to the 'graphalgo' or 'cline' campaigns.",
+          "sample_queries": [
+            "Splunk SPL: index=endpoint_logs ProcessName=\"npm\" | search CommandLine=\"*install*\" AND (CommandLine=\"*graphalgo*\" OR CommandLine=\"*cline*\" OR CommandLine=\"*oura*\" OR CommandLine=\"*fake*\") | stats count by User, Host",
+            "KQL: DeviceProcessEvents | where ProcessName == \"npm\" or ProcessName == \"pip\" | where CommandLine contains \"install\" | where CommandLine contains \"graphalgo\" or CommandLine contains \"cline\" | project TimeGenerated, CommandLine, User"
+          ],
+          "look_for": "Installation of packages with names resembling legitimate tools but with slight variations, or packages with no downloads/low reputation."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "github.com (suspicious repos)",
+          "npmjs.com (typosquatted packages)",
+          "pypi.org (typosquatted packages)"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "graphalgo",
+          "cline",
+          "oura-mcp",
+          "nextjs-job-test",
+          "coding-challenge"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "git.exe",
+          "npm",
+          "pip",
+          "node.exe",
+          "python.exe"
+        ],
+        "network_patterns": [
+          "HTTPS traffic to GitHub API",
+          "npm registry requests"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Emails with subject lines like 'Job Opportunity', 'Technical Assessment', 'Coding Challenge'"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block access to suspicious GitHub repositories and npm packages.",
+        "Scan developer environments for unauthorized packages.",
+        "Educate developers on the risks of cloning unverified repositories.",
+        "Revoke any API keys or secrets potentially exposed by the malicious packages."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "ShinyHunters Data Exfiltration and Extortion via Third-Party Compromise",
+      "description": "The ShinyHunters group is actively targeting organizations (e.g., Odido, CarGurus, Wynn Resorts) via third-party vendor compromises or credential stuffing, leading to massive data leaks and extortion. This hypothesis hunts for signs of unauthorized access to customer databases, unusual data exfiltration volumes, and communication with known ShinyHunters infrastructure.",
+      "threat_actors": [
+        "ShinyHunters",
+        "Scattered Lapsus$ Hunters"
+      ],
+      "industries_targeted": [
+        "Telecommunications",
+        "Financial Services",
+        "Healthcare",
+        "Retail",
+        "Hospitality"
+      ],
+      "mitre_attack_techniques": [
+        "T1078 - Valid Accounts",
+        "T1021.001 - Remote Services: Remote Desktop Protocol",
+        "T1071.001 - Application Layer Protocol: Web Protocols",
+        "T1041 - Exfiltration Over C2 Channel"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Identity",
+          "specific_data": "Authentication logs, MFA bypass attempts, unusual login locations",
+          "tools": [
+            "SIEM",
+            "Identity Provider Logs"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "Large data transfers, connections to known leak sites",
+          "tools": [
+            "NDR",
+            "DLP"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Credential Stuffing and Account Takeover",
+          "description": "Detect multiple failed login attempts followed by a successful login from a new location or device, indicative of credential stuffing.",
+          "sample_queries": [
+            "Splunk SPL: index=auth_logs | search status=\"failed\" | stats count as fail_count by user, src_ip | where fail_count > 5 | join kind=leftouter (index=auth_logs | search status=\"success\" | stats count by user, src_ip) on user | where fail_count > 5",
+            "KQL: SigninLogs | where ResultType == 50166 or ResultType == 50053 | summarize FailedAttempts=count() by UserPrincipalName, IPAddress | join kind=inner (SigninLogs | where ResultType == 0 | summarize SuccessAttempts=count() by UserPrincipalName, IPAddress) on UserPrincipalName | where FailedAttempts > 5"
+          ],
+          "look_for": "High volume of failed logins followed by a successful login, especially from a different geographic location."
+        },
+        {
+          "tactic_name": "Mass Data Exfiltration Detection",
+          "description": "Identify unusually large data transfers from customer databases or file servers, particularly to external IPs or cloud storage.",
+          "sample_queries": [
+            "Splunk SPL: index=network_logs | search action=\"transfer\" AND (protocol=\"SFTP\" OR protocol=\"HTTP\" OR protocol=\"HTTPS\") | eval size_kb=bytes/1024 | where size_kb > 100000 | stats sum(size_kb) as total_kb by src_ip, dst_ip, user",
+            "KQL: NetworkTraffic | where Direction == \"Outbound\" | where BytesSent > 100000000 | summarize TotalBytes=sum(BytesSent) by SourceIp, DestinationIp, User"
+          ],
+          "look_for": "Large volume data transfers (e.g., >100MB) from internal databases to external IPs, especially during off-hours."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "shinyhunters.com",
+          "leak sites (e.g., leaksite.io)",
+          "pastebin.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "customers.db",
+          "users.csv",
+          "data_dump.zip"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "mysqld",
+          "postgres",
+          "mongod",
+          "sqlservr"
+        ],
+        "network_patterns": [
+          "Large SFTP transfers",
+          "HTTP POST requests to leak sites"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Ransom notes in email",
+          "Data dumps on Telegram channels"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Immediately revoke compromised credentials and enforce MFA.",
+        "Block traffic to known ShinyHunters leak sites and Telegram channels.",
+        "Isolate affected databases and investigate the scope of data exfiltration.",
+        "Prepare a communication plan for potential data breach notification."
+      ]
+    }
+  ],
   "stats": {
-    "priority_breakdown": {},
-    "confidence_breakdown": {},
-    "unique_threat_actors": [],
-    "unique_industries_targeted": [],
-    "unique_mitre_techniques": [],
+    "priority_breakdown": {
+      "HIGH": 2,
+      "CRITICAL": 3
+    },
+    "confidence_breakdown": {
+      "HIGH": 3,
+      "MEDIUM": 2
+    },
+    "unique_threat_actors": [
+      "ClickFix",
+      "Hudson Rock identified actors",
+      "Lazarus Group",
+      "Ransomware Groups (Phobos, LockBit)",
+      "OpenClaw attackers",
+      "Scattered Lapsus$ Hunters",
+      "SmartLoader",
+      "UNC2814",
+      "ModeloRAT operators",
+      "ShinyHunters"
+    ],
+    "unique_industries_targeted": [
+      "Software Development",
+      "Technology",
+      "Financial Services",
+      "Healthcare",
+      "General Public",
+      "Critical Infrastructure",
+      "Telecommunications",
+      "Retail",
+      "Hospitality",
+      "Government"
+    ],
+    "unique_mitre_techniques": [
+      "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "T1567.002 - Exfiltration Over Web Service: Web Service",
+      "T1021.001 - Remote Services: Remote Desktop Protocol",
+      "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+      "T1105 - Ingress Tool Transfer",
+      "T1041 - Exfiltration Over C2 Channel",
+      "T1566.001 - Phishing: Spearphishing Attachment",
+      "T1190 - Exploit Public-Facing Application",
+      "T1078 - Valid Accounts",
+      "T1071.001 - Application Layer Protocol: Web Protocols",
+      "T1055.012 - Process Injection: Process Hollowing"
+    ],
     "source_data_stats": {
       "top_threat_actors": [
         [
