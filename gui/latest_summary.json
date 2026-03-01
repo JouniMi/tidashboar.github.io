@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-02-28T15:32:03Z",
-  "summary": "# Strategic Threat Landscape Assessment: Q1 2026\n**Date:** February 27, 2026\n**Classification:** CONFIDENTIAL // FOR EXECUTIVE REVIEW\n**Reporting Period:** February 20, 2026 – February 27, 2026 (7-Day Window)\n\n## Executive Summary\n\nThe past seven days have witnessed a critical escalation in the sophistication and scope of cyber threats, characterized by a convergence of state-sponsored espionage and high-velocity criminal exploitation. The threat landscape is currently dominated by **ShinyHunters**, whose activity has surged to 8 distinct incidents in just one week, signaling a coordinated campaign likely targeting high-value intellectual property or critical infrastructure. Simultaneously, the **Lazarus Group** maintains a persistent presence with 5 active incidents, indicating a sustained focus on financial theft and disruptive operations. A particularly alarming trend is the weaponization of the software supply chain, evidenced by multiple incidents targeting **npm package consumers** and **CI/CD pipelines**, suggesting that adversaries are shifting from perimeter breaches to compromising the very tools developers use to build secure systems. This shift necessitates an immediate re-evaluation of Software Composition Analysis (SCA) and build pipeline integrity across the enterprise.\n\nStrategically, the convergence of critical infrastructure vulnerabilities and active exploitation presents an existential risk. The discovery of **CVE-2026-20127 (CVSS 10.0)** affecting Cisco Catalyst SD-WAN and Juniper PTX routers, combined with a massive data breach impacting **Fortinet FortiGate** deployments across 55 countries, indicates a systemic failure in network perimeter defense. These are not theoretical risks; they are actively being leveraged to facilitate data exfiltration and ransomware deployment. The targeting of the **University of Mississippi Medical Center** and **Conpet** (Romanian oil pipeline) highlights a dual-threat environment where healthcare and energy sectors are being hit by both ransomware (e.g., Qilin, Everest) and state-aligned actors. C-level leadership must prioritize immediate patching of network infrastructure and the isolation of critical SD-WAN and firewall assets while preparing for potential supply chain compromises that could bypass traditional endpoint defenses.\n\n---\n\n## Threat Actor Intelligence\n\n### Active Threat Actors (7-Day Window)\n*   **ShinyHunters (8 Incidents):** This group has demonstrated the highest activity level in the current window. Their focus appears to be on high-volume data exfiltration, likely targeting financial institutions and technology firms. The rapid increase from 20 incidents in the 30-day window to 8 in just 7 days suggests a concentrated, time-sensitive campaign.\n*   **Lazarus Group (5 Incidents):** A persistent state-sponsored actor (North Korea) remains highly active. Their continued presence indicates ongoing operations focused on cryptocurrency theft and disruptive attacks against financial and critical infrastructure targets.\n*   **UNC2814 (2 Incidents):** A known Chinese state-sponsored group, their activity suggests continued espionage efforts, likely targeting intellectual property or government networks.\n*   **ClickFix (1 Incident):** A cybercriminal group known for targeting financial services, indicating a continued focus on direct financial gain.\n\n### Threat Actor Evolution & Trends\n*   **Emerging Dominance:** **ShinyHunters** has emerged as the primary threat vector in the short term, outpacing historical trends. While **Lazarus** remains consistent, the spike in ShinyHunters activity suggests a new operational phase or a specific target set being aggressively pursued.\n*   **Declining/Consolidating Actors:** Groups like **Medusa**, **Vanilla Tempest**, and **Conti** (historically active in the 150-day window) have shown no activity in the last 7 days, suggesting a consolidation of the ransomware market where fewer, more capable groups (like ShinyHunters and Lazarus) are dominating the landscape.\n*   **Ransomware Fragmentation:** The 30-day window shows a diverse array of ransomware groups (Phobos, Everest, Nitrogen, Qilin, Crazy), but the 7-day window focuses heavily on **Qilin** and **Everest**, indicating a shift toward Ransomware-as-a-Service (RaaS) operators with higher operational maturity.\n\n### Attribution Analysis\n*   **ShinyHunters:** High confidence in attribution based on TTPs and historical behavior. Motivation: Financial gain and data extortion.\n*   **Lazarus Group:** High confidence. Motivation: State-sponsored financial theft and geopolitical disruption.\n*   **UNC2814:** High confidence. Motivation: Espionage and IP theft.\n*   **Ransomware Actors (Qilin, Everest):** Medium-High confidence. Motivation: Financial extortion via RaaS models.\n\n### TTP Analysis\n*   **Supply Chain Compromise:** A critical shift in TTPs is observed with multiple incidents targeting **npm packages** and **CI/CD pipelines**. Attackers are injecting malicious code into legitimate software repositories to compromise downstream organizations.\n*   **Network Infrastructure Exploitation:** Active exploitation of **CVE-2026-20127** (Cisco/Juniper) and **CVE-2025-49113** (Roundcube) indicates a move toward exploiting unpatched, high-value network devices to gain initial access and lateral movement.\n*   **Data Exfiltration:** The sheer volume of \"data_breach\" incidents (29 in 7 days) compared to ransomware (6) suggests a strategy of \"double extortion\" where data is stolen and leaked before encryption, or purely for espionage purposes.\n\n---\n\n## Technical Threat Analysis\n\n### Critical Vulnerabilities (Immediate Action Required)\nThe following vulnerabilities represent the highest risk due to active exploitation and maximum severity scores:\n\n1.  **CVE-2026-20127 (CVSS 10.0):**\n    *   **Affected Assets:** Cisco Catalyst SD-WAN Controller (vSmart), Cisco Catalyst SD-WAN Manager (vManage), Juniper Networks PTX Series routers.\n    *   **Risk:** Critical. Allows for remote code execution and full network compromise.\n    *   **Status:** Actively exploited in the wild.\n2.  **CVE-2025-49113 (CVSS 9.9):**\n    *   **Affected Assets:** Roundcube Webmail.\n    *   **Risk:** High. Likely used for initial access via phishing or direct exploitation of webmail interfaces.\n3.  **CVE-2026-22719 / CVE-2026-22720 (CVSS High):**\n    *   **Status:** Emerging threats requiring immediate patch management review.\n\n### Attack Surface Analysis\n*   **Most Targeted Industries:**\n    *   **Financial Services:** Heavily targeted by ShinyHunters and ransomware groups (74 U.S. banks targeted in the last week).\n    *   **Healthcare:** High-value targets for ransomware (University of Mississippi Medical Center, ApolloMD, Vikor Scientific).\n    *   **Technology/Software:** Targeted via supply chain attacks (npm packages, CI/CD).\n    *   **Energy/Infrastructure:** Conpet (Romanian oil pipeline) targeted by Qilin.\n*   **Geographic Concentration:** While specific geographic data is limited in the raw feed, the Fortinet breach spans **55 countries**, and the Lazarus/ShinyHunters campaigns show a global footprint with heavy concentration in the **U.S.** and **Europe** (Romania, Italy).\n\n### Malware & Exploit Trends\n*   **Supply Chain Malware:** New malware families are being deployed specifically to compromise **npm package consumers** and **developers**. This indicates a \"poison the well\" strategy.\n*   **Ransomware Variants:** **Qilin** and **Everest** are the most active RaaS operators. **Phobos** remains a secondary threat.\n*   **Exploit Kits:** No specific exploit kits were named, but the active exploitation of CVE-2026-20127 suggests the use of custom, targeted exploits rather than generic kits.\n\n### Infrastructure Threats\n*   **Malicious Domains/IPs:** While specific IOCs were not provided in the raw data, the scale of the **Fortinet** breach implies a massive botnet or command-and-control infrastructure is currently active.\n*   **Network Infrastructure:** The compromise of **Cisco SD-WAN** and **Juniper PTX** routers represents a critical failure in the network backbone, potentially allowing attackers to pivot across entire enterprise networks.\n\n---\n\n## Strategic Intelligence\n\n### Sector-Specific Threats\n*   **Financial Services:** Facing a dual threat of state-sponsored theft (Lazarus) and criminal extortion (ShinyHunters, Qilin). The targeting of 74 U.S. banks in a single week suggests a coordinated, automated attack wave.\n*   **Healthcare:** Remains the primary target for ransomware due to the critical nature of operations and willingness to pay. The University of Mississippi Medical Center incident highlights the vulnerability of academic medical centers.\n*   **Technology & Software:** The supply chain attacks on npm packages pose a systemic risk to all organizations relying on third-party libraries. This is a \"force multiplier\" for attackers.\n*   **Energy & Critical Infrastructure:** The attack on Conpet (Romanian oil pipeline) by Qilin signals a growing interest in disrupting physical energy flows, likely with geopolitical motivations.\n\n### Geopolitical Indicators\n*   **North Korea (Lazarus):** Continued activity suggests ongoing funding operations for the regime, likely driven by economic sanctions.\n*   **China (UNC2814):** Persistent espionage activity indicates a focus on long-term intelligence gathering.\n*   **Criminal Syndicates:** The rise of ShinyHunters and the fragmentation of ransomware groups suggest a highly competitive, profit-driven criminal ecosystem that is increasingly sophisticated.\n\n### Supply Chain Risks\n*   **Software Supply Chain:** The targeting of **npm packages** and **CI/CD pipelines** is the most significant strategic risk. Attackers are bypassing perimeter defenses by compromising the trust relationships between developers and package repositories.\n*   **Third-Party Vendors:** The Fortinet breach affecting 55 countries demonstrates that even top-tier security vendors are vulnerable, creating a cascading risk for all their customers.\n\n### Incident Response Insights\n*   **Speed of Compromise:** The Fortinet breach and the rapid spread of the Cisco vulnerability exploitation suggest that dwell time is decreasing. Organizations must assume that if a critical vulnerability is disclosed, it is being exploited within hours.\n*   **Ransomware Negotiation:** The diversity of ransomware groups (Qilin, Everest, Phobos) indicates that negotiation strategies must be tailored to specific actors, as their demands and leak behaviors vary.\n\n---\n\n## Forward-Looking Assessment\n\n### Threat Forecast\n*   **Supply Chain Escalation:** Expect a surge in attacks targeting software repositories (npm, PyPI, Maven) and CI/CD tools. Attackers will likely move from simple package poisoning to more sophisticated \"dependency confusion\" attacks.\n*   **Network Infrastructure Collapse:** As CVE-2026-20127 becomes more widely known, we anticipate a wave of attacks targeting unpatched Cisco and Juniper devices, potentially leading to widespread network outages.\n*   **Ransomware Consolidation:** The market will likely consolidate further around high-performing RaaS groups like Qilin and Everest, with smaller groups being absorbed or going dormant.\n\n### Defensive Priorities\n1.  **Immediate Patching:** Prioritize the patching of **CVE-2026-20127** (Cisco/Juniper) and **CVE-2025-49113** (Roundcube) across all environments. If patching is not immediately possible, implement network segmentation and strict access controls.\n2.  **Supply Chain Hardening:** Implement strict Software Composition Analysis (SCA) and verify the integrity of all npm packages and CI/CD pipelines. Consider moving to private registries with enhanced verification.\n3.  **Network Perimeter Review:** Conduct an immediate audit of all Fortinet, Cisco, and Juniper devices. Assume compromise and isolate critical network segments until verification is complete.\n4.  **Incident Response Readiness:** Update IR playbooks to include supply chain compromise scenarios and ransomware negotiation protocols for Qilin and Everest.\n\n### Intelligence Gaps\n*   **Specific IOCs:** The current data lacks specific malicious domains and IP addresses, hindering immediate blocking capabilities. Enhanced monitoring of threat feeds is required to fill this gap.\n*   **Attribution of \"Unknown\" Actors:** Several high-impact incidents (e.g., the 74 U.S. banks attack) are attributed to \"Unknown\" actors. Further analysis is needed to determine if these are new groups or known actors operating under new aliases.\n*   **Geographic Granularity:** While the Fortinet breach is global, more granular data on regional attack concentrations is needed to tailor defensive strategies for specific geographic subsidiaries.\n\n---\n**Prepared by:** Cybersecurity Threat Intelligence Unit\n**Distribution:** C-Suite, CISO, Board of Directors, Incident Response Team",
+  "generated_at": "2026-03-01T02:06:22Z",
+  "summary": "# Strategic Threat Landscape Assessment: Q1 2026\n**Date:** February 27, 2026\n**Classification:** CONFIDENTIAL // FOR EXECUTIVE REVIEW\n**Reporting Period:** February 20, 2026 – February 27, 2026\n\n## Executive Summary\n\nOver the past seven days, the global threat landscape has shifted from opportunistic disruption to highly targeted, high-impact operations driven by sophisticated state-sponsored actors and organized cybercriminal syndicates. The data indicates a convergence of espionage and financial extortion, with **ShinyHunters** and the **Lazarus Group** dominating the threat actor landscape. ShinyHunters has intensified its data exfiltration campaigns, while Lazarus Group continues to demonstrate a dual-focus strategy targeting both cryptocurrency infrastructure and critical software supply chains. Simultaneously, the ransomware ecosystem has evolved, with groups like **Qilin**, **Everest**, and **Phobos** aggressively targeting healthcare, energy, and financial sectors. The emergence of critical, actively exploited vulnerabilities in foundational network infrastructure (Cisco SD-WAN and Juniper routers) presents an immediate systemic risk, suggesting that threat actors are prioritizing lateral movement and network control over initial access.\n\nStrategically, the convergence of geopolitical tensions and economic incentives is driving a \"hybrid threat\" model where state actors and criminal syndicates increasingly share infrastructure and TTPs. The targeting of the University of Mississippi Medical Center, Conpet (Romanian energy), and 74 U.S. banks within a single week underscores a deliberate focus on sectors with high operational resilience requirements and significant ransom-paying potential. Furthermore, the compromise of NPM packages and CI/CD pipelines signals a maturation of supply chain attacks, moving beyond simple dependency confusion to active injection of malicious code into developer workflows. Immediate executive attention is required to address the CVSS 10.0 vulnerabilities in Cisco and Juniper infrastructure, as these represent a single point of failure for global network segmentation. Failure to patch these assets within the next 48 hours could result in widespread network compromise, enabling rapid lateral movement by the aforementioned threat actors.\n\n---\n\n## Threat Actor Intelligence\n\n### Active Threat Actors (7-Day Window)\n*   **ShinyHunters (8 Incidents):** This group remains the most active threat actor in the current window, focusing heavily on data breaches. Their methodology involves high-volume exfiltration of sensitive data to leverage for extortion or sale on dark web markets.\n*   **Lazarus Group (5 Incidents):** A North Korea-linked APT group showing renewed vigor. Their activity is bifurcated: targeting cryptocurrency exchanges/DeFi platforms for financial theft and compromising software supply chains (NPM packages) to achieve broader strategic impact.\n*   **UNC2814 (2 Incidents):** A persistent threat actor with a history of targeting government and defense sectors. Their low volume but high specificity suggests reconnaissance or preparation for a larger operation.\n*   **Anonymous (1 Incident):** Self-proclaimed members conducted a low-impact operation, likely for ideological signaling rather than financial gain.\n\n### Threat Actor Evolution & Trends\n*   **ShinyHunters:** Activity has surged significantly compared to the 30-day window (8 vs. 19 cumulative), indicating an acceleration in their campaign tempo. They are transitioning from sporadic breaches to sustained, high-volume data harvesting.\n*   **Lazarus Group:** While their 7-day count (5) is lower than their 30-day cumulative (8), the *nature* of their attacks has shifted. The 150-day window shows a focus on generic cybercrime, but the current window reveals a strategic pivot toward **supply chain compromise** and **crypto-targeting**, aligning with state-sponsored resource acquisition goals.\n*   **Ransomware Ecosystem Shift:** The 30-day window highlights the rise of **Phobos** and **ClickFix**, while the 150-day window shows the decline of legacy groups like **Conti**. This indicates a consolidation of the ransomware-as-a-service (RaaS) market, with newer, more aggressive operators (Qilin, Everest) taking market share.\n\n### Attribution Analysis & Motivations\n*   **Lazarus Group:** **High Confidence** attribution. Motivation is primarily **financial** (funding state operations) and **strategic disruption** of global financial systems.\n*   **ShinyHunters:** **High Confidence** attribution. Motivation is **financial extortion** via data leakage.\n*   **Qilin / Everest / Phobos:** **Medium-High Confidence**. These are RaaS operators motivated by **financial gain**, targeting organizations with high insurance coverage and operational criticality.\n\n### TTP Analysis (Tactics, Techniques, and Procedures)\n*   **Supply Chain Injection:** A critical emerging TTP observed in the Lazarus Group's targeting of NPM package consumers and CI/CD pipelines. Attackers are no longer just stealing credentials; they are poisoning the software development lifecycle.\n*   **Dual-Use Infrastructure:** The targeting of both crypto wallets and enterprise networks by the same actors suggests a shared infrastructure model where financial theft funds broader espionage campaigns.\n*   **Exploitation of Critical Infrastructure:** The immediate exploitation of CVE-2026-20127 (Cisco) and Juniper vulnerabilities indicates a shift toward **network-level compromise** rather than endpoint infection, allowing attackers to bypass perimeter defenses entirely.\n\n---\n\n## Technical Threat Analysis\n\n### Critical Vulnerabilities (Immediate Action Required)\nThe following vulnerabilities are being actively exploited in the wild and pose an existential risk to network integrity:\n\n| CVE ID | CVSS Score | Affected Asset | Risk Assessment |\n| :--- | :--- | :--- | :--- |\n| **CVE-2026-20127** | **10.0** | Cisco Catalyst SD-WAN Controller/Manager | **CRITICAL**: Allows remote code execution (RCE) on core network management systems. Immediate patching is mandatory. |\n| **CVE-2026-22719** | **High** | Cisco Catalyst SD-WAN | **HIGH**: Likely related to the 10.0 vector; requires immediate verification of patch status. |\n| **CVE-2026-22720** | **High** | Cisco Catalyst SD-WAN | **HIGH**: Part of the same vulnerability cluster; indicates a systemic flaw in the SD-WAN architecture. |\n| **CVE-2026-22721** | **High** | Cisco Catalyst SD-WAN | **HIGH**: Requires immediate remediation to prevent lateral movement. |\n| **CVE-2026-1731** | **9.9** | BeyondTrust Remote Support (RS/PRA) | **CRITICAL**: Compromise of privileged access management tools allows attackers to assume admin roles instantly. |\n| **Unspecified Juniper** | **10.0** | Juniper Networks PTX Series Routers | **CRITICAL**: Core routing infrastructure is vulnerable to RCE. |\n\n### Attack Surface Analysis\n*   **Most Targeted Industries:**\n    *   **Financial Services & Crypto:** Heavily targeted by Lazarus Group and ransomware gangs (74 U.S. banks, crypto exchanges).\n    *   **Healthcare:** University of Mississippi Medical Center and ApolloMD targeted, indicating a continued focus on high-value, time-sensitive data.\n    *   **Energy:** Conpet (Romanian oil pipeline) targeted by Qilin, highlighting the risk to critical national infrastructure.\n    *   **Technology/Software:** NPM package consumers and CI/CD pipelines are the new frontier for supply chain attacks.\n*   **Geographic Concentration:** While specific geographic data is limited in the raw feed, the targets (U.S. banks, Romanian energy, Japanese hotels, Dutch telecom) suggest a **globalized attack surface** with no safe harbor.\n\n### Malware & Exploit Trends\n*   **Supply Chain Malware:** The compromise of NPM packages represents a sophisticated evolution. Attackers are injecting malicious code into legitimate developer tools, ensuring widespread distribution to downstream organizations.\n*   **Ransomware Variants:** **Qilin** and **Everest** are the dominant RaaS operators. **Phobos** is also active. These groups are utilizing double-extortion tactics (encryption + data theft).\n*   **Exploit Kits:** While no specific exploit kits were named, the rapid exploitation of the Cisco and Juniper vulnerabilities suggests the use of custom, zero-day or N-day exploit modules tailored for network infrastructure.\n\n### Infrastructure Threats\n*   **Malicious Domains/IPs:** No specific IOCs were provided in the raw data, but the activity suggests the use of **legitimate cloud infrastructure** (e.g., compromised NPM packages, CI/CD runners) rather than traditional C2 servers, making detection via IP blocking ineffective.\n*   **Network Infrastructure:** The primary threat vector is the **SD-WAN and Router infrastructure** itself. Compromise here grants attackers control over the entire network topology.\n\n---\n\n## Strategic Intelligence\n\n### Sector-Specific Threats\n*   **Financial Services:** Facing a dual threat of **state-sponsored theft** (Lazarus) and **ransomware extortion** (Qilin, Everest). The targeting of 74 U.S. banks suggests a coordinated campaign or a \"spray and pray\" approach by a highly capable actor.\n*   **Healthcare:** Remains a prime target for ransomware due to the inability to tolerate downtime. The attack on UMMC and ApolloMD confirms that healthcare providers are being targeted for their high willingness to pay.\n*   **Energy & Critical Infrastructure:** The attack on Conpet (Romania) signals a geopolitical dimension, potentially linked to regional tensions. Energy operators must assume they are targets for both financial and disruptive motives.\n*   **Technology & Software Development:** The NPM/CI/CD attacks indicate that the **software supply chain** is now the primary attack vector for high-impact breaches. Organizations relying on third-party libraries are at extreme risk.\n\n### Geopolitical Indicators\n*   **North Korea (Lazarus Group):** The activity of Lazarus Group aligns with known state objectives of generating revenue for the regime while disrupting Western financial systems.\n*   **Eastern Europe/Russia:** The targeting of Romanian energy (Conpet) and the involvement of actors like ShinyHunters (often linked to Russian-speaking criminal circles) suggests a correlation with regional instability.\n*   **State-Sponsored Espionage:** UNC2814's activity, though low volume, warrants monitoring for potential intelligence gathering against defense or government entities.\n\n### Supply Chain Risks\n*   **Software Supply Chain:** The compromise of NPM packages is a critical finding. Organizations must implement **Software Bill of Materials (SBOM)** verification and strict dependency scanning.\n*   **Third-Party Risk:** The attacks on Odido (telecom) and ISPsystem highlight the risk of third-party service providers. A breach in a vendor's environment can cascade to the customer.\n\n### Incident Response Insights\n*   **Speed of Exploitation:** The time between vulnerability disclosure and active exploitation for CVE-2026-20127 was negligible. This necessitates a shift from \"patch when convenient\" to \"patch immediately\" for critical infrastructure.\n*   **Ransomware Negotiation:** The diversity of ransomware groups (Qilin, Everest, Phobos) suggests that paying ransoms does not guarantee data return or cessation of attacks, as data is often sold on the dark web regardless of payment.\n\n---\n\n## Forward-Looking Assessment\n\n### Threat Forecast\n*   **Infrastructure-Wide Compromise:** In the next 30 days, expect a surge in attacks leveraging the Cisco and Juniper vulnerabilities to establish persistent footholds in enterprise networks.\n*   **Supply Chain Escalation:** Following the NPM attacks, anticipate similar compromises in other package managers (PyPI, Maven) and CI/CD platforms (GitHub Actions, Jenkins).\n*   **Ransomware Consolidation:** Smaller ransomware groups will likely be absorbed or outcompeted by major players like Qilin and Everest, leading to more sophisticated, targeted campaigns.\n\n### Defensive Priorities\n1.  **Immediate Patching:** Prioritize the remediation of **CVE-2026-20127** (Cisco) and the **Juniper PTX** vulnerability. If patching is not immediately possible, implement strict network segmentation and firewall rules to block unauthorized access to management interfaces.\n2.  **Supply Chain Hardening:** Implement strict **SBOM** requirements for all software vendors. Enable **dependency scanning** in all CI/CD pipelines and restrict the ability to install new packages without multi-party approval.\n3.  **Privileged Access Management (PAM):** Audit and patch **BeyondTrust** systems immediately (CVE-2026-1731). Enforce MFA and just-in-time access for all administrative accounts.\n4.  **Network Segmentation:** Isolate SD-WAN controllers and core routing infrastructure from general user networks to limit lateral movement in the event of a compromise.\n\n### Intelligence Gaps\n*   **Attribution of \"Unknown\" Actors:** Several high-impact incidents (e.g., 74 U.S. banks, UMMC) are attributed to \"Unknown\" actors. Further forensic analysis is required to determine if these are new actors or known groups operating under different aliases.\n*   **Malicious Infrastructure:** The lack of specific IOCs (IPs, Domains) in the current data limits the ability to block traffic at the perimeter. Enhanced threat hunting is required to identify the command-and-control infrastructure used in the NPM and CI/CD attacks.\n*   **Geopolitical Correlation:** While the targets suggest geopolitical motives, the specific link between the attacks on Romanian energy and regional events requires deeper open-source intelligence (OSINT) analysis to confirm state sponsorship.",
   "stats": {
     "7_day": {
-      "total_documents": 320,
+      "total_documents": 314,
       "top_threat_actors": [
         [
           "ShinyHunters",
@@ -18,11 +18,11 @@
           2
         ],
         [
-          "Russian-speaking hacker (single actor or small group)",
+          "Anonymous (self-proclaimed members)",
           1
         ],
         [
-          "ClickFix",
+          "Unclear / Unspecified",
           1
         ]
       ],
@@ -36,15 +36,15 @@
           3
         ],
         [
-          "CVE-2025-49113",
-          2
-        ],
-        [
           "CVE-2026-22719",
           2
         ],
         [
           "CVE-2026-22720",
+          2
+        ],
+        [
+          "CVE-2026-22721",
           2
         ]
       ],
@@ -55,7 +55,7 @@
         ],
         [
           "malware",
-          11
+          12
         ],
         [
           "ransomware",
@@ -74,7 +74,7 @@
       "top_geographies": [
         [
           "Global",
-          29
+          28
         ],
         [
           "United States",
@@ -85,11 +85,11 @@
           8
         ],
         [
-          "Europe",
-          4
+          "Romania",
+          3
         ],
         [
-          "North America",
+          "Europe",
           3
         ]
       ],
@@ -143,7 +143,7 @@
       "top_threat_actors": [
         [
           "ShinyHunters",
-          20
+          19
         ],
         [
           "lazarus group",
@@ -165,68 +165,68 @@
       "top_vulnerabilities": [
         [
           "CVE-2026-1731",
-          10
+          11
         ],
         [
           "CVE-2026-21509",
-          9
+          7
         ],
         [
           "CVE-2026-2441",
           7
         ],
         [
-          "CVE-2025-8088",
-          6
+          "CVE-2026-24423",
+          5
         ],
         [
-          "CVE-2025-40536",
+          "CVE-2026-1281",
           5
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          86
+          85
         ],
         [
           "malware",
-          67
+          60
         ],
         [
           "ransomware",
-          27
+          26
         ],
         [
           "phishing",
-          14
+          15
         ],
         [
           "ddos",
-          11
+          9
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          118
+          113
         ],
         [
           "United States",
-          64
+          60
         ],
         [
           "Europe",
-          25
+          22
         ],
         [
           "United Kingdom",
-          19
+          17
         ],
         [
           "North America",
-          15
+          14
         ]
       ],
       "top_exploit_kits": [
@@ -257,19 +257,19 @@
           5
         ],
         [
-          "supply chain compromise",
-          4
-        ],
-        [
           "vishing (voice phishing)",
           4
         ],
         [
           "social engineering",
-          3
+          4
         ],
         [
-          "unknown",
+          "supply chain compromise",
+          4
+        ],
+        [
+          "phishing",
           3
         ]
       ]
@@ -279,7 +279,7 @@
       "top_threat_actors": [
         [
           "lazarus group",
-          5
+          6
         ],
         [
           "Medusa ransomware group",
@@ -294,7 +294,7 @@
           3
         ],
         [
-          "Detour Dog",
+          "Generic Cybercriminals",
           2
         ]
       ],
@@ -323,46 +323,46 @@
       "top_incidents": [
         [
           "data_breach",
-          81
+          73
         ],
         [
           "malware",
-          54
+          50
         ],
         [
           "ransomware",
-          26
+          24
         ],
         [
           "phishing",
-          16
+          17
         ],
         [
           "ddos",
-          3
+          4
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          89
+          87
         ],
         [
           "United States",
-          37
+          35
         ],
         [
           "Europe",
-          25
+          28
         ],
         [
           "North America",
-          18
+          19
         ],
         [
-          "United Kingdom",
-          17
+          "Asia-Pacific",
+          14
         ]
       ],
       "top_exploit_kits": [
@@ -393,49 +393,52 @@
           4
         ],
         [
-          "phishing emails with malicious attachments",
-          3
-        ],
-        [
-          "unknown",
-          3
-        ],
-        [
           "credential stuffing",
           3
         ],
         [
           "exploitation of unpatched vulnerabilities",
           3
+        ],
+        [
+          "credential theft",
+          3
+        ],
+        [
+          "Compromise of third‑party provider infrastructure",
+          2
         ]
       ]
     },
     "industry_monthly_trends": {
       "2025-10": {
-        "Financial Services": 109,
-        "Technology": 91,
-        "Healthcare": 65,
-        "Government": 63,
+        "Financial Services": 106,
+        "Technology": 88,
+        "Healthcare": 61,
+        "Government": 57,
         "Education": 29
+      },
+      "2025-11": {
+        "Technology": 4,
+        "Financial Services": 3,
+        "Advertising": 2,
+        "Software Development": 2,
+        "All Industries Using Windows 11 Desktops": 1
       }
     },
     "highlighted_incident": {
-      "title": "Ransomware targeting 2 organizations",
-      "date": "2025-10-01T08:50:17",
-      "summary": "Attack Vectors: phishing emails with malicious attachments, exploited unpatched software vulnerabilities, credential theft via credential stuffing | Affected: K-12 schools, colleges and universities",
+      "title": "Data_Breach targeting 2 organizations",
+      "date": "2025-10-03T17:55:55",
+      "summary": "Affected: Salesforce, Various major companies (approx. 39)",
       "severity": "critical",
       "threat_actors": [],
       "affected_companies": [
-        "K-12 schools",
-        "colleges and universities"
+        "Salesforce",
+        "Various major companies (approx. 39)"
       ],
       "affected_industries": [],
-      "attack_vectors": [
-        "phishing emails with malicious attachments",
-        "exploited unpatched software vulnerabilities",
-        "credential theft via credential stuffing"
-      ],
-      "incident_type": "ransomware"
+      "attack_vectors": [],
+      "incident_type": "data_breach"
     },
     "highlighted_vulnerability": {
       "cve_id": "CVE-2025-49844",
@@ -444,18 +447,6 @@
       "summary": "Authenticated remote code execution via crafted Lua script that manipulates Redis garbage collector leading to use‑after‑free."
     },
     "high_impact_incidents": [
-      {
-        "title": "Data_Breach targeting Fortinet FortiGate firewall deployments across 55 countries",
-        "date": "2026-02-21T13:50:58",
-        "affected_companies": [
-          "Fortinet FortiGate firewall deployments across 55 countries"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
       {
         "title": "Malware targeting 3 organizations",
         "date": "2026-02-23T12:30:00",
@@ -508,6 +499,18 @@
         "incident_type": "malware",
         "impact_assessment": "",
         "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting Odido (Dutch telecommunications provider)",
+        "date": "2026-02-24T11:40:20",
+        "affected_companies": [
+          "Odido (Dutch telecommunications provider)"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
       }
     ],
     "high_impact_vulnerabilities": [
@@ -555,44 +558,18 @@
         ]
       },
       {
-        "cve_id": "CVE-2025-49113",
-        "date": "2026-02-21T11:19:44",
+        "cve_id": "CVE-2026-1731",
+        "date": "2026-02-23T12:09:32",
         "cvss_score": 9.9,
-        "summary": "Deserialization of untrusted data in RoundCube Webmail leading to remote code execution by authenticated users due to insufficient validation of the _from URL parameter.",
+        "summary": "Critical pre-authentication remote code execution vulnerability in BeyondTrust Remote Support (RS) and older versions of Privileged Remote Access (PRA), allowing unauthenticated attackers to execute arbitrary OS commands.",
         "affected_companies": [
-          "Roundcube Webmail",
-          "Roundcube Project"
+          "BeyondTrust Remote Support (RS)",
+          "BeyondTrust Privileged Remote Access (PRA) - older versions",
+          "BeyondTrust"
         ]
       }
     ],
     "ransomware_targets": [
-      {
-        "company": "Marquis Software Solutions",
-        "date": "2026-01-29T17:57:58",
-        "actor": "Unattributed ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "undisclosed (estimated high due to operational downtime and potential ransom payment)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Dozens of U.S. banks",
-        "date": "2026-01-29T17:57:58",
-        "actor": "Unattributed ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "undisclosed (estimated high due to operational downtime and potential ransom payment)",
-        "industry": "Unknown"
-      },
-      {
-        "company": "Dozens of U.S. credit unions",
-        "date": "2026-01-29T17:57:58",
-        "actor": "Unattributed ransomware group",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "undisclosed (estimated high due to operational downtime and potential ransom payment)",
-        "industry": "Unknown"
-      },
       {
         "company": "HP Inc. (legacy Polycom systems)",
         "date": "2026-02-03T12:22:55",
