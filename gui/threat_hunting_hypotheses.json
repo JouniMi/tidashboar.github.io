@@ -1,15 +1,548 @@
 {
-  "generated_at": "2026-03-04T06:38:37Z",
+  "generated_at": "2026-03-04T22:32:53Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 799,
-  "hypotheses_count": 0,
-  "hypotheses": [],
+  "total_articles_analyzed": 855,
+  "hypotheses_count": 5,
+  "hypotheses": [
+    {
+      "hypothesis_id": "TH-001",
+      "title": "Detection of AI-Assisted FortiGate Compromise Campaign",
+      "description": "A Russian-speaking threat actor is using commercial generative AI tools to automate the scanning and exploitation of exposed FortiGate firewalls via weak credentials and exposed management ports. This hypothesis hunts for lateral movement and command execution originating from compromised network edge devices that may be acting as pivot points.",
+      "threat_actors": [
+        "Russian-speaking financially motivated threat actor",
+        "CyberStrikeAI users"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Healthcare",
+        "Government",
+        "Critical Infrastructure"
+      ],
+      "mitre_attack_techniques": [
+        "T1190 - Exploit Public-Facing Application",
+        "T1078 - Valid Accounts",
+        "T1021.001 - Remote Services: Remote Desktop Protocol",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "Firewall logs, NetFlow, and IDS/IPS alerts for FortiGate management interfaces (port 443, 8443, 8080)",
+          "tools": [
+            "Firewall Logs",
+            "SIEM",
+            "NDR"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "EDR logs for PowerShell execution, Go/Python recon tools, and lateral movement attempts",
+          "tools": [
+            "EDR",
+            "Sysmon"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Anomalous Management Access",
+          "description": "Identify successful logins to FortiGate management interfaces from unusual internal or external IPs, followed by configuration changes or outbound connections.",
+          "sample_queries": [
+            "Splunk: index=firewall sourcetype=fortinet:traffic action=login status=success dest_port=443 | stats count by src_ip, user | where count > 5",
+            "KQL: DeviceLog | where DeviceVendor == \"Fortinet\" and EventID == \"1000\" and Result == \"Success\" | summarize count() by SourceIP, AccountName | where count_ > 3"
+          ],
+          "look_for": "Multiple failed logins followed by a success, or logins from IPs not in the trusted admin range, followed by outbound connections to unknown C2."
+        },
+        {
+          "tactic_name": "AI-Driven Reconnaissance Detection",
+          "description": "Look for automated scanning patterns or the execution of Go/Python scripts commonly used in AI-assisted reconnaissance campaigns.",
+          "sample_queries": [
+            "Splunk: index=endpoint ProcessName=\"go.exe\" OR ProcessName=\"python.exe\" CommandLine=\"*scan*\" OR CommandLine=\"*recon*\" | stats count by ProcessName, CommandLine",
+            "KQL: DeviceProcessEvents | where FileName in~ (\"go.exe\", \"python.exe\") and CommandLine contains \"scan\" | project Timestamp, DeviceName, FileName, CommandLine"
+          ],
+          "look_for": "Execution of Go or Python binaries with arguments suggesting network scanning or credential testing."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "go.exe",
+          "python.exe",
+          "recon_tool.py",
+          "scanner.go"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "go.exe",
+          "python.exe",
+          "cmd.exe",
+          "powershell.exe"
+        ],
+        "network_patterns": [
+          "Outbound connections from FortiGate to non-standard ports",
+          "High volume of failed SSH/HTTPS logins to port 443/8443"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Use of AI-generated scripts for scanning",
+          "Rapid succession of port scans from a single host"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Immediately isolate compromised FortiGate devices from the network.",
+        "Reset all administrative credentials for network devices.",
+        "Block outbound traffic from network devices to unknown external IPs.",
+        "Review firewall rules for unauthorized changes."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "Supply Chain Compromise via Malicious NPM/Go Packages (SANDWORM_MODE & Cline)",
+      "description": "Attackers are injecting malicious code into popular developer tools (Cline CLI, npm packages) to steal API keys, CI secrets, and cryptocurrency wallets. This hypothesis targets the execution of malicious payloads within developer environments and CI/CD pipelines.",
+      "threat_actors": [
+        "Supply Chain Attackers",
+        "North Korean APT (Lazarus Group)",
+        "Unidentified Cybercriminals"
+      ],
+      "industries_targeted": [
+        "Software Development",
+        "Technology",
+        "Financial Services",
+        "Cloud Services"
+      ],
+      "mitre_attack_techniques": [
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+        "T1055.012 - Process Injection: DLL Side-Loading",
+        "T1003.001 - OS Credential Dumping: LSASS Memory",
+        "T1005 - Data from Local System"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs, file integrity monitoring for node_modules, and network connections from developer tools",
+          "tools": [
+            "EDR",
+            "SIEM",
+            "DevSecOps Tools"
+          ]
+        },
+        {
+          "source_type": "Cloud",
+          "specific_data": "CI/CD pipeline logs, API key usage logs, and container registry activity",
+          "tools": [
+            "CloudTrail",
+            "GitHub Actions Logs",
+            "Jenkins Logs"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Malicious Package Execution",
+          "description": "Detect the execution of known malicious packages or unexpected network calls from developer tools like Cline, npm, or VS Code extensions.",
+          "sample_queries": [
+            "Splunk: index=endpoint ProcessName=\"node.exe\" CommandLine=\"*Cline*\" OR CommandLine=\"*npm*\" | search \"OpenClaw\" OR \"SANDWORM\" OR \"Atomic\"",
+            "KQL: DeviceProcessEvents | where FileName == \"node.exe\" and CommandLine contains \"Cline\" | where CommandLine contains \"install\" | project Timestamp, DeviceName, CommandLine"
+          ],
+          "look_for": "Execution of 'Cline' or 'npm install' followed by network connections to suspicious domains or the installation of 'OpenClaw' or 'Atomic' components."
+        },
+        {
+          "tactic_name": "Secret Exfiltration from CI/CD",
+          "description": "Identify attempts to read environment variables or access CI/CD secrets from within a compromised build environment.",
+          "sample_queries": [
+            "Splunk: index=ci_cd sourcetype=jenkins OR sourcetype=github_actions | search \"GITHUB_TOKEN\" OR \"AWS_SECRET\" OR \"npm_token\" | stats count by job_name, user",
+            "KQL: CloudAuditLogs | where OperationName contains \"ReadSecret\" or \"GetToken\" | where ResourceGroup contains \"CI\" or \"CD\" | project Timestamp, Caller, ResourceId"
+          ],
+          "look_for": "Unusual access to secrets, API keys, or tokens from build agents, especially if the agent is running unexpected code."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "github.com/xinfeisoft/crypto",
+          "pastebin.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "Cline",
+          "OpenClaw",
+          "Atomic",
+          "jd-gui.jar",
+          "node_modules"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "node.exe",
+          "npm",
+          "Cline",
+          "git"
+        ],
+        "network_patterns": [
+          "Outbound HTTPS from developer tools to non-standard C2",
+          "Connections to Pastebin for dead drops"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Presence of 'SANDWORM_MODE' environment variables",
+          "Execution of 'go' or 'python' scripts within node_modules"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Revoke all CI/CD API keys and tokens immediately.",
+        "Audit all installed npm packages and VS Code extensions for known malicious versions.",
+        "Isolate developer workstations showing signs of infection.",
+        "Scan repositories for injected malicious code or backdoors."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "OAuth Redirect Abuse for Malware Delivery and Credential Theft",
+      "description": "Attackers are abusing legitimate OAuth error redirection mechanisms in Microsoft Entra ID and Google Workspace to bypass phishing filters and deliver malware or steal credentials. This hypothesis hunts for suspicious OAuth flows that redirect to attacker-controlled infrastructure.",
+      "threat_actors": [
+        "Unspecified Cybercriminal Group",
+        "State-Sponsored Actors"
+      ],
+      "industries_targeted": [
+        "Government",
+        "Finance",
+        "Healthcare",
+        "Technology"
+      ],
+      "mitre_attack_techniques": [
+        "T1566.001 - Phishing: Spearphishing Link",
+        "T1566.002 - Phishing: Spearphishing Attachment",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1071.001 - Application Layer Protocol: Web Protocols"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Identity",
+          "specific_data": "OAuth consent logs, sign-in logs, and conditional access policies",
+          "tools": [
+            "Azure AD Logs",
+            "Google Workspace Audit Logs",
+            "SIEM"
+          ]
+        },
+        {
+          "source_type": "Email",
+          "specific_data": "Email headers, URL click logs, and phishing detection logs",
+          "tools": [
+            "Email Gateway",
+            "Secure Email Gateway"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Suspicious OAuth Redirection",
+          "description": "Identify OAuth authorization requests that result in redirects to non-standard or suspicious domains, particularly those using error parameters.",
+          "sample_queries": [
+            "Splunk: index=identity sourcetype=azure_ad_signin | search \"error=access_denied\" OR \"redirect_uri\" | stats count by redirect_uri, user_principal_name | where count > 1",
+            "KQL: SigninLogs | where ResultType != 0 | where AppDisplayName in~ (\"Microsoft Entra ID\", \"Google Workspace\") | summarize count() by RedirectUri, UserPrincipalName | where count_ > 2"
+          ],
+          "look_for": "OAuth flows where the redirect_uri points to a domain not whitelisted for the application, or where the flow involves an error state that triggers a redirect."
+        },
+        {
+          "tactic_name": "Phishing Link Analysis",
+          "description": "Analyze clicked links in emails that appear to be legitimate OAuth providers but redirect to malicious sites.",
+          "sample_queries": [
+            "Splunk: index=email sourcetype=click_tracking | search \"login.microsoftonline.com\" OR \"accounts.google.com\" | search \"redirect\" OR \"error\" | stats count by destination_url, sender",
+            "KQL: EmailUrlClickEvents | where Url contains \"login.microsoftonline.com\" or Url contains \"accounts.google.com\" | where Url contains \"redirect\" | project Timestamp, User, Url"
+          ],
+          "look_for": "Links that start with a legitimate domain but contain parameters that redirect to a malicious domain (e.g., `?redirect=https://malicious-site.com`)."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "login.microsoftonline.com",
+          "accounts.google.com",
+          "malicious-redirect-domain.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [
+          "msedge.exe",
+          "chrome.exe",
+          "firefox.exe"
+        ],
+        "network_patterns": [
+          "HTTP 302 redirects from legitimate OAuth domains to suspicious IPs",
+          "OAuth token requests with unusual scopes"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Presence of 'redirect_uri' parameters in OAuth requests pointing to non-whitelisted domains",
+          "High volume of OAuth consent requests from a single user"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Block the identified malicious redirect domains at the proxy/firewall level.",
+        "Review and restrict OAuth consent policies to only allow whitelisted applications.",
+        "Force password resets for users who clicked suspicious OAuth links.",
+        "Enable Conditional Access policies to block sign-ins from suspicious locations."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "Exploitation of BeyondTrust CVE-2026-1731 for Ransomware Deployment",
+      "description": "Threat actors are actively exploiting a critical RCE vulnerability (CVE-2026-1731) in BeyondTrust Remote Support and Privileged Remote Access products to deploy VShell and SparkRAT, leading to ransomware attacks. This hypothesis focuses on detecting unauthorized access and lateral movement via compromised PAM tools.",
+      "threat_actors": [
+        "Ransomware Groups",
+        "Cybercriminals"
+      ],
+      "industries_targeted": [
+        "Healthcare",
+        "Financial Services",
+        "Government",
+        "Technology"
+      ],
+      "mitre_attack_techniques": [
+        "T1190 - Exploit Public-Facing Application",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1021.002 - Remote Services: SMB/Windows Admin Shares",
+        "T1486 - Data Encrypted for Impact"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "EDR logs for VShell, SparkRAT, and PowerShell execution on PAM servers",
+          "tools": [
+            "EDR",
+            "SIEM"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "Firewall logs for connections to BeyondTrust management interfaces",
+          "tools": [
+            "Firewall Logs",
+            "NDR"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "BeyondTrust Exploitation Detection",
+          "description": "Monitor for unauthorized access attempts and successful exploitation of BeyondTrust management consoles.",
+          "sample_queries": [
+            "Splunk: index=endpoint ProcessName=\"VShell.exe\" OR ProcessName=\"SparkRAT.exe\" | stats count by ProcessName, DeviceName",
+            "KQL: DeviceProcessEvents | where FileName in~ (\"VShell.exe\", \"SparkRAT.exe\") | project Timestamp, DeviceName, FileName, CommandLine"
+          ],
+          "look_for": "Execution of VShell or SparkRAT binaries, or PowerShell commands that interact with BeyondTrust APIs."
+        },
+        {
+          "tactic_name": "Lateral Movement via PAM",
+          "description": "Detect lateral movement originating from compromised PAM servers using stolen credentials.",
+          "sample_queries": [
+            "Splunk: index=identity sourcetype=windows_security | search EventID=4624 LogonType=10 | search \"BeyondTrust\" OR \"PAM\" | stats count by TargetUser, SourceIP",
+            "KQL: SigninLogs | where AppDisplayName contains \"BeyondTrust\" | where ResultType != 0 | summarize count() by UserPrincipalName, IPAddress"
+          ],
+          "look_for": "Successful logins to PAM systems from unusual IPs, followed by lateral movement to other critical systems."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "VShell.exe",
+          "SparkRAT.exe",
+          "beyondtrust.exe"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "VShell.exe",
+          "SparkRAT.exe",
+          "powershell.exe",
+          "cmd.exe"
+        ],
+        "network_patterns": [
+          "Unusual traffic to BeyondTrust management ports (443, 8443)",
+          "Outbound connections from PAM servers to C2"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "CVE-2026-1731 exploitation attempts",
+          "Deployment of VShell or SparkRAT"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Immediately patch BeyondTrust products to the latest version.",
+        "Isolate any systems showing signs of VShell or SparkRAT execution.",
+        "Reset all credentials for PAM systems and administrative accounts.",
+        "Block outbound traffic from PAM servers to unknown destinations."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "AI-Driven Android Malware (PromptSpy) Persistence and Evasion",
+      "description": "A new Android malware, PromptSpy, uses Google's Gemini AI at runtime to analyze on-screen elements and maintain persistence by pinning itself in the recent apps list. This hypothesis hunts for mobile devices exhibiting AI-driven evasion behaviors and unauthorized access to sensitive data.",
+      "threat_actors": [
+        "Mobile Malware Operators",
+        "ESET Researchers"
+      ],
+      "industries_targeted": [
+        "Consumer Technology",
+        "Financial Services",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1543.003 - Create or Modify System Process: Windows Service",
+        "T1055.012 - Process Injection: DLL Side-Loading",
+        "T1056.001 - Input Capture: Keylogging",
+        "T1056.002 - Input Capture: Screen Capture"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Mobile device logs, app installation logs, and network traffic from mobile devices",
+          "tools": [
+            "MDM",
+            "Mobile EDR",
+            "SIEM"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "DNS logs and HTTPS traffic from mobile devices to AI APIs",
+          "tools": [
+            "DNS Logs",
+            "NDR"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "AI-Powered Persistence Detection",
+          "description": "Identify mobile apps that are using AI APIs to manipulate the user interface or maintain persistence.",
+          "sample_queries": [
+            "Splunk: index=mobile sourcetype=android_log | search \"Gemini\" OR \"AI\" OR \"persistence\" | stats count by app_name, device_id",
+            "KQL: DeviceLog | where DeviceVendor == \"Android\" and Message contains \"Gemini\" | summarize count() by AppName, DeviceName"
+          ],
+          "look_for": "Apps making calls to Gemini AI APIs to analyze screen content or manage app states."
+        },
+        {
+          "tactic_name": "Unauthorized Data Exfiltration",
+          "description": "Detect mobile apps exfiltrating sensitive data like lockscreen data, screenshots, or device info.",
+          "sample_queries": [
+            "Splunk: index=mobile sourcetype=network_traffic | search \"screenshot\" OR \"lockscreen\" OR \"device_info\" | stats count by destination_ip, app_name",
+            "KQL: NetworkFlow | where DestinationPort == 443 and (Url contains \"screenshot\" or Url contains \"lockscreen\") | project Timestamp, SourceIP, DestinationIP, Url"
+          ],
+          "look_for": "Outbound traffic containing keywords related to sensitive data exfiltration from mobile devices."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "api.gemini.google.com",
+          "promptspy-c2.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "PromptSpy.apk",
+          "GeminiHelper.apk"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "PromptSpy",
+          "GeminiHelper"
+        ],
+        "network_patterns": [
+          "HTTPS traffic to AI APIs from unknown apps",
+          "Unusual data exfiltration patterns from mobile devices"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Apps requesting excessive permissions (screen capture, accessibility)",
+          "AI API calls from non-standard apps"
+        ]
+      },
+      "priority": "MEDIUM",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Remove the PromptSpy app from infected devices immediately.",
+        "Revoke access tokens and reset passwords for accounts accessed on infected devices.",
+        "Update mobile security policies to restrict AI API access for non-approved apps.",
+        "Scan all mobile devices for similar AI-driven malware."
+      ]
+    }
+  ],
   "stats": {
-    "priority_breakdown": {},
-    "confidence_breakdown": {},
-    "unique_threat_actors": [],
-    "unique_industries_targeted": [],
-    "unique_mitre_techniques": [],
+    "priority_breakdown": {
+      "CRITICAL": 2,
+      "HIGH": 2,
+      "MEDIUM": 1
+    },
+    "confidence_breakdown": {
+      "HIGH": 3,
+      "MEDIUM": 2
+    },
+    "unique_threat_actors": [
+      "CyberStrikeAI users",
+      "Ransomware Groups",
+      "Unidentified Cybercriminals",
+      "State-Sponsored Actors",
+      "Unspecified Cybercriminal Group",
+      "ESET Researchers",
+      "Cybercriminals",
+      "Mobile Malware Operators",
+      "North Korean APT (Lazarus Group)",
+      "Russian-speaking financially motivated threat actor",
+      "Supply Chain Attackers"
+    ],
+    "unique_industries_targeted": [
+      "Cloud Services",
+      "Software Development",
+      "Critical Infrastructure",
+      "Consumer Technology",
+      "Healthcare",
+      "Finance",
+      "Technology",
+      "Government",
+      "Financial Services"
+    ],
+    "unique_mitre_techniques": [
+      "T1190 - Exploit Public-Facing Application",
+      "T1003.001 - OS Credential Dumping: LSASS Memory",
+      "T1566.002 - Phishing: Spearphishing Attachment",
+      "T1005 - Data from Local System",
+      "T1486 - Data Encrypted for Impact",
+      "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+      "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "T1078 - Valid Accounts",
+      "T1021.001 - Remote Services: Remote Desktop Protocol",
+      "T1056.001 - Input Capture: Keylogging",
+      "T1071.001 - Application Layer Protocol: Web Protocols",
+      "T1566.001 - Phishing: Spearphishing Link",
+      "T1056.002 - Input Capture: Screen Capture",
+      "T1021.002 - Remote Services: SMB/Windows Admin Shares",
+      "T1055.012 - Process Injection: DLL Side-Loading",
+      "T1543.003 - Create or Modify System Process: Windows Service"
+    ],
     "source_data_stats": {
       "top_threat_actors": [
         [
@@ -29,7 +562,7 @@
           3
         ],
         [
-          "Iranian state-sponsored actors",
+          "MiniMax",
           2
         ]
       ],
@@ -50,11 +583,11 @@
           6
         ],
         [
-          "unknown",
-          4
+          "Social engineering",
+          5
         ],
         [
-          "Social engineering",
+          "unknown",
           4
         ],
         [
