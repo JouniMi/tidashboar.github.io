@@ -1,15 +1,530 @@
 {
-  "generated_at": "2026-03-08T18:29:40Z",
+  "generated_at": "2026-03-08T23:47:49Z",
   "time_window": "14 days",
-  "total_articles_analyzed": 829,
-  "hypotheses_count": 0,
-  "hypotheses": [],
+  "total_articles_analyzed": 832,
+  "hypotheses_count": 5,
+  "hypotheses": [
+    {
+      "hypothesis_id": "TH-001",
+      "title": "AI-Assisted FortiGate Compromise via Weak Credentials and Exposed Ports",
+      "description": "A Russian-speaking threat actor is using commercial generative AI tools to automate the scanning and compromise of internet-exposed FortiGate firewalls. The attacker is not exploiting zero-days but is abusing exposed management ports (443, 8443) and weak single-factor credentials to gain administrative access, potentially leading to lateral movement or data exfiltration.",
+      "threat_actors": [
+        "Russian-speaking Cybercrime Group",
+        "Unidentified Threat Actor"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Financial Services",
+        "Government",
+        "Healthcare",
+        "Critical Infrastructure"
+      ],
+      "mitre_attack_techniques": [
+        "T1190 - Exploit Public-Facing Application",
+        "T1078 - Valid Accounts",
+        "T1021.001 - Remote Services: Remote Desktop Protocol",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Network",
+          "specific_data": "Firewall logs, NetFlow data, and authentication logs from FortiGate devices",
+          "tools": [
+            "FortiAnalyzer",
+            "SIEM",
+            "NetFlow Collector"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "EDR logs showing PowerShell execution or suspicious process spawning on management workstations",
+          "tools": [
+            "EDR (CrowdStrike, SentinelOne)",
+            "Sysmon"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Anomalous Authentication Pattern Detection",
+          "description": "Identify successful logins to FortiGate management interfaces from unusual geolocations or IP ranges, especially those followed by configuration changes.",
+          "sample_queries": [
+            "Splunk SPL: index=fortigate event_type=login status=success | stats count by src_ip, user, _time | where count > 5 | table src_ip, user, count",
+            "KQL: FortiGateLogs | where EventID == \"LoginSuccess\" | summarize count() by SrcIP, User | where count_ > 3"
+          ],
+          "look_for": "Multiple failed logins followed by a success, logins from non-corporate IP ranges, or logins occurring outside business hours."
+        },
+        {
+          "tactic_name": "AI-Generated Script Execution",
+          "description": "Search for PowerShell or shell scripts executed on management workstations that contain patterns typical of AI-generated reconnaissance or credential harvesting.",
+          "sample_queries": [
+            "Splunk SPL: index=edr ProcessName=\"powershell.exe\" | search \"Invoke-WebRequest\" OR \"Get-Content\" OR \"Invoke-RestMethod\" | stats count by CommandLine",
+            "KQL: DeviceProcessEvents | where ProcessName == \"powershell.exe\" | where CommandLine has_any (\"Invoke-WebRequest\", \"Get-Content\", \"Invoke-RestMethod\")"
+          ],
+          "look_for": "Execution of scripts that query external APIs, download files from unknown URLs, or attempt to enumerate network devices."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [
+          "powershell.exe",
+          "cmd.exe",
+          "python.exe"
+        ],
+        "network_patterns": [
+          "TCP 443/8443 to FortiGate management IPs",
+          "Outbound connections to unknown IPs from management workstations"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Repeated failed login attempts on FortiGate",
+          "Configuration changes to firewall rules or admin accounts"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Immediately rotate credentials for all FortiGate management accounts.",
+        "Restrict management access to specific IP ranges via firewall rules.",
+        "Enable MFA on all FortiGate management interfaces.",
+        "Isolate compromised devices and perform a full forensic analysis."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-002",
+      "title": "ClickFix Campaigns Abusing Windows Terminal for Lumma Stealer Deployment",
+      "description": "Threat actors are evolving the ClickFix social engineering technique by instructing users to launch Windows Terminal (via Win+X -> I) instead of the Run dialog. Users are then tricked into pasting malicious PowerShell commands that deploy the Lumma Stealer, bypassing traditional Run-dialog detections.",
+      "threat_actors": [
+        "ClickFix threat actors",
+        "Velvet Tempest"
+      ],
+      "industries_targeted": [
+        "General Consumer",
+        "Enterprise IT",
+        "Financial Services",
+        "Technology"
+      ],
+      "mitre_attack_techniques": [
+        "T1566.001 - Phishing: Spearphishing Attachment",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1204.002 - User Execution: Malicious File",
+        "T1055.012 - Process Injection: DLL Injection"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs, PowerShell script block logs, and command-line arguments",
+          "tools": [
+            "EDR",
+            "Sysmon",
+            "Windows Event Logs"
+          ]
+        },
+        {
+          "source_type": "Email",
+          "specific_data": "Email headers and body content for social engineering lures",
+          "tools": [
+            "Email Security Gateway",
+            "SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Windows Terminal Launch Anomaly",
+          "description": "Detect the specific shortcut sequence (Win+X -> I) or direct launches of wt.exe followed immediately by PowerShell execution.",
+          "sample_queries": [
+            "Splunk SPL: index=edr ProcessName=\"wt.exe\" | search \"wt.exe\" | stats count by CommandLine, ParentProcessName | where ParentProcessName != \"explorer.exe\"",
+            "KQL: DeviceProcessEvents | where ProcessName == \"wt.exe\" | where CommandLine has \"wt.exe\" | join kind=inner (DeviceProcessEvents | where ProcessName == \"powershell.exe\" | where Timestamp > start_time) on DeviceId"
+          ],
+          "look_for": "wt.exe spawning powershell.exe with arguments containing encoded commands or downloading files."
+        },
+        {
+          "tactic_name": "Lumma Stealer Network Beaconing",
+          "description": "Identify outbound connections to known Lumma Stealer C2 infrastructure or unusual data exfiltration patterns.",
+          "sample_queries": [
+            "Splunk SPL: index=network | search dest_ip IN (\"185.220.101.*\", \"194.26.192.*\") OR dest_domain IN (\"lumma-stealer-c2.com\", \"malicious-domain.net\")",
+            "KQL: NetworkTraffic | where DestinationIp in (\"185.220.101.*\", \"194.26.192.*\")"
+          ],
+          "look_for": "Connections to newly registered domains, high-volume data exfiltration to unknown IPs, or connections from browser processes to non-standard ports."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "fake-google-meet-update.com",
+          "fake-zoom-update.com",
+          "fake-security-check.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "LummaStealer.exe",
+          "TunnesshClient.exe",
+          "wt.exe"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "wt.exe",
+          "powershell.exe",
+          "LummaStealer.exe"
+        ],
+        "network_patterns": [
+          "Outbound HTTPS to unknown IPs from browser processes",
+          "DNS queries for newly registered domains"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "PowerShell commands containing 'Invoke-WebRequest' or 'DownloadString' pasted into terminal"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "High",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Block execution of PowerShell from Windows Terminal unless explicitly whitelisted.",
+        "Deploy EDR rules to detect the specific command-line arguments used in ClickFix campaigns.",
+        "Conduct user awareness training on the new Windows Terminal variant of ClickFix.",
+        "Scan endpoints for Lumma Stealer indicators and isolate infected systems."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-003",
+      "title": "Supply Chain Compromise via Malicious NPM Packages (SANDWORM_MODE)",
+      "description": "A new supply chain worm campaign, codenamed SANDWORM_MODE, is using typosquatted NPM packages to infect developer machines and CI/CD pipelines. The malware harvests secrets, API tokens, and crypto keys, and can modify other repositories using stolen credentials, posing a significant risk to software development environments.",
+      "threat_actors": [
+        "Unidentified Threat Actor",
+        "Supply Chain Attackers"
+      ],
+      "industries_targeted": [
+        "Software Development",
+        "Technology",
+        "Financial Services",
+        "Cloud Services"
+      ],
+      "mitre_attack_techniques": [
+        "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+        "T1078 - Valid Accounts",
+        "T1003.001 - Credential Dumping: LSASS Memory",
+        "T1562.001 - Impair Defenses: Disable or Modify Tools"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Cloud",
+          "specific_data": "CI/CD pipeline logs, NPM registry logs, and cloud access logs",
+          "tools": [
+            "GitHub Actions Logs",
+            "GitLab CI Logs",
+            "CloudTrail"
+          ]
+        },
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Node.js process logs, package installation logs, and environment variable access",
+          "tools": [
+            "EDR",
+            "SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Malicious Package Installation Detection",
+          "description": "Monitor for the installation of NPM packages with names similar to popular libraries but with slight variations (typosquatting).",
+          "sample_queries": [
+            "Splunk SPL: index=ci-cd | search \"npm install\" | regex \"npm install [a-z]+-[a-z]+\" | stats count by package_name",
+            "KQL: PackageInstallationLogs | where PackageName matches regex \"^[a-z]+-[a-z]+$\" | summarize count() by PackageName"
+          ],
+          "look_for": "Installation of packages with names like 'react-dom', 'lodash', 'axios' but with slight misspellings or extra characters."
+        },
+        {
+          "tactic_name": "Secret Exfiltration from CI/CD",
+          "description": "Detect attempts to access or exfiltrate environment variables, API keys, or secrets from CI/CD pipelines.",
+          "sample_queries": [
+            "Splunk SPL: index=ci-cd | search \"process.env\" OR \"process.argv\" | stats count by job_id, user",
+            "KQL: CI_CD_Logs | where Message has \"process.env\" | summarize count() by JobId, User"
+          ],
+          "look_for": "Scripts accessing environment variables like GITHUB_TOKEN, AWS_SECRET_ACCESS_KEY, or NPM_TOKEN and sending them to external endpoints."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "node_modules/.cache",
+          "package.json"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "node.exe",
+          "npm.exe",
+          "yarn.exe"
+        ],
+        "network_patterns": [
+          "Outbound connections from CI/CD runners to unknown IPs",
+          "DNS queries for suspicious domains"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Unusual package versions installed",
+          "Modification of repository files by CI/CD jobs"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "MEDIUM",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Audit all NPM dependencies for typosquatting and known malicious packages.",
+        "Rotate all CI/CD tokens and API keys immediately.",
+        "Implement strict allowlists for NPM packages in CI/CD pipelines.",
+        "Scan repositories for unauthorized modifications."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-004",
+      "title": "OAuth Redirect Abuse for Malware Delivery",
+      "description": "Attackers are abusing the legitimate OAuth redirection mechanism to bypass email and browser defenses. They craft URLs with popular identity providers (Microsoft Entra ID, Google Workspace) that redirect victims to attacker-controlled infrastructure, delivering malware without stealing tokens.",
+      "threat_actors": [
+        "Unspecified Cybercriminal Group",
+        "Microsoft Defender Researchers"
+      ],
+      "industries_targeted": [
+        "Government",
+        "Public Sector",
+        "Technology",
+        "Finance",
+        "Healthcare"
+      ],
+      "mitre_attack_techniques": [
+        "T1566.002 - Phishing: Spearphishing Link",
+        "T1203 - Exploitation for Client Execution",
+        "T1571 - Non-Standard Port",
+        "T1071.001 - Application Layer Protocol: Web Protocols"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Email",
+          "specific_data": "Email logs containing OAuth redirect URLs",
+          "tools": [
+            "Email Security Gateway",
+            "SIEM"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "Web proxy logs, DNS logs, and HTTP request logs",
+          "tools": [
+            "Web Proxy",
+            "DNS Logger",
+            "SIEM"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "OAuth Redirect Chain Analysis",
+          "description": "Identify OAuth URLs that contain redirect parameters pointing to non-standard or suspicious domains.",
+          "sample_queries": [
+            "Splunk SPL: index=email | search \"login.microsoftonline.com\" OR \"accounts.google.com\" | regex \"redirect_uri=[^&]*\" | stats count by redirect_uri",
+            "KQL: EmailLogs | where MessageBody has \"redirect_uri\" | summarize count() by redirect_uri"
+          ],
+          "look_for": "Redirect URIs that do not match the expected domain of the identity provider or point to known malicious domains."
+        },
+        {
+          "tactic_name": "Malware Delivery via OAuth",
+          "description": "Detect downloads or executions of malware following an OAuth redirect event.",
+          "sample_queries": [
+            "Splunk SPL: index=proxy | search \"login.microsoftonline.com\" | stats count by dest_ip, dest_port",
+            "KQL: NetworkTraffic | where DestinationUrl has \"login.microsoftonline.com\" | join kind=inner (DeviceProcessEvents | where ProcessName == \"powershell.exe\") on DeviceId"
+          ],
+          "look_for": "Outbound connections to unknown IPs immediately after an OAuth redirect, or execution of PowerShell scripts from browser processes."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [
+          "login.microsoftonline.com",
+          "accounts.google.com"
+        ],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [],
+        "registry_keys": [],
+        "process_names": [
+          "chrome.exe",
+          "edge.exe",
+          "firefox.exe"
+        ],
+        "network_patterns": [
+          "HTTP 302 redirects from OAuth providers to unknown domains",
+          "Outbound connections to non-standard ports"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "OAuth URLs with 'error' or 'redirect_uri' parameters pointing to suspicious domains"
+        ]
+      },
+      "priority": "HIGH",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Medium",
+      "recommended_actions": [
+        "Configure email security gateways to block OAuth URLs with suspicious redirect parameters.",
+        "Implement browser policies to restrict OAuth redirects to trusted domains.",
+        "Monitor for unusual OAuth activity and investigate any redirects to unknown domains.",
+        "Educate users on the risks of clicking OAuth links in emails."
+      ]
+    },
+    {
+      "hypothesis_id": "TH-005",
+      "title": "OpenClaw AI Agent Hijacking via Localhost WebSocket Exploitation",
+      "description": "A critical vulnerability (ClawJacked) in the OpenClaw AI agent framework allows malicious websites to connect to the local OpenClaw gateway via WebSocket, brute-force passwords, and hijack the agent. This enables attackers to steal data, execute commands, and gain persistent access to the victim's machine.",
+      "threat_actors": [
+        "Oasis Security",
+        "Unidentified Threat Actor"
+      ],
+      "industries_targeted": [
+        "Technology",
+        "Software Development",
+        "Financial Services",
+        "General Consumer"
+      ],
+      "mitre_attack_techniques": [
+        "T1190 - Exploit Public-Facing Application",
+        "T1055.012 - Process Injection: DLL Injection",
+        "T1059.001 - Command and Scripting Interpreter: PowerShell",
+        "T1003.001 - Credential Dumping: LSASS Memory"
+      ],
+      "data_sources_needed": [
+        {
+          "source_type": "Endpoint",
+          "specific_data": "Process creation logs, network connection logs, and WebSocket traffic logs",
+          "tools": [
+            "EDR",
+            "Sysmon",
+            "Network Traffic Analyzer"
+          ]
+        },
+        {
+          "source_type": "Network",
+          "specific_data": "Localhost traffic logs, WebSocket connection logs",
+          "tools": [
+            "Firewall",
+            "IDS/IPS"
+          ]
+        }
+      ],
+      "hunting_tactics": [
+        {
+          "tactic_name": "Localhost WebSocket Connection Anomaly",
+          "description": "Detect unexpected WebSocket connections to localhost ports used by OpenClaw or similar AI agents.",
+          "sample_queries": [
+            "Splunk SPL: index=network | search \"localhost\" AND \"WebSocket\" | stats count by src_ip, dest_port",
+            "KQL: NetworkTraffic | where DestinationIp == \"127.0.0.1\" | where Protocol == \"WebSocket\" | summarize count() by DestinationPort"
+          ],
+          "look_for": "WebSocket connections to localhost ports (e.g., 8080, 3000) from browser processes or unknown applications."
+        },
+        {
+          "tactic_name": "OpenClaw Process Hijacking",
+          "description": "Identify processes spawned by OpenClaw that execute suspicious commands or access sensitive files.",
+          "sample_queries": [
+            "Splunk SPL: index=edr | search \"openclaw\" | stats count by CommandLine, ParentProcessName",
+            "KQL: DeviceProcessEvents | where ProcessName has \"openclaw\" | summarize count() by CommandLine"
+          ],
+          "look_for": "OpenClaw processes executing PowerShell scripts, accessing browser data, or connecting to external C2 servers."
+        }
+      ],
+      "iocs_and_patterns": {
+        "domains": [],
+        "ips": [],
+        "file_hashes": [],
+        "file_names": [
+          "openclaw.exe",
+          "openclaw-gateway"
+        ],
+        "registry_keys": [],
+        "process_names": [
+          "openclaw.exe",
+          "node.exe",
+          "python.exe"
+        ],
+        "network_patterns": [
+          "WebSocket connections to localhost ports",
+          "Outbound connections from OpenClaw processes"
+        ],
+        "user_agent_strings": [],
+        "other_indicators": [
+          "Brute-force attempts on OpenClaw gateway",
+          "Unauthorized access to browser data or files"
+        ]
+      },
+      "priority": "CRITICAL",
+      "confidence": "HIGH",
+      "estimated_detection_rate": "Medium",
+      "false_positive_risk": "Low",
+      "recommended_actions": [
+        "Immediately update OpenClaw to the latest patched version (2026.2.26 or later).",
+        "Block all WebSocket connections to localhost ports used by AI agents unless explicitly required.",
+        "Monitor for unauthorized access to browser data or sensitive files by AI agent processes.",
+        "Conduct a full forensic analysis of systems running OpenClaw."
+      ]
+    }
+  ],
   "stats": {
-    "priority_breakdown": {},
-    "confidence_breakdown": {},
-    "unique_threat_actors": [],
-    "unique_industries_targeted": [],
-    "unique_mitre_techniques": [],
+    "priority_breakdown": {
+      "CRITICAL": 2,
+      "HIGH": 3
+    },
+    "confidence_breakdown": {
+      "HIGH": 4,
+      "MEDIUM": 1
+    },
+    "unique_threat_actors": [
+      "ClickFix threat actors",
+      "Unidentified Threat Actor",
+      "Supply Chain Attackers",
+      "Oasis Security",
+      "Unspecified Cybercriminal Group",
+      "Velvet Tempest",
+      "Russian-speaking Cybercrime Group",
+      "Microsoft Defender Researchers"
+    ],
+    "unique_industries_targeted": [
+      "Software Development",
+      "Critical Infrastructure",
+      "Government",
+      "Enterprise IT",
+      "Cloud Services",
+      "Public Sector",
+      "Healthcare",
+      "Finance",
+      "General Consumer",
+      "Technology",
+      "Financial Services"
+    ],
+    "unique_mitre_techniques": [
+      "T1195.002 - Supply Chain Compromise: Compromise Software Supply Chain",
+      "T1566.001 - Phishing: Spearphishing Attachment",
+      "T1059.001 - Command and Scripting Interpreter: PowerShell",
+      "T1003.001 - Credential Dumping: LSASS Memory",
+      "T1203 - Exploitation for Client Execution",
+      "T1021.001 - Remote Services: Remote Desktop Protocol",
+      "T1566.002 - Phishing: Spearphishing Link",
+      "T1071.001 - Application Layer Protocol: Web Protocols",
+      "T1078 - Valid Accounts",
+      "T1571 - Non-Standard Port",
+      "T1204.002 - User Execution: Malicious File",
+      "T1055.012 - Process Injection: DLL Injection",
+      "T1190 - Exploit Public-Facing Application",
+      "T1562.001 - Impair Defenses: Disable or Modify Tools"
+    ],
     "source_data_stats": {
       "top_threat_actors": [
         [
@@ -54,11 +569,11 @@
           4
         ],
         [
-          "social engineering",
+          "Unknown",
           3
         ],
         [
-          "Distributed Denial of Service (DDoS)",
+          "social engineering",
           3
         ]
       ],
