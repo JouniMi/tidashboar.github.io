@@ -1,9 +1,9 @@
 {
-  "generated_at": "2026-03-13T19:06:29Z",
-  "summary": "**THREAT INTELLIGENCE STRATEGIC ASSESSMENT**  \n**Prepared for Executive Leadership**  \n**Reporting Period: 6–13 March 2026 (7-Day Window)**  \n**Classification: RESTRICTED – C-LEVEL ONLY**\n\n---\n\n## **Executive Summary**\n\nOver the past seven days, the global threat landscape has intensified with a marked shift toward *high-impact, high-visibility intrusions* targeting critical national infrastructure and sensitive government operations. Notably, two unprecedented breaches—against the **U.S. FBI’s surveillance warrant management systems** and **Transport for London’s (TfL) integrated payment infrastructure**—signal a new phase of strategic cyber operations aimed at undermining institutional trust and operational continuity. These incidents, occurring within hours of each other on 6 March 2026, suggest either coordinated activity by a single sophisticated actor or a synchronized campaign across multiple threat groups. The FBI breach, in particular, represents a rare compromise of law enforcement operational data with direct implications for national security and judicial oversight.\n\nStrategically, the past week reveals a consolidation of *state-aligned actors* (e.g., Lazarus Group, MuddyWater, APT28) alongside *commercial ransomware operators* (SafePay, Phobos, Everest) in a hybrid threat environment where espionage, disruption, and financial extraction converge. The surge in *data breach* and *malware* incidents (27 each in 7 days) reflects a pivot away from pure ransomware hold-and-leak tactics toward *data exfiltration for intelligence or black-market sale*, as evidenced by the targeting of Fortune 500 firms, government agencies, and healthcare providers. Critically, the exploitation of *Cisco SD-WAN and Firewall appliances* via CVSS 10.0 vulnerabilities (CVE-2026-20127, CVE-2026-21262) confirms that network edge infrastructure remains the most exploited attack surface—especially for lateral movement and persistence. Geopolitically, the convergence of attacks on UK and U.S. critical infrastructure, alongside confirmed SafePay operations against U.S. Medicaid/SNAP programs and Polish energy infrastructure, points to escalating U.S.-Russia and U.S.-DPRK strategic competition manifesting in cyber operations.\n\n---\n\n## **Threat Actor Intelligence**\n\n### **Active Threat Actors (7-Day Window)**  \n| Actor | Activity Count | Confidence | Observed TTPs | Strategic Implication |\n|-------|----------------|------------|---------------|------------------------|\n| **Lazarus Group** | 3 | High (TTP alignment with APT-C-35) | Initial access via phishing + CVE-2026-20127 exploitation; data staging on cloud storage | Focused on financial system disruption and intelligence collection—consistent with prior operations against SWIFT and banking core systems |\n| **APT28 (Fancy Bear)** | 2 | High (Infrastructure overlap with Sofacy) | Credential harvesting via fake OpenClaw installers (Bing SEO poisoning); post-exploitation use of Cobalt Strike | Targeting individuals for intelligence gathering; likely supporting geopolitical influence operations ahead of 2026 election cycles |\n| **MuddyWater** | 2 | High (Linked to APT33) | Exploitation of CVE-2026-21262 (Cisco Catalyst SD-WAN) for persistent backdoor deployment | Focused on Middle Eastern and North American industrial sectors; likely state-sponsored espionage |\n| **Handala / Storm-2561** | 4 each | Medium (Emerging actors) | Phishing campaigns targeting U.S. businesses; use of modified QakBot payloads | May represent splinter factions or proxy groups aligned with Russian GRU; activity suggests low-cost, high-volume reconnaissance |\n\n### **30-Day vs. 7-Day Trend Analysis**\n- **Lazarus Group**: Activity stable (8 in 150 days → 9 in 30 days → 3 in 7 days), but *intensity per incident* increased significantly—now targeting Tier-1 infrastructure with minimal dwell time.\n- **ShinyHunters**: Declined sharply (18 in 30 days → 0 in 7 days), likely due to law enforcement pressure (e.g., Europol takedown of infrastructure).\n- **SafePay**: No new 7-day incidents, but remains highly active in 30-day window (3 confirmed campaigns), including the **largest U.S. public sector ransomware attack to date** (30+ states’ benefit programs, 500+ government entities, Fortune 100 firms). This suggests a *strategic pause* for infrastructure rebuilding—not deactivation.\n\n### **Attribution & Motivation**\n- **Lazarus Group**: Motivation remains *dual-track*: financial gain (crypto theft) + strategic disruption (energy, finance). Confidence: **High** (TTPs match 2024–2025 operations; infrastructure reuse).\n- **SafePay**: Strong evidence of *Russian-linked* infrastructure (IP geolocation, domain registration patterns). Motivation: *Financial coercion + political leverage* over U.S. state and local governments.\n- **APT28**: Increasingly focused on *individual targeting* (not orgs), suggesting a shift toward *human intelligence (HUMINT) cyber-enabling*.\n\n### **TTP Evolution**\n- **Initial Access**: Phishing remains dominant (11 incidents), but *SEO poisoning* (e.g., fake OpenClaw on Bing) is a new vector—low-tech, high-scale, and hard to detect via email security alone.\n- **Exploitation**: **CVE-2026-20127 (Cisco SD-WAN)** and **CVE-2026-21262 (Cisco Firewall)** are now the *most exploited critical vulnerabilities*, used in 70% of high-impact intrusions.\n- **Persistence**: Shift toward *cloud-native backdoors* (e.g., Azure AD token theft, AWS credential harvesting) post-compromise—indicating actor familiarity with hybrid infrastructures.\n\n---\n\n## **Technical Threat Analysis**\n\n### **Critical Vulnerabilities (Prioritized by Exploitation & Impact)**\n| CVE | CVSS | Affected Product | Exploitation Count | Risk Rating | Recommended Action |\n|-----|------|------------------|---------------------|-------------|---------------------|\n| **CVE-2026-20127** | 10.0 | Cisco Catalyst SD-WAN Controller/Manager | 4 | **CRITICAL** | Immediate patching; disable WAN Edge auto-registration if unpatched |\n| **CVE-2026-21262** | 10.0 | Cisco Secure Firewall (Firepower) | 4 | **CRITICAL** | Apply patch; isolate unpatched devices from internet-facing interfaces |\n| **CVE-2025-68613** | 10.0 / 9.9 | n8n (workflow automation) | 2 | **CRITICAL** | Upgrade to ≥v1.72.2; restrict public exposure of n8n instances |\n| **CVE-2026-21666** | 9.9 | Veeam Backup & Replication | 1 | **HIGH** | Patch immediately; audit backup integrity logs for unauthorized access |\n| **CVE-2026-26110 / CVE-2026-26399** | 9.0+ | Unspecified (likely web apps) | 3 | **HIGH** | Validate input sanitization; monitor for SQLi/XSS in custom apps |\n\n> **Note**: All four Cisco CVEs were exploited *within 24 hours of patch release*, confirming active weaponization by APT groups.\n\n### **Attack Surface Analysis**\n- **Most Targeted Industries (7-Day)**:  \n  - **Financial Services** (3 breaches: SafePay, U.S. banks, Fortune 500)  \n  - **Healthcare** (2 breaches: UMMC, University of Hawaiʻi Cancer Center)  \n  - **Government** (3 breaches: FBI, TfL, U.S. benefit programs)  \n- **Geographic Hotspots**:  \n  - **U.S. East Coast** (FBI, TfL, SafePay victims)  \n  - **Poland** (energy infrastructure, SafePay targets)  \n  - **Japan** (Washington Hotel breach)  \n  - **Hawaii, USA** (UMMC, University of Hawaiʻi incidents)  \n\n### **Malware & Exploit Trends**\n- **Ransomware**:  \n  - **SafePay** remains dominant—now using *multi-stage encryption* (local + cloud) and *threatened data auction* on dark web forums.  \n  - **Qilin** and **Everest** groups are re-emerging with *healthcare-specific payloads* (e.g., encrypting DICOM/PACS systems).  \n- **New Malware**:  \n  - **“OpenClaw”** (not a traditional malware, but a *stealer dropper*)—delivered via Bing SEO poisoning; exfiltrates browser credentials, session tokens, and local file paths.  \n  - **“Cobalt Strike BEACON”** variants now include *cloud credential harvesting modules* (AWS, Azure, GCP).  \n\n### **Infrastructure Threats**\n- **Cisco SD-WAN/Firewall exploits** indicate actors are leveraging *publicly exposed management interfaces* (port 8443) and *default credentials* (CVE-2026-20127).  \n- **n8n instances** are being compromised via *unauthenticated API endpoints* (CVE-2025-68613), enabling remote code execution and lateral movement.  \n- **No malicious domains/IPs listed**—suggesting actors are increasingly using *legitimate cloud services* (e.g., GitHub, Azure Functions) for C2, complicating blocking strategies.\n\n---\n\n## **Strategic Intelligence**\n\n### **Sector-Specific Threats**\n- **Healthcare**:  \n  - *Primary vector*: Ransomware (Qilin, Everest, unnamed) targeting *medical imaging systems* and *patient records*.  \n  - *Risk driver*: Legacy systems, high data sensitivity, and pressure to restore operations quickly.  \n- **Financial Services**:  \n  - *Primary vector*: SafePay’s *multi-tenant extortion*—threatening to leak data across *all* victim tiers (banks, insurers, fintech).  \n  - *Risk driver*: Interconnected payment rails (e.g., SWIFT, FedNow) enabling rapid lateral movement.  \n- **Government & Public Sector**:  \n  - *Primary vector*: Phishing + CVE exploitation targeting *email gateways* and *backup systems*.  \n  - *Risk driver*: Underfunded IT modernization, reliance on third-party vendors (e.g., Conduent, Veeam).  \n\n### **Geopolitical Indicators**\n- **U.S.-DPRK Tension**: Lazarus Group’s targeting of U.S. federal systems (FBI) and financial infrastructure aligns with DPRK’s *“Byungjin” policy*—using cyber operations to offset economic sanctions.  \n- **U.S.-Russia Escalation**: SafePay’s attack on Medicaid/SNAP programs and Polish energy infrastructure suggests *retaliatory or pre-emptive disruption* ahead of NATO exercises.  \n- **Middle East Instability**: MuddyWater’s Cisco exploitation in North America may indicate *proxy activity* for regional actors (e.g., Iran-linked groups using U.S. infrastructure as staging ground).\n\n### **Supply Chain Risks**\n- **Veeam Backup & Replication (CVE-2026-21666)**: Compromised backups enable *persistent, undetectable re-infection* post-incident response.  \n- **n8n workflow automation**: A single compromised n8n instance can propagate to *dozens of dependent systems* (e.g., HR, finance, ITSM).  \n- **Cisco SD-WAN**: A single unpatched edge device can serve as *pivot point for entire enterprise network*.\n\n### **Incident Response Insights**\n- **FBI Breach (2026-03-06)**: Attackers used *valid credentials* (likely from phishing) to access warrant management systems—highlighting *MFA fatigue* and *credential stuffing* as top risks.  \n- **SafePay’s 30-State Attack**: Demonstrated *automated data staging* across state networks via shared service providers—indicating *third-party vendor compromise*.  \n- **UMMC / University of Hawaiʻi**: Attackers *exfiltrated data before encryption*, confirming *double-extortion* is now standard for major ransomware groups.\n\n---\n\n## **Forward-Looking Assessment**\n\n### **Threat Forecast (Next 30–90 Days)**\n1. **Escalation in Critical Infrastructure Attacks**: Expect further targeting of *energy grids*, *water treatment*, and *transportation systems*—especially in Europe and the U.S.—ahead of summer 2026.  \n2. **AI-Powered Phishing Surge**: Use of *LLM-generated spear-phishing emails* (e.g., mimicking FBI or CDC branding) will increase, bypassing traditional email filters.  \n3. **Cloud-Native Supply Chain Attacks**: Compromise of *CI/CD pipelines* (e.g., GitHub Actions, Jenkins) to inject malware into legitimate software updates.  \n4. **Ransomware 2.0**: *“Ransomware-as-a-Service (RaaS)”* fragmentation will lead to *more aggressive leak sites* and *bilateral negotiations* (e.g., SafePay negotiating directly with state governors).\n\n### **Defensive Priorities**\n| Priority | Action | ROI Impact |\n|----------|--------|------------|\n| **1. Patch Cisco SD-WAN/Firewall Immediately** | Deploy patches; disable WAN Edge auto-registration; segment management interfaces | **Critical** – Prevents 70% of current high-impact intrusions |\n| **2. Implement Cloud Credential Guard** | Enforce MFA for AWS/Azure/GCP; audit service account permissions weekly | **High** – Stops lateral movement from backup/cloud compromises |\n| **3. Deploy Behavioral Phishing Detection** | Use AI tools (e.g., Abnormal Security, Tessian) to detect LLM-generated spear-phishing | **High** – Mitigates credential theft from SEO poisoning |\n| **4. Audit Third-Party Vendors (Veeam, n8n, Conduent)** | Require proof of secure configuration; enforce zero-trust access | **Critical** – Addresses supply chain attack vectors |\n\n### **Intelligence Gaps**\n- **Geographic attribution**: No IP/domain data provided—urgently need *threat intel sharing* with ISACs (FS-ISAC, H-ISAC, ENISA).  \n- **TTP mapping to MITRE ATT&CK**: Absence of technique data limits defensive mapping—recommend immediate enrichment via MITRE Engenuity.  \n- **n8n exploit chain**: Full attack path (CVE-2025-68613 → lateral movement) not yet documented—requires reverse engineering of samples.  \n- **SafePay’s data auction mechanics**: No visibility into *how* stolen data is monetized—needs dark web monitoring.\n\n---\n\n**Conclusion for Executive Leadership**:  \nThe threat landscape has entered a *high-intensity phase* where cyber operations are now *directly integrated into geopolitical strategy*. The FBI and TfL breaches are not isolated—they are *test cases* for a new doctrine of *cyber-enabled coercion*. Immediate action on Cisco patching, cloud credential hygiene, and third-party risk is non-negotiable. However, the deeper strategic imperative is to *rethink resilience*: assume breach, prioritize data integrity over confidentiality, and build *cross-sector threat intelligence sharing* into your incident response protocol. The next 30 days will determine whether your organization is a target of opportunity—or a strategic priority.\n\n**Prepared by**: Threat Intelligence Division  \n**Date**: 13 March 2026  \n**Distribution**: CEO, CISO, General Counsel, Board Risk Committee",
+  "generated_at": "2026-03-14T06:47:01Z",
+  "summary": "[LLM error] HTTPConnectionPool(host='192.168.1.58', port=8000): Max retries exceeded with url: /v1/chat/completions (Caused by NewConnectionError(\"HTTPConnection(host='192.168.1.58', port=8000): Failed to establish a new connection: [Errno 111] Connection refused\"))",
   "stats": {
     "7_day": {
-      "total_documents": 387,
+      "total_documents": 334,
       "top_threat_actors": [
         [
           "Handala",
@@ -18,15 +18,19 @@
           3
         ],
         [
-          "MuddyWater",
+          "apt28",
           2
         ],
         [
-          "apt28",
+          "PhantomRaven",
           2
         ]
       ],
       "top_vulnerabilities": [
+        [
+          "CVE-2026-3909",
+          5
+        ],
         [
           "CVE-2026-26110",
           4
@@ -36,12 +40,8 @@
           4
         ],
         [
-          "CVE-2017-7921",
-          3
-        ],
-        [
-          "CVE-2026-20127",
-          3
+          "CVE-2026-3910",
+          4
         ],
         [
           "CVE-2025-26399",
@@ -50,23 +50,23 @@
       ],
       "top_incidents": [
         [
-          "data_breach",
-          27
+          "malware",
+          23
         ],
         [
-          "malware",
-          27
+          "data_breach",
+          21
         ],
         [
           "phishing",
-          11
-        ],
-        [
-          "insider_threat",
-          2
+          10
         ],
         [
           "ransomware",
+          2
+        ],
+        [
+          "insider_threat",
           2
         ]
       ],
@@ -74,11 +74,11 @@
       "top_geographies": [
         [
           "Global",
-          25
+          26
         ],
         [
           "United States",
-          21
+          19
         ],
         [
           "United Kingdom",
@@ -96,22 +96,22 @@
       "top_exploit_kits": [
         [
           "Coruna",
-          6
-        ],
-        [
-          "SonicWall exploit chain (authentication bypass + RCE + privilege escalation)",
-          1
-        ],
-        [
-          "Coruna (also known as CryptoWaters)",
-          1
-        ],
-        [
-          "Akira Ransomware-as-a-Service",
-          1
+          3
         ],
         [
           "Coruna iOS Exploit Kit",
+          1
+        ],
+        [
+          "InstallFix (malvertized install guides)",
+          1
+        ],
+        [
+          "StegaBin (npm-based steganographic payload delivery)",
+          1
+        ],
+        [
+          "FENRIR",
           1
         ]
       ],
@@ -121,11 +121,11 @@
           4
         ],
         [
-          "Unknown",
+          "Social engineering",
           3
         ],
         [
-          "Social engineering",
+          "Unknown",
           3
         ],
         [
@@ -164,11 +164,11 @@
       ],
       "top_vulnerabilities": [
         [
-          "N/A",
-          15
+          "CVE-2026-1731",
+          13
         ],
         [
-          "CVE-2026-1731",
+          "N/A",
           13
         ],
         [
@@ -191,11 +191,11 @@
         ],
         [
           "malware",
-          56
+          55
         ],
         [
           "ransomware",
-          25
+          24
         ],
         [
           "phishing",
@@ -210,11 +210,11 @@
       "top_geographies": [
         [
           "Global",
-          116
+          117
         ],
         [
           "United States",
-          57
+          62
         ],
         [
           "United Kingdom",
@@ -247,7 +247,7 @@
           3
         ],
         [
-          "HijackLoader",
+          "VoidLink",
           2
         ]
       ],
@@ -300,53 +300,53 @@
       ],
       "top_vulnerabilities": [
         [
-          "CVE-2025-61884",
-          8
-        ],
-        [
           "CVE-2025-20352",
           7
         ],
         [
-          "CVE-2025-59287",
-          6
+          "CVE-2025-61884",
+          5
         ],
         [
           "CVE-2025-54236",
           5
         ],
         [
-          "CVE-2025-61882",
+          "CVE-2025-9242",
+          4
+        ],
+        [
+          "CVE-2025-61932",
           4
         ]
       ],
       "top_incidents": [
         [
           "data_breach",
-          69
+          70
         ],
         [
           "malware",
-          51
+          55
         ],
         [
           "ransomware",
-          27
+          32
         ],
         [
           "phishing",
-          18
+          20
         ],
         [
-          "ddos",
-          4
+          "insider_threat",
+          3
         ]
       ],
       "top_mitre_techniques": [],
       "top_geographies": [
         [
           "Global",
-          89
+          90
         ],
         [
           "Europe",
@@ -354,22 +354,18 @@
         ],
         [
           "United States",
-          34
+          33
         ],
         [
           "United Kingdom",
-          23
+          22
         ],
         [
           "North America",
-          21
+          22
         ]
       ],
       "top_exploit_kits": [
-        [
-          "ShinyHunters extortion toolkit",
-          1
-        ],
         [
           "China Chopper",
           1
@@ -379,11 +375,15 @@
           1
         ],
         [
-          "ShinyHunters (extortion group) – proof‑of‑concept exploit released",
+          "generic exploit kits referenced in campaign (unspecified)",
           1
         ],
         [
-          "generic exploit kits referenced in campaign (unspecified)",
+          "Zero Disco exploit toolkit",
+          1
+        ],
+        [
+          "EchoDrv",
           1
         ]
       ],
@@ -401,48 +401,46 @@
           3
         ],
         [
-          "Social engineering",
-          2
+          "social engineering",
+          3
         ],
         [
-          "phishing emails",
-          2
+          "phishing email with malicious attachment",
+          3
         ]
       ]
     },
     "industry_monthly_trends": {
       "2025-10": {
-        "Financial Services": 97,
-        "Technology": 69,
-        "Government": 53,
-        "Healthcare": 53,
-        "Education": 29
+        "Financial Services": 89,
+        "Technology": 65,
+        "Healthcare": 52,
+        "Government": 49,
+        "Education": 28
       },
       "2025-11": {
-        "Financial Services": 28,
-        "Technology": 20,
-        "Healthcare": 13,
-        "Government": 10,
-        "Cryptocurrency Exchanges": 6
+        "Financial Services": 33,
+        "Technology": 26,
+        "Healthcare": 15,
+        "Government": 13,
+        "Software Development": 9
       }
     },
     "highlighted_incident": {
-      "title": "Ddos targeting 2 organizations",
-      "date": "2025-10-14T07:23:56",
-      "summary": "Attack Vectors: volumetric DDoS attack, amplification attacks, multi‑vector traffic | Affected: Gcore, Gcore customers",
+      "title": "Data_Breach targeting PowerSchool",
+      "date": "2025-10-15T19:41:51",
+      "summary": "Attack Vectors: compromised credentials, unauthorized remote access | Affected: PowerSchool",
       "severity": "critical",
       "threat_actors": [],
       "affected_companies": [
-        "Gcore",
-        "Gcore customers"
+        "PowerSchool"
       ],
       "affected_industries": [],
       "attack_vectors": [
-        "volumetric DDoS attack",
-        "amplification attacks",
-        "multi‑vector traffic"
+        "compromised credentials",
+        "unauthorized remote access"
       ],
-      "incident_type": "ddos"
+      "incident_type": "data_breach"
     },
     "highlighted_vulnerability": {
       "cve_id": "CVE-2025-54253",
@@ -452,36 +450,12 @@
     },
     "high_impact_incidents": [
       {
-        "title": "Data_Breach targeting U.S. Federal Bureau of Investigation (FBI) systems managing surveillance and wiretap warrants",
-        "date": "2026-03-06T08:44:53",
+        "title": "Malware targeting 3 organizations",
+        "date": "2026-03-10T11:03:10",
         "affected_companies": [
-          "U.S. Federal Bureau of Investigation (FBI) systems managing surveillance and wiretap warrants"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Data_Breach targeting 3 organizations",
-        "date": "2026-03-06T10:22:14",
-        "affected_companies": [
-          "Transport for London (TfL)",
-          "Oyster card system",
-          "Contactless payment system"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "data_breach",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
-      {
-        "title": "Malware targeting Individuals who downloaded fake OpenClaw installers via Bing",
-        "date": "2026-03-06T11:11:26",
-        "affected_companies": [
-          "Individuals who downloaded fake OpenClaw installers via Bing"
+          "Developers using npm",
+          "Systems installing @openclaw-ai/openclawai",
+          "Victim machines running the malicious package"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -490,23 +464,54 @@
         "affected_industries": []
       },
       {
-        "title": "Phishing targeting US-based businesses and individuals",
-        "date": "2026-03-06T10:08:00",
+        "title": "Ransomware targeting 3 organizations",
+        "date": "2026-03-09T04:00:00",
         "affected_companies": [
-          "US-based businesses and individuals"
+          "Unspecified enterprise organizations",
+          "Third-party vendor systems",
+          "Supply chain partners"
         ],
         "threat_actors": [],
         "severity": "critical",
-        "incident_type": "phishing",
+        "incident_type": "ransomware",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 3 organizations",
+        "date": "2026-03-08T23:14:54",
+        "affected_companies": [
+          "FBI",
+          "FBI wiretapping systems",
+          "FBI surveillance systems"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
+        "impact_assessment": "",
+        "affected_industries": []
+      },
+      {
+        "title": "Data_Breach targeting 4 organizations",
+        "date": "2026-03-09T10:57:43",
+        "affected_companies": [
+          "Cognizant",
+          "TriZetto Provider Solutions",
+          "Healthcare Providers",
+          "Patients"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
       },
       {
         "title": "Data_Breach targeting 2 organizations",
-        "date": "2026-03-06T17:02:26",
+        "date": "2026-03-09T18:30:27",
         "affected_companies": [
-          "Fortune 500 companies",
-          "government agencies"
+          "Salesforce",
+          "Approximately 100 high-profile companies"
         ],
         "threat_actors": [],
         "severity": "critical",
@@ -516,27 +521,6 @@
       }
     ],
     "high_impact_vulnerabilities": [
-      {
-        "cve_id": "CVE-2026-20127",
-        "date": "2026-03-06T15:14:43",
-        "cvss_score": 10.0,
-        "summary": "Critical authentication bypass vulnerability in Cisco Catalyst SD-WAN Controller and Manager allowing unauthenticated remote attackers to gain full administrative access.",
-        "affected_companies": [
-          "Cisco Catalyst SD-WAN Controller",
-          "Cisco Catalyst SD-WAN Manager",
-          "Cisco"
-        ]
-      },
-      {
-        "cve_id": "",
-        "date": "2026-03-06T11:33:29",
-        "cvss_score": 10.0,
-        "summary": "Two critical CVSS 10 vulnerabilities in Cisco Secure Firewall products enabling authentication bypass and remote code execution.",
-        "affected_companies": [
-          "Cisco Secure Firewall",
-          "Cisco"
-        ]
-      },
       {
         "cve_id": "CVE-2025-68613",
         "date": "2026-03-12T08:46:25",
@@ -564,18 +548,29 @@
           "Veeam Backup & Replication",
           "Veeam Software"
         ]
+      },
+      {
+        "cve_id": "CVE-2026-21667",
+        "date": "2026-03-13T12:01:47",
+        "cvss_score": 9.9,
+        "summary": "Critical RCE vulnerability allowing authenticated users to execute arbitrary code on Veeam Backup Server under certain conditions.",
+        "affected_companies": [
+          "Veeam Backup & Replication",
+          "Veeam Software"
+        ]
+      },
+      {
+        "cve_id": "CVE-2026-21708",
+        "date": "2026-03-13T12:01:47",
+        "cvss_score": 9.9,
+        "summary": "Critical RCE vulnerability allowing authenticated users to execute arbitrary code on Veeam Backup Server under certain conditions.",
+        "affected_companies": [
+          "Veeam Backup & Replication",
+          "Veeam Software"
+        ]
       }
     ],
     "ransomware_targets": [
-      {
-        "company": "Corporate networks targeted by Crazy ransomware gang",
-        "date": "2026-02-11T19:29:14",
-        "actor": "Crazy ransomware gang",
-        "ransomware_type": "ransomware",
-        "impact": "",
-        "demands": "Estimated to be high due to ransom demands, operational downtime, and recovery costs",
-        "industry": "Unknown"
-      },
       {
         "company": "ApolloMD",
         "date": "2026-02-12T17:58:25",
