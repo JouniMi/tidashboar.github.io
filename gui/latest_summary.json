@@ -1,20 +1,20 @@
 {
-  "generated_at": "2026-03-17T19:56:58Z",
-  "summary": "# Strategic Threat Landscape Assessment\n**Date:** March 14, 2026\n**Classification:** CONFIDENTIAL // FOR EXECUTIVE REVIEW\n**Prepared By:** Threat Intelligence Division\n\n## Executive Summary\n\nOver the past seven days, the threat landscape has shifted decisively toward supply chain compromise and critical infrastructure disruption, driven by a convergence of state-sponsored espionage and aggressive ransomware operations. Intelligence indicates a significant escalation in attacks targeting software development ecosystems, specifically through the npm registry, alongside a concentrated campaign against healthcare and backup infrastructure. The persistence of the **Lazarus Group** across 7, 30, and 150-day windows signals a sustained strategic focus on financial and technological assets, while the **SafePay ransomware gang** has demonstrated a capacity for mass-scale disruption, impacting Fortune 100 companies, government benefit programs, and major healthcare providers. This dual-threat environment requires immediate executive attention to both software supply chain integrity and backup system resilience.\n\nStrategic implications are severe, particularly regarding business continuity and regulatory compliance. The exploitation of critical vulnerabilities in automation tools (**n8n**) and backup solutions (**Veeam**) presents a direct risk to organizational recovery capabilities. Geopolitically, the arrest of a Russian national associated with the **Phobos ransomware operation** suggests increased law enforcement pressure, potentially driving actors toward more sophisticated, unattributed methods or state-aligned proxies like **Storm-2561** and **APT28**. Immediate action is required to patch high-severity vulnerabilities (CVSS 9.9–10.0) and audit third-party dependencies, as the current attack vectors prioritize long-term access and data exfiltration over simple encryption.\n\n## Threat Actor Intelligence\n\n### Active Threat Actors (7-Day Window)\n*   **Storm-2561:** Detected in 6 incidents. Likely state-aligned espionage activity focusing on intelligence gathering.\n*   **Handala:** Detected in 5 incidents. Associated with targeted intrusion campaigns.\n*   **Lazarus Group:** Detected in 2 incidents. Persistent actor with a history of financial theft and disruptive attacks.\n*   **APT28:** Detected in 2 incidents. Known for geopolitical espionage and infrastructure targeting.\n*   **PhantomRaven:** Detected in 2 incidents. Emerging threat actor with potential ties to advanced persistent threats.\n\n### Threat Actor Evolution\n*   **Persistent Threats:** The **Lazarus Group** remains the most consistent threat across all analyzed timeframes (7, 30, and 150 days), indicating a long-term strategic campaign rather than opportunistic activity.\n*   **Emerging Ransomware:** **SafePay** appears in the 150-day window and has executed high-impact campaigns recently (Conduent, Blue Cross, Volvo). **Phobos** shows activity in the 30-day window, though recent law enforcement action suggests operational disruption.\n*   **Declining/Static:** **Conti** and **Yanluowang** appear in the 150-day window but show no activity in the 7-day window, suggesting a shift in the ransomware-as-a-service (RaaS) market share toward SafePay and Phobos.\n\n### Attribution Analysis\n*   **Lazarus Group:** High Confidence. North Korea-linked. Motivation: Financial theft and geopolitical disruption.\n*   **SafePay:** High Confidence. Ransomware-as-a-Service. Motivation: Financial extortion via mass targeting of critical sectors.\n*   **Phobos:** Medium-High Confidence. Russian-linked. Motivation: Financial extortion. Recent arrests indicate operational fragility.\n*   **Storm-2561 / APT28:** Medium Confidence. State-sponsored. Motivation: Espionage and strategic advantage.\n\n### TTP Analysis\n*   **Supply Chain Compromise:** Increased usage of compromised npm packages (e.g., `@openclaw-ai/openclawai`) to deliver malware to development environments.\n*   **Backup Targeting:** Specific exploitation of Veeam Backup & Replication vulnerabilities to prevent recovery and force ransom payment.\n*   **Initial Access:** Phishing remains a vector (10 incidents), but malware deployment (26 incidents) and data breaches (24 incidents) are the dominant attack types, suggesting post-exploitation focus.\n\n## Technical Threat Analysis\n\n### Critical Vulnerabilities\nThe following vulnerabilities require immediate patching due to active exploitation and high CVSS scores:\n*   **CVE-2025-68613 (CVSS 10.0/9.9):** Affects **n8n** automation workflows. Critical risk to workflow integrity and data access.\n*   **CVE-2026-21666 / CVE-2026-21667 (CVSS 9.9):** Affects **Veeam Backup & Replication**. Direct threat to disaster recovery capabilities.\n*   **CVE-2026-3909 / CVE-2026-26110 / CVE-2026-21262 / CVE-2026-3910:** High-frequency critical CVEs identified in the 7-day window requiring immediate vulnerability management review.\n\n### Attack Surface Analysis\n*   **Most Targeted Industries:**\n    1.  **Healthcare:** Ambulance providers (Wisconsin, Bell), Medical Centers (UMMC, Hawaii Cancer Center), and Medical Device Manufacturers (Stryker).\n    2.  **Financial Services:** 74 U.S. banks, Blue Cross Blue Shield plans, Conduent.\n    3.  **Technology/Software:** npm registry users, JavaScript development teams.\n*   **Geographic Concentration:** While global distribution data is limited, confirmed incidents heavily concentrate in the **United States** (Wisconsin, Mississippi, Hawaii, 30+ states) and **Japan** (Washington Hotel, Advantest Corporation).\n\n### Malware & Exploit Trends\n*   **Malware Dominance:** Malware incidents (26) outnumber ransomware (8) and DDoS (5) in the 7-day window, indicating a focus on persistence and data theft rather than immediate disruption.\n*   **Supply Chain Poisoning:** The `@openclaw-ai/openclawai` package compromise represents a significant vector for infecting developer machines and downstream organizations.\n*   **Exploit Kits:** No specific exploit kits were identified in the infrastructure data, suggesting targeted delivery via compromised software updates or packages.\n\n### Infrastructure Threats\n*   **Software Infrastructure:** The npm registry is a primary attack surface.\n*   **Backup Infrastructure:** Veeam environments are under active exploitation.\n*   **Network Infrastructure:** Specific malicious domains and IPs were not enumerated in the current dataset, necessitating reliance on software-based indicators (SBOMs, package versions).\n\n## Strategic Intelligence\n\n### Sector-Specific Threats\n*   **Healthcare:** Facing a \"perfect storm\" of ransomware (SafePay, Phobos) and malware targeting critical care providers (Bell Ambulance, UMMC). Risk to patient safety and operational continuity is critical.\n*   **Financial Services:** 74 U.S. banks targeted recently. SafePay has explicitly targeted state benefit programs (Medicaid, SNAP), indicating a strategy to maximize societal impact and pressure.\n*   **Technology/DevOps:** The npm supply chain attack highlights the risk to software development lifecycles. Organizations relying on third-party JavaScript libraries are at elevated risk.\n\n### Geopolitical Indicators\n*   **Russian Ransomware Ecosystem:** The arrest of a 47-year-old Polish man linked to Phobos and a Russian national admin of Phobos indicates law enforcement success, but the persistence of SafePay suggests the ecosystem is resilient and evolving.\n*   **State-Sponsored Activity:** The presence of **APT28** and **Storm-2561** alongside criminal groups suggests a blurred line between state espionage and criminal extortion, potentially leveraging criminal infrastructure for state objectives.\n\n### Supply Chain Risks\n*   **Third-Party Software:** The compromise of `@openclaw-ai/openclawai` demonstrates that open-source dependencies are a primary entry point.\n*   **Vendor Risk:** Veeam and n8n vulnerabilities indicate that even trusted enterprise vendors are targets. Organizations must verify vendor security postures and patching cadences.\n\n### Incident Response Insights\n*   **Recovery Challenges:** Attacks on Veeam backups (CVE-2026-21666) specifically aim to destroy recovery options. IR plans must include offline, immutable backups.\n*   **Developer Security:** Incidents targeting npm users require IR teams to include development environments in their scope, not just production servers.\n*   **Healthcare Resilience:** Multiple ambulance and hospital targets suggest a need for sector-specific IR playbooks that prioritize life-safety systems over data restoration.\n\n## Forward-Looking Assessment\n\n### Threat Forecast\n*   **Supply Chain Escalation:** Expect an increase in attacks targeting package managers (npm, PyPI) and CI/CD pipelines as actors seek broader reach with less effort.\n*   **Backup Weaponization:** Ransomware groups will continue to prioritize backup infrastructure vulnerabilities to ensure extortion success.\n*   **Healthcare Targeting:** Healthcare remains the highest-value target for ransomware due to operational criticality; expect continued campaigns against providers and medical device manufacturers.\n\n### Defensive Priorities\n1.  **Immediate Patching:** Prioritize remediation of **CVE-2025-68613 (n8n)** and **CVE-2026-21666/67 (Veeam)** across all environments.\n2.  **Dependency Scanning:** Implement rigorous Software Bill of Materials (SBOM) analysis for all npm and JavaScript dependencies to detect compromised packages like `@openclaw-ai`.\n3.  **Backup Hardening:** Enforce immutable backup policies and network segmentation for backup servers to mitigate Veeam exploitation risks.\n4.  **Healthcare Sector Review:** Conduct specific risk assessments for healthcare assets, focusing on endpoint protection and incident response readiness for critical care systems.\n\n### Intelligence Gaps\n*   **Infrastructure Visibility:** Current data lacks specific malicious domain and IP indicators. Enhanced network traffic analysis is required to identify command-and-control infrastructure associated with the active malware campaigns.\n*   **Attribution Clarity:** While major actors are identified, the \"splintered ransomware groups\" targeting global enterprises require deeper forensic analysis to determine if they are affiliates of SafePay or independent actors.\n*   **Geographic Mapping:** Further analysis is needed to map the geographic distribution of the 74 U.S. banks and 30+ state benefit programs targeted to identify regional hotspots.",
+  "generated_at": "2026-03-18T06:30:11Z",
+  "summary": "# STRATEGIC THREAT LANDSCAPE ASSESSMENT\n**Date:** March 15, 2026\n**Classification:** CONFIDENTIAL // EXECUTIVE BRIEFING\n**Prepared By:** Threat Intelligence Division\n\n## Executive Summary\n\nOver the past seven days, the threat landscape has demonstrated a marked escalation in targeted attacks against critical infrastructure and software supply chains, driven by a convergence of state-sponsored activity and aggressive ransomware syndicates. The most significant evolution is the emergence of **Storm-2561**, which has surged to the top of active threat actor activity (7 incidents), displacing previously dominant groups in the short-term window. Concurrently, the **Lazarus Group** maintains persistent activity across all temporal windows (7, 30, and 150 days), indicating a sustained strategic campaign rather than opportunistic behavior. The attack surface has shifted decisively toward operational technology and healthcare logistics, evidenced by high-impact incidents targeting the largest ambulance provider in Wisconsin, Bell Ambulance, and medical device manufacturer Stryker. This suggests adversaries are prioritizing disruption of essential services over pure data exfiltration.\n\nStrategically, the data indicates a critical vulnerability in the software supply chain and backup infrastructure that requires immediate executive attention. The compromise of the **npm registry** and the exploitation of critical vulnerabilities in **n8n** (CVSS 10.0) and **Veeam Backup & Replication** (CVSS 9.9) present existential risks to business continuity. Furthermore, the **SafePay ransomware gang** has executed a broad-spectrum campaign targeting Fortune 100 companies, government benefit programs, and healthcare entities, signaling a coordinated effort to maximize financial leverage through systemic disruption. Geopolitical dynamics remain tense, with North Korean-linked actors (Lazarus) and Russian-affiliated ransomware groups (SafePay, Phobos) operating in parallel, suggesting a fragmented but highly active threat ecosystem. Immediate remediation of identified CVEs and supply chain hardening are the top priorities to mitigate imminent risk.\n\n## Threat Actor Intelligence\n\n### Active Threat Actors (7 Days)\n*   **Storm-2561:** Currently the most active actor in the 7-day window (7 incidents). This represents a significant spike compared to historical baselines, suggesting a new campaign or toolset deployment.\n*   **Handala:** Second most active (5 incidents). Historically associated with espionage, their increased activity warrants monitoring for potential data theft operations.\n*   **Lazarus Group:** Maintains consistent activity (2 incidents in 7 days, 6 in 30 days, 7 in 150 days). Their persistence across all timeframes confirms them as a long-term strategic threat.\n*   **PhantomRaven & Hive0163:** Lower volume (2 incidents each) but present in the active window, indicating a diverse threat actor ecosystem.\n\n### Threat Actor Evolution\n*   **Emerging:** **Storm-2561** is the primary emerging threat, showing high velocity in the 7-day window but absent from the 30-day top list. This indicates a rapid ramp-up in operations.\n*   **Persistent:** **Lazarus Group** is the only actor appearing in the top 5 across all three timeframes (7, 30, 150 days), demonstrating sustained operational capability and strategic focus.\n*   **Declining/Shifted:** **ShinyHunters** dominated the 30-day window (17 incidents) but dropped out of the 7-day top list. This suggests their recent campaign may have concluded or shifted tactics to avoid detection. **Conti** and **Yanluowang** appear in the 150-day window but are absent from recent activity, indicating a potential decline in their operational tempo or rebranding.\n\n### Attribution Analysis\n*   **Lazarus Group:** **High Confidence.** State-sponsored (North Korea). Motivation: Financial theft, espionage, and disruption of critical infrastructure.\n*   **SafePay / Phobos:** **High Confidence.** Ransomware-as-a-Service (RaaS). Motivation: Financial extortion. SafePay is currently conducting a high-volume campaign targeting government and healthcare sectors.\n*   **Storm-2561:** **Medium Confidence.** Emerging actor. Motivation: Likely financial or espionage, pending further TTP analysis.\n\n### TTP Analysis\n*   **Supply Chain Compromise:** Evidenced by the npm registry breach targeting JavaScript development teams.\n*   **Backup Infrastructure Targeting:** Exploitation of Veeam vulnerabilities indicates a focus on destroying recovery capabilities to force ransom payment.\n*   **Malware Deployment:** Malware remains the primary attack vector (22 incidents in 7 days), surpassing ransomware (9 incidents) and phishing (8 incidents).\n\n## Technical Threat Analysis\n\n### Critical Vulnerabilities\nThe following vulnerabilities require immediate patching due to active exploitation and high CVSS scores:\n1.  **CVE-2025-68613 (n8n):** CVSS 10.0 / 9.9. Critical risk to workflow automation and integration platforms.\n2.  **CVE-2026-21666 / 21667 / 21708 (Veeam):** CVSS 9.9. Critical risk to backup integrity and disaster recovery.\n3.  **CVE-2026-3909:** 5 incidents in 7 days. High frequency suggests active exploitation in the wild.\n4.  **CVE-2026-3910:** 4 incidents in 7 days. Secondary high-priority vulnerability.\n\n### Attack Surface Analysis\n*   **Most Targeted Industries:**\n    *   **Healthcare:** Ambulance providers, Medical Centers (UMMC, Hawaii Cancer Center), and Device Manufacturers (Stryker).\n    *   **Financial Services:** 74 U.S. banks targeted in recent ransomware campaigns.\n    *   **Technology/Software:** npm registry users and JavaScript development teams.\n*   **Geographic Concentration:** While specific geographic distribution data is limited, incidents heavily impact U.S. entities (Wisconsin, Mississippi, Hawaii, U.S. Banks) and Japanese entities (Washington Hotel, Advantest Corporation).\n\n### Malware & Exploit Trends\n*   **Malware Dominance:** Malware incidents (22) are the most frequent attack type, followed closely by Data Breaches (19).\n*   **Exploit Kits:** No specific exploit kits were enumerated in the current dataset, but the high volume of malware suggests the use of custom loaders or fileless techniques.\n*   **Ransomware:** 9 incidents in 7 days, with SafePay and Phobos being the primary named drivers.\n\n### Infrastructure Threats\n*   **Current Status:** Specific malicious domains and IP addresses were not enumerated in the provided intelligence feed.\n*   **Implication:** Reliance on CVE-based detection and behavioral analysis is currently more effective than signature-based blocking. Enhanced network monitoring is required to identify command-and-control (C2) traffic associated with Storm-2561 and Lazarus.\n\n## Strategic Intelligence\n\n### Sector-Specific Threats\n*   **Healthcare:** This sector faces a dual threat of ransomware (UMMC, Hawaii Cancer Center) and operational disruption (Ambulance providers). The targeting of Stryker indicates a supply chain risk affecting medical device integrity.\n*   **Financial Services:** 74 U.S. banks were targeted in a coordinated campaign. This suggests a shift toward high-value financial extortion.\n*   **Government:** State benefit programs (Medicaid, SNAP) and 500+ government entities were targeted by SafePay, indicating a strategy to disrupt public services to increase pressure.\n\n### Geopolitical Indicators\n*   **North Korea:** Lazarus Group activity confirms continued state-sponsored cyber operations focused on financial gain and strategic disruption.\n*   **Russia:** SafePay and Phobos ransomware groups (often linked to Russian-speaking cybercriminal ecosystems) are conducting broad campaigns against Western infrastructure.\n*   **Regional Risk:** High concentration of incidents in North America (U.S.) and East Asia (Japan), suggesting these regions are the primary theaters for current conflict.\n\n### Supply Chain Risks\n*   **Software Supply Chain:** The compromise of the **npm registry** is a critical supply chain event. Organizations relying on JavaScript packages must audit dependencies immediately.\n*   **Third-Party Risk:** Incidents at Stryker and ambulance providers highlight the risk of third-party vendors being used as entry points to critical infrastructure.\n\n### Incident Response Insights\n*   **High-Impact Incidents:** The simultaneous targeting of Stryker and ambulance providers suggests a coordinated effort to disrupt healthcare logistics.\n*   **Lessons Learned:** Backup systems (Veeam) are being targeted specifically to prevent recovery. Incident Response plans must include offline, immutable backups that are not accessible via the primary network.\n\n## Forward-Looking Assessment\n\n### Threat Forecast\n*   **Automation Attacks:** Expect a surge in attacks leveraging **n8n** vulnerabilities (CVE-2025-68613) to automate lateral movement and data exfiltration.\n*   **Backup Destruction:** Adversaries will continue to target **Veeam** and similar backup solutions to ensure ransomware demands are met.\n*   **Ransomware Expansion:** SafePay and splintered groups will likely expand targeting to include more critical infrastructure sectors beyond healthcare and finance.\n\n### Defensive Priorities\n1.  **Immediate Patching:** Prioritize remediation of **CVE-2025-68613 (n8n)** and **CVE-2026-21666/21667/21708 (Veeam)**.\n2.  **Supply Chain Hygiene:** Implement strict verification processes for npm packages and third-party software dependencies.\n3.  **Backup Resilience:** Ensure backup infrastructure is segmented and immutable to prevent ransomware encryption of recovery data.\n4.  **Healthcare Sector Hardening:** Increase monitoring on OT/IT convergence points in healthcare facilities and medical device manufacturers.\n\n### Intelligence Gaps\n*   **IOC Enrichment:** The current dataset lacks specific malicious domains and IP addresses. Additional technical intelligence gathering is required to build blocklists for Storm-2561 and Lazarus infrastructure.\n*   **TTP Mapping:** MITRE ATT&CK techniques were not enumerated. Mapping observed behaviors to the ATT&CK framework is necessary for better detection engineering.\n*   **Attribution Confidence:** Further analysis is needed to confirm the specific motivations and affiliations of **Storm-2561** and **Hive0163**.",
   "stats": {
     "7_day": {
-      "total_documents": 400,
+      "total_documents": 334,
       "top_threat_actors": [
         [
           "Storm-2561",
-          6
+          7
         ],
         [
           "Handala",
           5
         ],
         [
-          "apt28",
+          "PhantomRaven",
           2
         ],
         [
@@ -22,7 +22,7 @@
           2
         ],
         [
-          "PhantomRaven",
+          "Hive0163",
           2
         ]
       ],
@@ -32,37 +32,37 @@
           5
         ],
         [
-          "CVE-2026-26110",
-          4
-        ],
-        [
-          "CVE-2026-21262",
-          4
-        ],
-        [
           "CVE-2026-3910",
           4
         ],
         [
-          "CVE-2025-26399",
+          "CVE-2025-47813",
           3
+        ],
+        [
+          "CVE-2026-21262",
+          2
+        ],
+        [
+          "CVE-2026-26127",
+          2
         ]
       ],
       "top_incidents": [
         [
           "malware",
-          26
+          22
         ],
         [
           "data_breach",
-          24
-        ],
-        [
-          "phishing",
-          10
+          19
         ],
         [
           "ransomware",
+          9
+        ],
+        [
+          "phishing",
           8
         ],
         [
@@ -74,15 +74,15 @@
       "top_geographies": [
         [
           "Global",
-          37
+          35
         ],
         [
           "United States",
-          22
+          19
         ],
         [
           "United Kingdom",
-          5
+          4
         ],
         [
           "European Union",
@@ -99,19 +99,19 @@
           4
         ],
         [
-          "Modified AuraInspector Tool",
+          "Gridtide",
           1
         ],
         [
-          "WormGPT variants",
+          "SesameOp",
           1
         ],
         [
-          "Jailbroken models on BreachForums",
+          "VEILDrive",
           1
         ],
         [
-          "Custom AuraInspector (Modified)",
+          "Havoc Framework",
           1
         ]
       ],
@@ -119,10 +119,6 @@
         [
           "Phishing",
           5
-        ],
-        [
-          "Social Engineering",
-          4
         ],
         [
           "Unknown",
@@ -133,7 +129,11 @@
           3
         ],
         [
-          "Credential theft",
+          "Credential stuffing",
+          2
+        ],
+        [
+          "Residential proxy abuse",
           2
         ]
       ]
@@ -147,7 +147,7 @@
         ],
         [
           "lazarus group",
-          7
+          6
         ],
         [
           "ClickFix",
@@ -169,7 +169,7 @@
         ],
         [
           "CVE-2026-1731",
-          9
+          8
         ],
         [
           "CVE-2026-2441",
@@ -187,11 +187,11 @@
       "top_incidents": [
         [
           "data_breach",
-          75
+          76
         ],
         [
           "malware",
-          54
+          52
         ],
         [
           "ransomware",
@@ -210,7 +210,7 @@
       "top_geographies": [
         [
           "Global",
-          116
+          118
         ],
         [
           "United States",
@@ -258,7 +258,7 @@
         ],
         [
           "Social engineering",
-          7
+          6
         ],
         [
           "Social Engineering",
@@ -290,12 +290,12 @@
           3
         ],
         [
-          "Yanluowang ransomware group",
+          "Smishing Triad",
           3
         ],
         [
-          "Everest",
-          2
+          "Yanluowang ransomware group",
+          3
         ]
       ],
       "top_vulnerabilities": [
@@ -322,12 +322,12 @@
       ],
       "top_incidents": [
         [
-          "data_breach",
+          "malware",
           60
         ],
         [
-          "malware",
-          58
+          "data_breach",
+          60
         ],
         [
           "ransomware",
@@ -335,7 +335,7 @@
         ],
         [
           "phishing",
-          21
+          20
         ],
         [
           "ddos",
@@ -346,23 +346,23 @@
       "top_geographies": [
         [
           "Global",
-          96
+          95
         ],
         [
           "Europe",
-          37
+          36
         ],
         [
           "United States",
-          34
-        ],
-        [
-          "North America",
-          25
+          35
         ],
         [
           "United Kingdom",
           25
+        ],
+        [
+          "North America",
+          24
         ]
       ],
       "top_exploit_kits": [
@@ -412,14 +412,14 @@
     },
     "industry_monthly_trends": {
       "2025-10": {
-        "Financial Services": 75,
-        "Technology": 52,
-        "Healthcare": 45,
+        "Financial Services": 73,
+        "Technology": 51,
+        "Healthcare": 44,
         "Government": 39,
         "Education": 21
       },
       "2025-11": {
-        "Financial Services": 49,
+        "Financial Services": 51,
         "Technology": 44,
         "Healthcare": 24,
         "Government": 23,
@@ -457,20 +457,6 @@
       "summary": "Critical remote code execution vulnerability in Redis allowing unauthenticated attackers to execute arbitrary commands."
     },
     "high_impact_incidents": [
-      {
-        "title": "Malware targeting 3 organizations",
-        "date": "2026-03-10T11:03:10",
-        "affected_companies": [
-          "Developers using npm",
-          "Systems installing @openclaw-ai/openclawai",
-          "Victim machines running the malicious package"
-        ],
-        "threat_actors": [],
-        "severity": "critical",
-        "incident_type": "malware",
-        "impact_assessment": "",
-        "affected_industries": []
-      },
       {
         "title": "Data_Breach targeting Largest ambulance provider in Wisconsin",
         "date": "2026-03-11T13:07:00",
@@ -520,6 +506,18 @@
         "incident_type": "data_breach",
         "impact_assessment": "",
         "affected_industries": []
+      },
+      {
+        "title": "Malware targeting Stryker",
+        "date": "2026-03-11T16:18:39",
+        "affected_companies": [
+          "Stryker"
+        ],
+        "threat_actors": [],
+        "severity": "critical",
+        "incident_type": "malware",
+        "impact_assessment": "",
+        "affected_industries": []
       }
     ],
     "high_impact_vulnerabilities": [
@@ -543,16 +541,6 @@
       },
       {
         "cve_id": "CVE-2026-21666",
-        "date": "2026-03-13T04:15:00",
-        "cvss_score": 9.9,
-        "summary": "Authenticated remote code execution vulnerability in Veeam Backup & Replication allowing domain users to execute arbitrary code on the backup server.",
-        "affected_companies": [
-          "Veeam Backup & Replication",
-          "Veeam Software Group"
-        ]
-      },
-      {
-        "cve_id": "CVE-2026-21666",
         "date": "2026-03-13T12:01:47",
         "cvss_score": 9.9,
         "summary": "Critical RCE vulnerability allowing authenticated users to execute arbitrary code on Veeam Backup Server under certain conditions.",
@@ -563,6 +551,16 @@
       },
       {
         "cve_id": "CVE-2026-21667",
+        "date": "2026-03-13T12:01:47",
+        "cvss_score": 9.9,
+        "summary": "Critical RCE vulnerability allowing authenticated users to execute arbitrary code on Veeam Backup Server under certain conditions.",
+        "affected_companies": [
+          "Veeam Backup & Replication",
+          "Veeam Software"
+        ]
+      },
+      {
+        "cve_id": "CVE-2026-21708",
         "date": "2026-03-13T12:01:47",
         "cvss_score": 9.9,
         "summary": "Critical RCE vulnerability allowing authenticated users to execute arbitrary code on Veeam Backup Server under certain conditions.",
