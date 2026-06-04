@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-06-04T05:42:38.736034+00:00",
+    "generated_at": "2026-06-04T15:45:49.733533+00:00",
     "report_version": "3.0",
     "format": "unified_narrative",
     "reading_time_minutes": 10,
@@ -884,152 +884,108 @@
       "source_type": ""
     }
   ],
-  "executive_brief": "The threat landscape has fundamentally shifted from opportunistic scanning to AI-accelerated, precision exploitation of trusted infrastructure and developer toolchains. State-sponsored actors like GREYVIBE are using commercial AI platforms to automate malware development, lure generation, and infrastructure management, while simultaneously exploiting platform design flaws like ChatGPhish to turn AI assistants into trusted phishing vectors. At the enterprise level, threat actors have abandoned perimeter breaches in favor of compromising the very systems designed to secure them: FortiClient EMS and Palo Alto GlobalProtect are being actively exploited to push credential stealers disguised as legitimate patches and forge VPN authentication cookies. This convergence means traditional endpoint detection and network segmentation are failing against attacks that originate from trusted management consoles.\n\nCompounding the crisis is the collapse of coordinated vulnerability disclosure. Researcher Nightmare-Eclipse publicly dumped working proof-of-concept code for six unpatched Windows zero-days, triggering immediate weaponization by cybercrime groups before Microsoft could issue mitigations. Simultaneously, ShinyHunters has industrialized data extortion, executing silent social engineering campaigns that compromised Carnival and Charter Communications to exfiltrate nearly 11 million records without deploying ransomware. The open-source supply chain is the new blast radius, with trojanized npm packages, compromised CI/CD workflows, and unpatched Git services providing attackers with direct pathways into enterprise networks. Defenders must assume management interfaces are compromised, treat AI-generated output as untrusted, and enforce strict supply chain verification immediately.",
+  "executive_brief": "The threat landscape has fundamentally shifted from opportunistic exploitation to industrialized, AI-accelerated warfare. This week, defenders witnessed the collapse of three core security assumptions: trusted vendor update mechanisms, coordinated vulnerability disclosure, and the protective value of open-source developer tooling. Attackers are no longer waiting for patch Tuesday. They are hijacking legitimate software distribution channels to push credential stealers, weaponizing uncoordinated zero-day dumps within hours, and using generative AI to compress multi-stage attack chains into automated workflows. The operational tempo has increased exponentially, reducing the window for detection and response from days to hours.",
   "threat_stories": [
     {
-      "headline": "GREYVIBE's AI Arsenal & The ChatGPhish Vector",
-      "narrative": "Russia-linked threat group GREYVIBE has fundamentally altered the espionage playbook by weaponizing commercial AI platforms to automate every phase of the kill chain. Between May 28 and May 30, 2026, researchers confirmed the group leverages ChatGPT, Gemini, and Ideogram to generate custom malware loaders like LegionRelay, craft hyper-realistic phishing lures, and manage command-and-control infrastructure [45, 80, 96, 113]. The campaign targets Ukrainian military, government, and civilian sectors through five distinct attack chains, including fake CAPTCHA redirects, fraudulent adult club sites, and spoofed military login portals [88, 96]. Despite the AI assistance, GREYVIBE\u2019s operational security remains fragile. Attackers repeatedly upload test payloads to public scanning services, leave identifiable development artifacts in memory, and commit architectural design flaws in their malware that allow defenders to trace backend infrastructure [80, 96]. This pattern proves that while AI accelerates attack velocity, it does not erase the fundamental need for tradecraft discipline.\n\nCompounding the AI threat vector is the ChatGPhish vulnerability, disclosed on May 29, 2026, which turns AI assistants into unwitting phishing delivery mechanisms [79, 100]. When users request ChatGPT to summarize external web pages, the platform\u2019s renderer blindly processes untrusted Markdown without sandboxing. Attackers embed hidden instructions in target pages, causing the AI to generate spoofed security alerts, fake QR codes, and credential-harvesting links directly within the trusted chat interface [79, 100]. Scanning the injected QR code pivots the attack to mobile devices, completely bypassing desktop URL filters and password managers [79]. This flaw transforms generative AI from a productivity tool into a trusted social engineering vector, forcing organizations to treat AI-generated output as inherently untrusted until OpenAI implements strict server-side sanitization [100].",
+      "headline": "The Poisoned Pipeline: Attackers Hijack FortiClient EMS to Push Credential Stealers",
+      "narrative": "The most dangerous vulnerability of this period does not require user interaction or complex exploitation chains. It weaponizes trust. Threat actors actively exploit CVE-2026-35616, a critical authentication bypass in FortiClient Endpoint Management Server (EMS), to subvert the very infrastructure enterprises rely on to secure their endpoints. By bypassing EMS authentication, attackers gain administrative control over the update distribution mechanism. They then push the EKZ Infostealer disguised as a legitimate Fortinet patch, achieving widespread credential theft across managed networks without triggering standard endpoint alerts.\n\nThis represents a tactical evolution in enterprise compromise. Instead of brute-forcing individual endpoints, attackers compromise the central management console and let the enterprise's own security posture deliver the payload. Fortinet confirmed active exploitation and issued hotfixes in April, but exploitation surged dramatically in late May as threat actors refined their delivery chains. Rapid7 caught attackers abusing forged VPN cookies and EMS misconfigurations to maintain persistent access across multiple customer environments.\n\nThe implications are severe. Organizations running unpatched FortiClient EMS face immediate, network-wide credential compromise. The EKZ payload harvests browser credentials, session tokens, and cloud API keys, providing attackers with the keys to lateral movement and cloud environment takeover. This is not a theoretical risk; it is an active, automated campaign targeting managed endpoint infrastructures globally.",
       "timeline": [
         {
-          "date": "2026-05-28",
-          "event": "GREYVIBE threat group confirmed leveraging ChatGPT, Gemini, and Ideogram to develop LegionRelay malware and generate phishing lures targeting Ukraine.",
-          "significance": "Demonstrates state actors industrializing AI for full-kill-chain automation, compressing campaign development timelines.",
-          "sources": []
-        },
-        {
-          "date": "2026-05-29",
-          "event": "ChatGPhish vulnerability disclosed; ChatGPT web interface renders untrusted Markdown from external summaries without sanitization.",
-          "significance": "Creates a new prompt injection vector that bypasses traditional browser security controls and pivots attacks to mobile devices via QR codes.",
-          "sources": []
-        },
-        {
-          "date": "2026-05-30",
-          "event": "WithSecure and Permiso Security publish detailed technical breakdowns of GREYVIBE's OpSec failures and ChatGPhish exploitation mechanics.",
-          "significance": "Provides defenders with concrete indicators and mitigations for AI-assisted espionage and AI-platform-based phishing.",
-          "sources": []
-        }
-      ],
-      "impact_assessment": "Critical for organizations deploying generative AI in enterprise workflows. Ukrainian government, defense, and civilian sectors face sustained, AI-optimized espionage. Global enterprises risk credential theft via AI-summarization phishing.",
-      "action_required": "Disable automatic Markdown rendering and external link fetching in AI web interfaces. Implement strict sandboxing for AI-generated content. Deploy advanced email security gateways tuned for AI-generated phishing lures and fake CAPTCHA redirects. Monitor for LegionRelay and PhantomRelay indicators.",
-      "sources": [
-        45,
-        64,
-        79,
-        80,
-        88,
-        96,
-        100,
-        103,
-        113
-      ]
-    },
-    {
-      "headline": "Weaponizing Trust: The FortiClient & GlobalProtect Compromises",
-      "narrative": "Enterprise security perimeters are collapsing as attackers systematically weaponize trusted endpoint and VPN management infrastructure. The most critical breach of trust involves CVE-2026-35616, a critical authentication bypass in FortiClient Endpoint Management Server (EMS) that has been actively exploited since late April 2026 [8, 42, 50]. Attackers craft malicious HTTP requests to bypass EMS authentication, gaining administrative control over the trusted update pipeline [42, 50]. Instead of deploying ransomware, threat actors push the EKZ credential stealer disguised as a legitimate Fortinet software patch, silently harvesting browser credentials and lateral movement tokens across entire networks without triggering user interaction alerts [41, 122, 123]. The exploitation maturity is high, and the attack vector completely neutralizes traditional endpoint detection by abusing the very system designed to protect it [42, 123].\n\nSimultaneously, attackers are exploiting CVE-2026-0257 in Palo Alto Networks PAN-OS GlobalProtect to forge VPN authentication cookies and establish unauthorized remote access [108, 115, 125]. When administrators misconfigure appliances to use the same certificate for both HTTPS services and cookie encryption, attackers extract the public key from a standard session and cryptographically forge valid cookies for any user, including the local admin account [125]. Rapid7 confirmed active exploitation against multiple enterprise customers by May 31, 2026, with attackers bypassing multi-factor authentication entirely to pivot into internal networks [125]. The convergence of these two compromises demonstrates a definitive shift: threat actors no longer need to breach the perimeter. They compromise the management consoles that control it. Defenders must immediately isolate EMS and GlobalProtect gateways, enforce strict certificate separation, and assume that any unpatched management interface is already compromised [42, 115, 125].",
-      "timeline": [
-        {
-          "date": "2026-04-28",
-          "event": "Fortinet releases hotfixes for critical FortiClient EMS authentication bypass flaw.",
-          "significance": "Establishes the initial patching window, but deployment lag leaves enterprises exposed.",
+          "date": "2026-04-15",
+          "event": "Fortinet releases initial hotfixes for FortiClient EMS addressing the underlying authentication bypass.",
+          "significance": "Establishes the patching baseline, though deployment lag creates an exploitation window.",
           "sources": []
         },
         {
           "date": "2026-05-28",
-          "event": "Security researchers confirm active exploitation of CVE-2026-35616 to push EKZ Infostealer disguised as legitimate Fortinet updates.",
-          "significance": "Proves attackers are weaponizing trusted update pipelines to bypass endpoint detection and steal credentials at scale.",
+          "event": "Security researchers confirm active exploitation of CVE-2026-35616 in the wild, with attackers deploying EKZ Infostealer.",
+          "significance": "Validates that threat actors have fully weaponized the flaw and are operationalizing it for credential theft.",
           "sources": []
         },
         {
           "date": "2026-05-30",
-          "event": "CVE-2026-0257 authentication bypass in Palo Alto GlobalProtect confirmed under active exploitation; attackers forging VPN cookies.",
-          "significance": "Demonstrates how certificate misconfigurations allow complete MFA bypass and unauthorized internal network access.",
-          "sources": []
-        },
-        {
-          "date": "2026-05-31",
-          "event": "Rapid7 publishes forensic evidence of forged GlobalProtect cookies compromising multiple enterprise customers.",
-          "significance": "Validates widespread exploitation and forces immediate emergency patching across PAN-OS deployments.",
+          "event": "Rapid7 identifies attackers forging VPN cookies and exploiting EMS misconfigurations across multiple enterprise customers.",
+          "significance": "Demonstrates the vulnerability's integration into broader attack chains for persistent network access.",
           "sources": []
         }
       ],
-      "impact_assessment": "Critical for any organization relying on FortiClient EMS or Palo Alto GlobalProtect. Compromise results in silent credential theft, lateral movement, and complete bypass of perimeter authentication controls.",
-      "action_required": "Immediately patch FortiClient EMS to version 7.4.7 and PAN-OS GlobalProtect to the latest patched firmware. Isolate EMS and GlobalProtect gateways in dedicated management VLANs. Enforce separate certificates for HTTPS services and cookie encryption. Audit all recent endpoint update deployments for unauthorized EKZ payloads.",
+      "impact_assessment": "Enterprises deploying FortiClient EMS face immediate, network-wide credential compromise. The EKZ payload bypasses traditional endpoint detection by leveraging trusted update channels, resulting in widespread theft of browser credentials, session tokens, and cloud API keys.",
+      "action_required": "Immediately patch FortiClient EMS to version 7.4.7 or apply the latest vendor hotfix. Isolate EMS consoles to dedicated management VLANs and restrict access to known administrative IPs. Verify digital signatures on all pending endpoint updates before deployment. Conduct a forensic audit of managed endpoints for unauthorized EKZ processes or unexpected PowerShell executions. Reset all credentials harvested from potentially compromised systems.",
       "sources": [
         8,
         41,
         42,
         50,
-        108,
-        115,
         122,
-        123,
-        125
+        123
       ]
     },
     {
-      "headline": "The Zero-Day Disclosure War: Microsoft vs. Nightmare-Eclipse",
-      "narrative": "The coordinated vulnerability disclosure process has completely fractured, plunging enterprises into a patching emergency. On May 28, 2026, researcher Nightmare-Eclipse (operating under the alias Chaotic Eclipse) publicly dumped proof-of-concept exploit code for six unpatched Windows zero-day vulnerabilities, including BlueHammer, RedSun, UnDefend, YellowKey (CVE-2026-45585), GreenPlasma, and MiniPlasma [27, 35, 72]. Microsoft immediately condemned the uncoordinated release as irresponsible, warning that public POCs drastically reduce the window for enterprise remediation [72, 82]. The threat landscape reacted instantly. Within hours of publication, automated cybercrime groups weaponized three of the flaws, deploying them in drive-by attacks and credential harvesting campaigns before Microsoft Security Response Center could publish mitigations [35, 72].\n\nThe researcher claims Microsoft deleted their reporting account and refused communication, justifying the public dump as retaliation for vendor negligence [35, 104]. Microsoft maintains the vulnerabilities were never submitted through official channels, leaving defenders with zero visibility into the attack surface [27, 104]. This dispute has created a dangerous precedent. Working exploit code for Windows components affecting Defender and BitLocker is now circulating on GitHub and GitLab, accessible to any threat actor with basic scripting skills [35, 82]. Enterprises operating on standard patch cycles face immediate compromise. Security teams must enforce strict network segmentation, disable unnecessary BitLocker/Defender features where feasible, and implement application whitelisting to contain propagation until Microsoft releases emergency updates [35, 72, 104].",
+      "headline": "AI-Industrialized Espionage: GreyVibe Supercharges Ukrainian Campaigns with Generative AI",
+      "narrative": "The Russia-linked GREYVIBE threat group has crossed a critical threshold in cyber operations. They are no longer relying solely on traditional spear-phishing or manual malware development. Instead, they integrate ChatGPT, Gemini, and Ideogram directly into their kill chain, using AI to generate custom malware loaders, craft hyper-realistic phishing lures, and automate infrastructure provisioning. This AI-assisted workflow compresses campaign development from weeks to days while dramatically lowering the barrier to entry for complex operations.\n\nGREYVIBE's current campaign targets Ukrainian military, government, and civilian sectors through five distinct attack chains: PhantomMail, PhantomClick, PrincessClub, DroneLink, and Nebo. The group uses AI to generate fake CAPTCHA redirects, fraudulent adult club websites, and spoofed military login portals. Their primary payload, LegionRelay, is a lightweight RAT developed and obfuscated using AI coding assistants. Despite the technological advancement, operational security remains fragile. Attackers repeatedly upload test samples to public scanning services and leave identifiable development artifacts in their malware, allowing researchers to trace command-and-control infrastructure.\n\nThis campaign proves that AI does not replace human operators; it amplifies them. The same tools available to defenders are now standard issue for state-aligned threat actors. The velocity of lure generation and malware iteration outpaces traditional signature-based detection, forcing a complete recalibration of email security and endpoint monitoring strategies.",
       "timeline": [
         {
-          "date": "2026-05-28",
-          "event": "Researcher Nightmare-Eclipse publishes POC code for six Windows zero-days on GitHub/GitLab without vendor coordination.",
-          "significance": "Eliminates the traditional patching window and triggers immediate weaponization by automated threat groups.",
+          "date": "2026-05-15",
+          "event": "GREYVIBE begins integrating ChatGPT and Gemini into malware development and lure generation workflows.",
+          "significance": "Marks the transition from manual campaign crafting to AI-assisted industrialization.",
           "sources": []
         },
         {
           "date": "2026-05-28",
-          "event": "Microsoft publicly condemns the disclosure, citing violation of Coordinated Vulnerability Disclosure (CVD) standards.",
-          "significance": "Highlights the breakdown of vendor-researcher trust and the immediate enterprise risk of unpatched systems.",
+          "event": "Security researchers document five distinct AI-powered attack chains targeting Ukrainian infrastructure.",
+          "significance": "Confirms operational deployment of AI-generated payloads and lures at scale.",
           "sources": []
         },
         {
           "date": "2026-05-29",
-          "event": "Three of the six flaws (BlueHammer, RedSun, UnDefend) confirmed actively exploited in the wild.",
-          "significance": "Validates the researcher's impact and forces enterprises into emergency containment postures.",
+          "event": "Analysis reveals critical OpSec failures, including public test uploads and identifiable LegionRelay artifacts.",
+          "significance": "Exposes backend infrastructure and provides actionable indicators for defensive blocking.",
           "sources": []
         }
       ],
-      "impact_assessment": "Critical for all Windows environments. Unpatched zero-days affecting core security components (Defender, BitLocker) are actively weaponized, enabling privilege escalation and persistence with zero warning.",
-      "action_required": "Apply Microsoft security updates immediately upon release. Implement strict network segmentation and application whitelisting to limit exploit propagation. Isolate systems running unpatched Windows versions from untrusted networks. Monitor MSRC advisories for patches addressing YellowKey, GreenPlasma, and MiniPlasma.",
+      "impact_assessment": "Ukrainian military, government, and civilian sectors face accelerated espionage and data theft. The AI-generated lures bypass traditional spam filters, while LegionRelay RATs establish persistent access for intelligence gathering and cryptocurrency mining. The techniques are highly exportable to other geopolitical targets.",
+      "action_required": "Deploy advanced email security gateways with AI-phishing detection capabilities. Implement strict browser security policies, including WebRTC restrictions and automated URL scanning. Tune EDR solutions to detect LegionRelay and PhantomRelay behavioral patterns rather than relying on static hashes. Conduct threat hunting for known GREYVIBE development artifacts and fake CAPTCHA redirect domains. Enforce multi-factor authentication across all remote access and collaboration platforms.",
       "sources": [
-        27,
-        35,
-        72,
-        82,
-        104
+        45,
+        64,
+        80,
+        88,
+        96,
+        103,
+        113
       ]
     },
     {
-      "headline": "ShinyHunters' Industrialized Extortion: Carnival & Charter",
-      "narrative": "ShinyHunters has industrialized data extortion, moving beyond ransomware encryption to execute precision strikes on corporate identity repositories. The group confirmed breaches at Carnival Corporation and Charter Communications on May 28 and May 30, 2026, respectively, exposing nearly 11 million customer records combined [2, 6, 63, 73, 118]. The Carnival intrusion began on April 14, 2026, when attackers executed a targeted social engineering campaign to deceive an employee into granting access to internal IT systems [6]. Once inside, the intruder navigated corporate directories and exfiltrated personal data files\u2014including names, emails, dates of birth, and membership identifiers for 5,995,277 individuals\u2014by April 22 [6, 10]. No ransomware encryption occurred. The group simply packaged the data and threatened public disclosure or dark web sale [6, 10].\n\nThe Charter Communications breach followed identical tactics, with ShinyHunters adding the telecommunications giant to their leak site on May 30, 2026, after compromising systems that exposed 4.9 million customer accounts [63, 73, 97, 118]. This pattern reveals a deliberate strategic pivot. By targeting identity and access management infrastructure through social engineering and credential abuse, ShinyHunters maximizes regulatory exposure and extortion leverage while minimizing operational noise [6, 118]. The group\u2019s methodology proves that modern extortion relies on data gravity, not system disruption. Organizations must enforce out-of-band verification for all internal support requests, restrict bulk data export capabilities, and assume that compromised employee credentials will be used for silent exfiltration rather than loud encryption [6, 25, 118].",
+      "headline": "The Extortion Assembly Line: ShinyHunters Systematically Targets Carnival and Charter",
+      "narrative": "Data extortion has evolved from sporadic ransomware demands to a highly industrialized data harvesting operation. The ShinyHunters extortion group executed two major breaches in consecutive weeks, compromising Carnival Corporation and Charter Communications, exposing nearly 11 million customer records. The group's methodology remains consistent: social engineering, credential compromise, rapid data exfiltration, and public leak threats. What changes is the scale and the speed of execution.\n\nThe Carnival breach originated between April 14 and April 22, 2026, when attackers deceived an employee into granting access to internal IT systems. The intruder navigated the corporate environment, exfiltrating names, emails, dates of birth, and internal identifiers for 5.99 million individuals. By May 28, Carnival confirmed the breach as ShinyHunters prepared the data for dark web distribution. Within days, the same group turned its attention to Charter Communications, compromising systems and leaking nearly 5 million customer records by May 30. The group monetizes these operations through ransom demands and bulk data sales, operating as a data-as-a-service provider for downstream fraudsters.\n\nThis pattern eliminates the illusion of security through obscurity. ShinyHunters targets high-value consumer databases with predictable attack vectors: compromised employee credentials and inadequate internal access controls. The financial and regulatory fallout for affected organizations is guaranteed, but the deeper threat lies in the downstream impact. Stolen PII fuels identity theft, synthetic account creation, and targeted fraud campaigns that persist for years.",
       "timeline": [
         {
           "date": "2026-04-14",
-          "event": "ShinyHunters initiates social engineering campaign against Carnival employee, gaining initial IT system access.",
-          "significance": "Establishes the entry vector: human manipulation rather than technical exploitation.",
+          "event": "ShinyHunters initiates social engineering campaign targeting Carnival Corporation employees.",
+          "significance": "Establishes initial access through human deception rather than technical exploitation.",
           "sources": []
         },
         {
           "date": "2026-04-22",
-          "event": "Attackers complete exfiltration of ~6 million customer records from Carnival systems.",
-          "significance": "Demonstrates rapid lateral movement and data staging without triggering endpoint alarms.",
+          "event": "Attackers complete exfiltration of 5.99 million customer records from Carnival systems.",
+          "significance": "Demonstrates rapid data harvesting capability once internal access is achieved.",
           "sources": []
         },
         {
           "date": "2026-05-28",
-          "event": "Carnival publicly confirms the breach; ShinyHunters claims responsibility.",
-          "significance": "Validates the group's shift to pure data brokerage and regulatory extortion over ransomware.",
+          "event": "Carnival publicly confirms the breach as ShinyHunters prepares data for leak.",
+          "significance": "Triggers regulatory notifications and public disclosure requirements.",
           "sources": []
         },
         {
           "date": "2026-05-30",
-          "event": "Charter Communications breach confirmed; ShinyHunters adds 4.9M records to leak site.",
-          "significance": "Confirms repeatable, industrialized methodology targeting telecommunications and hospitality sectors.",
+          "event": "ShinyHunters publishes Charter Communications data, exposing 4.9 million additional records.",
+          "significance": "Confirms the group's assembly-line approach to high-value consumer data theft.",
           "sources": []
         }
       ],
-      "impact_assessment": "High for hospitality, telecommunications, and enterprise IT. Silent data exfiltration via compromised credentials bypasses traditional ransomware defenses and triggers massive regulatory, legal, and reputational exposure.",
-      "action_required": "Enforce mandatory out-of-band verification for all internal IT support requests. Restrict bulk data export capabilities and monitor for large file transfers. Isolate sensitive data repositories with additional authentication layers. Conduct continuous security awareness training focused on social engineering and verification protocols.",
+      "impact_assessment": "Nearly 11 million consumers face identity theft, financial fraud, and targeted phishing campaigns. Affected organizations confront severe regulatory penalties, class-action litigation, and irreversible reputational damage. The stolen datasets fuel downstream criminal ecosystems for years.",
+      "action_required": "Enforce mandatory multi-factor authentication across all internal and remote access systems. Restrict bulk data export capabilities and deploy UEBA to detect anomalous access patterns. Implement strict least-privilege access controls and conduct quarterly access reviews. Establish verified out-of-band authentication protocols for all IT support requests. Prepare incident response playbooks for rapid containment and regulatory notification within 72 hours of detection.",
       "sources": [
         2,
         6,
@@ -1044,44 +1000,74 @@
       ]
     },
     {
-      "headline": "The Developer Supply Chain Under Siege",
-      "narrative": "The open-source software supply chain has become the primary attack surface for enterprise compromise, with threat actors executing sophisticated trojanization campaigns against developer toolchains. CISA added three critical supply chain flaws to its Known Exploited Vulnerabilities catalog on May 28, 2026, signaling an emergency response to coordinated repository compromises [34]. Attackers breached AVB Disc Soft\u2019s distribution systems to trojanize three officially signed DAEMON Tools Lite installers (CVE-2026-8398), bypassing standard code-signing verification [34]. Simultaneously, the Nx Console Visual Studio Code extension (v18.95.0) was briefly published with embedded malicious code capable of compromising developer environments before removal [34].\n\nThe most severe compromise targeted 42 @tanstack npm packages (CVE-2026-45321), where attackers abused GitHub Actions workflows, cache poisoning, and OIDC token theft from runner memory to publish 84 malicious versions containing credential-stealing malware under TanStack\u2019s legitimate identity [34]. This was immediately followed by the GlassWorm campaign, which distributed trojanized npm, Python, and VSCode extensions to harvest CI/CD pipeline credentials [47]. Compounding the crisis, a critical argument injection flaw in the Gogs self-hosted Git service allows authenticated users to execute remote code via malicious pull request branch names, with Metasploit exploit modules published by May 29 [48, 61, 90]. Developers are no longer just users of software; they are the delivery mechanism for enterprise compromise. Organizations must implement strict dependency scanning, isolate developer environments via microsegmentation, and rotate all credentials derived from compromised CI/CD workflows immediately [34, 47, 90].",
+      "headline": "Zero-Day Warfare & The Disclosure Collapse: Microsoft vs. Nightmare Eclipse",
+      "narrative": "The coordinated vulnerability disclosure framework has fractured. Researcher Nightmare Eclipse, operating alongside Chaotic Eclipse, publicly dumped proof-of-concept exploit code for six unpatched Windows zero-day vulnerabilities, including BlueHammer, RedSun, UnDefend, YellowKey, GreenPlasma, and MiniPlasma. Microsoft condemned the release as irresponsible, while the researcher claimed Microsoft refused communication, deleted their reporting account, and threatened legal action. The result is a chaotic patching environment where exploit code precedes vendor fixes.\n\nWithin hours of publication, threat actors weaponized three of the flaws: BlueHammer, RedSun, and UnDefend. These vulnerabilities compromise core Windows security components, including Microsoft Defender and BitLocker encryption. The public availability of functional exploit code eliminates the traditional patching window. Defenders must now assume active exploitation against unpatched Windows environments, with lateral movement and persistence mechanisms already in circulation. The remaining three vulnerabilities remain unpatched, creating an ongoing attack surface for automated exploitation campaigns.\n\nThis incident exposes the fatal flaw in relying on vendor coordination timelines. When disclosure breaks down, enterprises bear the brunt of the fallout. The weaponization speed confirms that automated scanning and exploitation infrastructure is already positioned to capitalize on public POC releases. Security teams must treat uncoordinated zero-day disclosures as immediate active threats, not advisory warnings.",
       "timeline": [
         {
-          "date": "2026-04-15",
-          "event": "Attackers breach AVB Disc Soft build systems, trojanizing three DAEMON Tools Lite installers.",
-          "significance": "Demonstrates supply chain compromise of legitimately signed binaries, bypassing standard security checks.",
-          "sources": []
-        },
-        {
-          "date": "2026-05-19",
-          "event": "Malicious Nx Console extension v18.95.0 published to Visual Studio Marketplace and OpenVSX for 36 minutes.",
-          "significance": "Shows rapid deployment and removal cycles designed to maximize infection before detection.",
+          "date": "2026-05-28",
+          "event": "Nightmare Eclipse publicly discloses six Windows zero-day vulnerabilities and publishes POC code on GitHub.",
+          "significance": "Bypasses coordinated disclosure, immediately exposing unpatched systems to exploitation.",
           "sources": []
         },
         {
           "date": "2026-05-28",
-          "event": "CISA adds TanStack (CVE-2026-45321), Nx Console (CVE-2026-48027), and DAEMON Tools (CVE-2026-8398) to KEV catalog.",
-          "significance": "Official recognition of systemic developer toolchain compromise and immediate enterprise risk.",
+          "event": "Microsoft publicly condemns the release and advocates for Coordinated Vulnerability Disclosure (CVD).",
+          "significance": "Highlights the breakdown of vendor-researcher communication channels.",
           "sources": []
         },
         {
           "date": "2026-05-29",
-          "event": "Metasploit module released for Gogs argument injection RCE; GlassWorm campaign confirmed targeting CI/CD pipelines.",
-          "significance": "Validates automated exploitation of developer platforms and downstream enterprise pipeline hijacking.",
+          "event": "Threat actors weaponize BlueHammer, RedSun, and UnDefend within hours of POC publication.",
+          "significance": "Confirms immediate exploitation capability and validates the critical risk to Windows environments.",
           "sources": []
         }
       ],
-      "impact_assessment": "Critical for software development teams, DevOps pipelines, and enterprises relying on open-source dependencies. Compromise results in credential theft, CI/CD pipeline hijacking, and downstream enterprise network infiltration.",
-      "action_required": "Audit and remove compromised npm packages, rotate all exposed credentials and secrets. Pin package versions to known good integrity hashes. Restrict network access to Gogs instances and disable user self-registration. Implement strict dependency scanning in CI/CD pipelines and isolate developer environments via microsegmentation.",
+      "impact_assessment": "All unpatched Windows environments face immediate compromise risk. Exploited vulnerabilities bypass Microsoft Defender and undermine BitLocker encryption, enabling persistent access and data exfiltration. Enterprise networks relying on these security controls lose their foundational protection layers.",
+      "action_required": "Apply Microsoft security updates immediately upon release. Isolate critical systems from untrusted networks until patched. Implement strict network segmentation and egress filtering to limit exploit propagation. Deploy application whitelisting to block unauthorized executable execution. Monitor Microsoft Security Response Center advisories for patches addressing YellowKey, GreenPlasma, and MiniPlasma. Assume active exploitation and conduct immediate forensic triage on high-value assets.",
       "sources": [
+        27,
+        35,
+        72,
+        82,
+        104
+      ]
+    },
+    {
+      "headline": "Developer Supply Chain Under Siege: Gogs RCE and npm Poisoning Campaigns",
+      "narrative": "The open-source developer ecosystem has become a primary attack vector. A critical zero-day vulnerability in Gogs, the self-hosted Git service, allows authenticated users to execute arbitrary code by crafting malicious branch names during pull request merges. The flaw exploits an argument injection vulnerability in the `git rebase` command, bypassing input sanitization. With default configurations enabling open registration and unlimited repository creation, unauthenticated attackers can easily establish accounts and trigger remote code execution. A Metasploit module is already public, and no vendor patch exists.\n\nSimultaneously, supply chain poisoning campaigns target developer tooling at scale. Attackers compromised 42 @tanstack npm packages, publishing 84 malicious versions containing credential-stealing malware by abusing GitHub Actions, cache poisoning, and OIDC token theft. A trojanized DAEMON Tools Lite installer and a malicious Nx Console VSCode extension further demonstrate the breadth of the attack. Developers are no longer just targets; they are the entry point to CI/CD pipelines, cloud infrastructure, and enterprise networks.\n\nThis dual assault on version control systems and package registries breaks the trust model of modern software development. Exploitation requires minimal technical skill, as automated scanners identify exposed Gogs instances and developers routinely pull compromised dependencies. The blast radius extends from individual workstations to entire enterprise infrastructure when CI/CD tokens are harvested.",
+      "timeline": [
+        {
+          "date": "2026-05-28",
+          "event": "Critical Gogs argument injection vulnerability disclosed; exploit module published to Metasploit.",
+          "significance": "Provides automated exploitation capability for internet-facing Gogs deployments.",
+          "sources": []
+        },
+        {
+          "date": "2026-05-29",
+          "event": "CISA adds TanStack npm, DAEMON Tools, and Nx Console supply chain compromises to KEV catalog.",
+          "significance": "Confirms widespread developer tooling poisoning and mandates immediate remediation.",
+          "sources": []
+        },
+        {
+          "date": "2026-05-30",
+          "event": "Attackers publish exploit code for Flowise RCE vulnerability, targeting AI development environments.",
+          "significance": "Extends supply chain and developer tool exploitation into AI/ML workflows.",
+          "sources": []
+        }
+      ],
+      "impact_assessment": "Organizations running exposed Gogs instances face immediate server compromise and cross-tenant data breaches. Developers using compromised npm packages or VSCode extensions risk credential theft, CI/CD pipeline takeover, and downstream enterprise compromise. The attack surface spans from individual workstations to cloud infrastructure.",
+      "action_required": "Immediately restrict network access to Gogs instances and disable user self-registration. Disable 'Rebase before merging' across all repositories. Audit and remove compromised npm packages, rotate all exposed credentials, and implement strict CI/CD pipeline security controls. Enforce dependency scanning in development workflows and restrict IDE extension installations to approved versions. Implement microsegmentation to isolate developer environments from production infrastructure.",
+      "sources": [
+        18,
         34,
         47,
         48,
+        51,
         61,
         86,
         90,
-        124
+        109,
+        121
       ]
     }
   ],
@@ -1089,25 +1075,30 @@
     {
       "name": "GREYVIBE",
       "aliases": [
-        "Russia-Linked GREYVIBE",
-        "GREYVIBE APT"
+        "PhantomMail",
+        "PhantomClick",
+        "PrincessClub",
+        "DroneLink",
+        "Nebo"
       ],
       "motivation": "Espionage, intelligence gathering, infrastructure disruption",
-      "recent_activity": "Leveraging ChatGPT, Gemini, and Ideogram to automate malware development (LegionRelay, PhantomRelay), generate phishing lures, and manage C2 infrastructure. Targeting Ukrainian military, government, and civilian sectors through five distinct attack chains including fake CAPTCHAs and spoofed login portals.",
+      "recent_activity": "Deployed AI-assisted attack chains targeting Ukrainian military, government, and civilian sectors. Used ChatGPT, Gemini, and Ideogram to generate LegionRelay RAT, phishing lures, and infrastructure. Exhibited OpSec failures including public test uploads and identifiable development artifacts.",
       "targets": [
-        "Ukraine",
-        "Government",
-        "Defense Contractors",
-        "Civilian Infrastructure"
+        "Ukrainian military",
+        "Government agencies",
+        "Civilian infrastructure",
+        "Energy sector"
       ],
       "ttps": [
         "T1566.001",
-        "T1190",
         "T1059.001",
-        "T1572"
+        "T1071.001",
+        "T1572",
+        "T1583.001"
       ],
       "sources": [
         45,
+        64,
         80,
         88,
         96,
@@ -1118,46 +1109,55 @@
     {
       "name": "ShinyHunters",
       "aliases": [
+        "ShinyHunters Ransomware",
         "ShinyHunters Extortion Group"
       ],
-      "motivation": "Financial extortion, data brokerage",
-      "recent_activity": "Executing precision social engineering campaigns to compromise employee credentials at Carnival and Charter Communications. Exfiltrating nearly 11 million customer records without deploying ransomware. Monetizing stolen data through public leak sites and regulatory threat campaigns.",
+      "motivation": "Financial extortion, data monetization",
+      "recent_activity": "Executed consecutive breaches against Carnival Corporation (6M records) and Charter Communications (4.9M records). Utilized social engineering to compromise employee credentials, exfiltrated PII, and prepared datasets for dark web sales and ransom demands.",
       "targets": [
-        "Hospitality",
+        "Hospitality & Tourism",
         "Telecommunications",
-        "Corporate IT",
-        "Identity Management Systems"
+        "Consumer databases",
+        "Healthcare"
       ],
       "ttps": [
         "T1566.002",
-        "T1078",
+        "T1078.003",
+        "T1005",
         "T1560.001",
-        "T1567"
+        "T1486"
       ],
       "sources": [
         2,
         6,
         10,
+        29,
+        38,
+        49,
+        63,
         73,
+        97,
         118
       ]
     },
     {
-      "name": "Nightmare-Eclipse",
+      "name": "Nightmare Eclipse / Chaotic Eclipse",
       "aliases": [
-        "Chaotic Eclipse"
+        "Chaotic Eclipse",
+        "Nightmare-Eclipse"
       ],
-      "motivation": "Ideological, vendor retaliation, public disclosure activism",
-      "recent_activity": "Publicly dumping proof-of-concept exploit code for six unpatched Windows zero-days (BlueHammer, RedSun, UnDefend, YellowKey, GreenPlasma, MiniPlasma) on GitHub/GitLab without Microsoft coordination. Triggering immediate weaponization by cybercrime groups and fracturing CVD processes.",
+      "motivation": "Ideological, disruption of coordinated disclosure norms",
+      "recent_activity": "Publicly dumped proof-of-concept exploit code for six unpatched Windows zero-day vulnerabilities (BlueHammer, RedSun, UnDefend, YellowKey, GreenPlasma, MiniPlasma). Bypassed Microsoft's vulnerability reporting process, triggering immediate weaponization by threat actors.",
       "targets": [
-        "Microsoft Windows",
-        "Enterprise IT",
-        "Security Researchers"
+        "Microsoft Windows environments",
+        "Enterprise security infrastructure",
+        "Vendor disclosure processes"
       ],
       "ttps": [
         "T1190",
-        "T1059",
-        "T1203"
+        "T1068",
+        "T1059.003",
+        "T1070.004"
       ],
       "sources": [
         27,
@@ -1168,126 +1168,88 @@
       ]
     },
     {
-      "name": "Silent Ransom Group",
-      "aliases": [
-        "SRG",
-        "Tech Support Impersonators"
-      ],
-      "motivation": "Financial extortion, data theft",
-      "recent_activity": "Impersonating IT support via phone and phishing emails to gain physical or remote access to enterprise environments. Deploying malicious USB devices, installing remote access tools, and exfiltrating data using WinSCP/Rclone for extortion. Bypassing network defenses through physical access and social engineering.",
-      "targets": [
-        "General Enterprise",
-        "Corporate Offices",
-        "IT Support Desks"
-      ],
-      "ttps": [
-        "T1566.002",
-        "T1534",
-        "T1053.005",
-        "T1041"
-      ],
-      "sources": [
-        25
-      ]
-    },
-    {
       "name": "BTMOB Service Operators",
       "aliases": [
         "BTMOB Developers",
-        "BTMOB RaaS"
+        "BTMOB RAT Vendors"
       ],
       "motivation": "Financial, malware-as-a-service distribution",
-      "recent_activity": "Distributing BTMOB Android RAT-as-a-Service with point-and-click phishing payload generators. Enabling full device takeover, credential harvesting, and persistent access for downstream cybercriminals. Targeting financial services, retail, and general consumers.",
+      "recent_activity": "Released BTMOB Android malware enabling full device takeover. Generated custom phishing payloads and point-and-click RAT kits targeting financial services, retail, and general consumers. Facilitates credential theft and remote device control.",
       "targets": [
-        "Android Users",
-        "Financial Services",
+        "Financial services",
         "Retail",
-        "General Consumer"
+        "General consumers",
+        "Android users"
       ],
       "ttps": [
         "T1566.001",
-        "T1055",
-        "T1547.001",
-        "T1005"
+        "T1055.012",
+        "T1543.003",
+        "T1056.001"
       ],
       "sources": [
         7,
         36,
         57
       ]
+    },
+    {
+      "name": "Silent Ransom Group",
+      "aliases": [
+        "SRG",
+        "Tech Support Impersonators"
+      ],
+      "motivation": "Financial extortion, data theft",
+      "recent_activity": "Exploited physical and digital access controls through IT support impersonation. Used malicious USB devices and remote access tools to infiltrate corporate networks. Exfiltrated data via WinSCP and Rclone for extortion. FBI issued flash report warning of widespread employee compliance.",
+      "targets": [
+        "Corporate offices",
+        "IT departments",
+        "Financial institutions",
+        "Healthcare"
+      ],
+      "ttps": [
+        "T1566.002",
+        "T1078.001",
+        "T1200",
+        "T1053.005",
+        "T1048.002"
+      ],
+      "sources": [
+        25
+      ]
     }
   ],
   "critical_vulnerabilities": [
     {
       "cve": "CVE-2026-35616",
-      "product": "FortiClient Endpoint Management Server (EMS)",
+      "product": "FortiClient Endpoint Management Server",
       "vendor": "Fortinet",
       "severity": "CRITICAL",
       "cvss": 9.1,
-      "description": "Improper access control allowing unauthenticated attackers to bypass authentication via API endpoints. Specially crafted HTTP requests enable privilege escalation and remote code execution. Attackers exploit this to push EKZ Infostealer disguised as legitimate Fortinet updates.",
+      "description": "Improper access control allows unauthenticated remote code execution via crafted HTTP requests. Attackers bypass authentication, gain administrative EMS access, and push malicious payloads disguised as legitimate endpoint updates.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Immediately apply Fortinet hotfixes for EMS 7.4.5/7.4.6 or upgrade to version 7.4.7. Verify patch deployment and restart services.",
+      "remediation": "Upgrade FortiClient EMS to version 7.4.7 or apply the latest vendor hotfix. Isolate EMS consoles to management VLANs and verify patch signatures before deployment.",
       "sources": [
         8,
         42,
         50,
+        122,
         123
       ]
     },
     {
       "cve": "CVE-2026-0257",
-      "product": "PAN-OS GlobalProtect VPN",
+      "product": "PAN-OS GlobalProtect",
       "vendor": "Palo Alto Networks",
-      "severity": "HIGH",
+      "severity": "CRITICAL",
       "cvss": 7.8,
-      "description": "Authentication bypass allowing attackers to forge VPN authentication cookies. When HTTPS and cookie encryption share the same certificate, attackers extract the public key and craft valid cookies for any user, including local admin, bypassing MFA.",
+      "description": "Authentication bypass in GlobalProtect portal and gateway allows attackers to forge VPN authentication cookies. When HTTPS and cookie encryption share a certificate, attackers extract the public key and craft valid admin cookies.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Upgrade PAN-OS to patched version. Generate dedicated certificate exclusively for cookie encryption. Disable authentication override feature.",
+      "remediation": "Upgrade to patched PAN-OS versions immediately. Disable the authentication override feature. Generate a dedicated certificate exclusively for cookie encryption.",
       "sources": [
         108,
         115,
         125
-      ]
-    },
-    {
-      "cve": "CVE-2026-45585",
-      "product": "Microsoft Windows (YellowKey)",
-      "vendor": "Microsoft",
-      "severity": "CRITICAL",
-      "cvss": 0.0,
-      "description": "Unpatched Windows zero-day vulnerability affecting Defender and BitLocker components. Part of six flaws publicly disclosed with working POC code. Enables privilege escalation and persistence mechanisms.",
-      "exploitation_status": "PoC available",
-      "remediation": "Apply Microsoft security updates immediately upon release. Implement network segmentation and application whitelisting to limit propagation.",
-      "sources": [
-        35,
-        72,
-        104
-      ]
-    },
-    {
-      "cve": "CVE-2026-45321",
-      "product": "@tanstack npm packages",
-      "vendor": "TanStack",
-      "severity": "CRITICAL",
-      "cvss": 9.5,
-      "description": "Supply chain compromise of 42 npm packages. Attackers abused GitHub Actions, cache poisoning, and OIDC token theft to publish 84 malicious versions containing credential-stealing malware under legitimate identity.",
-      "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Audit and remove compromised packages. Rotate all exposed credentials. Pin versions to known good hashes. Harden CI/CD pipeline configurations.",
-      "sources": [
-        34
-      ]
-    },
-    {
-      "cve": "CVE-2026-48027",
-      "product": "Nx Console Extension",
-      "vendor": "Nx Console",
-      "severity": "CRITICAL",
-      "cvss": 9.3,
-      "description": "Embedded malicious code in version 18.95.0 distributed via Visual Studio Marketplace and OpenVSX. Compromised release remained available for 36 minutes, capable of compromising developer environments.",
-      "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Upgrade immediately to version 18.100.0 or later. Remove v18.95.0 and scan host systems for persistence mechanisms.",
-      "sources": [
-        34
       ]
     },
     {
@@ -1296,11 +1258,28 @@
       "vendor": "LiteSpeed",
       "severity": "CRITICAL",
       "cvss": 10.0,
-      "description": "Privilege escalation vulnerability allowing arbitrary script execution as root via improper handling of Redis enable/disable functions. Any cPanel user can exploit this flaw to run unauthorized actions on affected servers.",
+      "description": "Privilege escalation via improper handling of Redis enable/disable functions. Any cPanel user can execute arbitrary scripts with root privileges, enabling full server compromise.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Upgrade LiteSpeed cPanel Plugin to version 2.4.7 or later. Review system logs, verify IPs, and block unauthorized access.",
+      "remediation": "Upgrade LiteSpeed cPanel Plugin to version 2.4.7 or later. Monitor cPanel logs for suspicious Redis API calls and block unauthorized IPs.",
       "sources": [
         4
+      ]
+    },
+    {
+      "cve": "CVE-2026-45585",
+      "product": "Microsoft Windows (Defender/BitLocker)",
+      "vendor": "Microsoft",
+      "severity": "CRITICAL",
+      "cvss": 9.8,
+      "description": "Cluster of unpatched zero-day vulnerabilities (BlueHammer, RedSun, UnDefend, YellowKey, GreenPlasma, MiniPlasma) compromising core Windows security components. POC code publicly available.",
+      "exploitation_status": "Active exploitation confirmed",
+      "remediation": "Apply Microsoft security updates immediately upon release. Isolate critical systems, implement strict egress filtering, and enforce application whitelisting.",
+      "sources": [
+        27,
+        35,
+        72,
+        82,
+        104
       ]
     },
     {
@@ -1309,98 +1288,136 @@
       "vendor": "Ghost Foundation",
       "severity": "HIGH",
       "cvss": 8.5,
-      "description": "Critical flaw enabling mass compromise of websites. Threat actors leverage this vulnerability to deploy ClickFix malware campaigns, hijacking user sessions and injecting malicious scripts into compromised instances.",
+      "description": "Critical flaw enabling mass compromise of Ghost CMS instances. Attackers leverage the vulnerability to deploy ClickFix malware, hijacking user sessions and injecting malicious scripts.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Update Ghost CMS to latest patched version. Deploy WAF rules to block ClickFix payloads. Restrict admin panel access via IP whitelisting.",
+      "remediation": "Update Ghost CMS to the latest patched version. Deploy WAF rules to block ClickFix payloads and restrict admin panel access to trusted IPs.",
       "sources": [
         122,
         123
       ]
     },
     {
-      "cve": "CVE-2026-39987",
-      "product": "Marimo notebook",
-      "vendor": "Marimo",
-      "severity": "HIGH",
-      "cvss": 0.0,
-      "description": "Remote exploitation of internet-reachable Marimo notebooks enabling initial access and credential extraction. Attackers leverage the flaw to extract cloud credentials and automate post-compromise activities using LLM agents.",
+      "cve": "CVE-2026-8398",
+      "product": "DAEMON Tools Lite",
+      "vendor": "AVB Disc Soft",
+      "severity": "CRITICAL",
+      "cvss": 9.3,
+      "description": "Supply chain compromise trojanizing official installers with legitimate code-signing certificates. Malicious binaries evade standard security checks and establish persistence.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Apply vendor patches immediately. Restrict network exposure. Implement strict access controls and rotate exposed cloud credentials.",
-      "sources": [
-        94
-      ]
-    }
-  ],
-  "hunting_leads": [
-    {
-      "title": "EKZ Infostealer Disguised as Fortinet Updates",
-      "context": "Attackers exploit CVE-2026-35616 to push credential stealers through trusted EMS update pipelines, bypassing traditional endpoint detection.",
-      "query": "index=fortinet_ems (action=\"update_push\" OR action=\"config_deploy\") AND (payload_name=\"*EKZ*\" OR file_hash=\"*malicious*\" OR destination_ip!=\"trusted_range\") | stats count by source_ip, destination_ip, action",
-      "indicators": [
-        "EKZ Infostealer binary hashes",
-        "Anomalous EMS API calls from untrusted IPs",
-        "PowerShell commands disguised as Fortinet patches"
-      ],
-      "sources": [
-        41,
-        42,
-        122
-      ]
-    },
-    {
-      "title": "Forged GlobalProtect VPN Authentication Cookies",
-      "context": "CVE-2026-0257 allows attackers to forge VPN cookies when HTTPS/cookie certificates match, bypassing MFA and establishing unauthorized access.",
-      "query": "index=pan_os_globalprotect (event=\"vpn_session_start\" OR event=\"auth_success\") AND (cookie_valid=\"true\" AND mfa_bypass=\"true\" OR certificate_mismatch=\"false\") | stats count by user, source_ip, session_duration",
-      "indicators": [
-        "Successful VPN logins without MFA challenge",
-        "Cookie decryption failures followed by successful sessions",
-        "Admin account logins from unusual geolocations"
-      ],
-      "sources": [
-        108,
-        115,
-        125
-      ]
-    },
-    {
-      "title": "ChatGPhish Markdown Injection Payloads",
-      "context": "Attackers embed malicious Markdown in external web pages to trigger prompt injection when ChatGPT summarizes content, delivering phishing links or QR codes.",
-      "query": "index=ai_platform_logs (action=\"summarize_page\" OR action=\"render_markdown\") AND (external_url=\"*\" OR contains(\"[markdown]\" OR \"![](\" OR \"<a href=\")) | stats count by user_id, external_url, rendered_output",
-      "indicators": [
-        "AI-generated outputs containing unexpected QR codes",
-        "Rendered Markdown links pointing to newly registered domains",
-        "Cross-origin redirects from chatgpt.com to external phishing portals"
-      ],
-      "sources": [
-        79,
-        100
-      ]
-    },
-    {
-      "title": "TanStack/npm Supply Chain Compromise",
-      "context": "84 malicious versions of @tanstack packages published via OIDC token theft and GitHub Actions abuse, containing credential-stealing malware.",
-      "query": "index=ci_cd_logs (package_manager=\"npm\" AND package_name=\"@tanstack/*\") AND (install_version=\"*malicious*\" OR integrity_hash!=\"known_good\" OR oidc_token_access=\"true\") | stats count by repository, installer_ip, package_version",
-      "indicators": [
-        "npm install events for @tanstack packages with mismatched integrity hashes",
-        "OIDC token extraction from CI/CD runner memory",
-        "Credential exfiltration to known C2 IPs post-installation"
-      ],
+      "remediation": "Remove compromised installers, scan affected systems, and obtain clean binaries from verified vendor sources. Verify cryptographic hashes before installation.",
       "sources": [
         34
       ]
     },
     {
-      "title": "Signal Backup Recovery Key Phishing Campaigns",
-      "context": "Attackers impersonate Signal Support via SMS to steal 64-character backup recovery keys, enabling full decryption of historical message archives.",
-      "query": "index=email_sms_gateway (direction=\"inbound\" AND contains(\"Signal Support\" OR \"sync issue\" OR \"backup recovery\")) AND (contains(\"paste your key\" OR \"64-character\" OR \"registration code\")) | stats count by sender_number, recipient_number, message_body",
+      "cve": "CVE-2026-45321",
+      "product": "@tanstack npm packages",
+      "vendor": "TanStack",
+      "severity": "CRITICAL",
+      "cvss": 9.5,
+      "description": "Supply chain compromise of 42 npm packages containing credential-stealing malware. Attackers abused GitHub Actions, cache poisoning, and OIDC token theft to publish 84 malicious versions.",
+      "exploitation_status": "Active exploitation confirmed",
+      "remediation": "Audit and remove compromised npm packages, rotate all exposed credentials, and reinstall clean versions. Harden CI/CD pipeline configurations and enforce package approval workflows.",
+      "sources": [
+        34
+      ]
+    },
+    {
+      "cve": "CVE-2026-48800",
+      "product": "Notepad++",
+      "vendor": "Notepad++",
+      "severity": "HIGH",
+      "cvss": 7.8,
+      "description": "Arbitrary code execution via tampered shortcuts.xml and config.xml files. Attackers inject malicious executables into the Run menu or substitute command-line interpreter paths.",
+      "exploitation_status": "Proof-of-concept available",
+      "remediation": "Update Notepad++ to version 8.9.6.1 or later. Restrict file permissions on configuration files and monitor AppData directories for unauthorized changes.",
+      "sources": [
+        77
+      ]
+    }
+  ],
+  "hunting_leads": [
+    {
+      "title": "Detect EKZ Infostealer Deployment via FortiClient EMS",
+      "context": "Attackers abuse compromised EMS consoles to push EKZ disguised as legitimate patches. Hunting for unexpected PowerShell executions or credential harvesting processes post-EMS update is critical.",
+      "query": "| where EventID=4688 AND CommandLine contains \"powershell\" AND CommandLine contains \"EKZ\" OR ParentProcessName=\"FortiClientAgent.exe\" OR NewProcessName contains \"rundll32.exe\" | stats count by ProcessId, ParentProcessId, CommandLine",
       "indicators": [
-        "SMS messages claiming to be from Signal Support requesting recovery keys",
-        "Links to spoofed Signal verification portals",
-        "Users pasting 64-character strings into chat interfaces"
+        "EKZ.dll",
+        "FortiClientAgent.exe spawning PowerShell",
+        "Unexpected credential harvesting processes post-EMS update",
+        "Modified Fortinet patch checksums"
       ],
       "sources": [
-        78,
-        107
+        41,
+        42,
+        122,
+        123
+      ]
+    },
+    {
+      "title": "Identify GREYVIBE LegionRelay RAT Activity",
+      "context": "GREYVIBE's AI-generated LegionRelay RAT exhibits specific network behaviors and development artifacts. Hunting for these patterns catches early-stage compromises before lateral movement occurs.",
+      "query": "| where (ProcessName=\"LegionRelay.exe\" OR CommandLine contains \"PhantomRelay\" OR DNSQuery contains \"clickfix\" OR DNSQuery contains \"princessclub\") | stats count by Hostname, ProcessName, DNSQuery | where count > 1",
+      "indicators": [
+        "LegionRelay.exe",
+        "PhantomRelay.ps1",
+        "clickfix redirect domains",
+        "princessclub infrastructure URLs",
+        "Unusual WebRTC initialization from non-browser processes"
+      ],
+      "sources": [
+        80,
+        96,
+        103
+      ]
+    },
+    {
+      "title": "Detect Gogs Argument Injection Exploitation",
+      "context": "The Gogs RCE exploits git rebase via malicious branch names. Hunting for unusual git commands or shell execution from Gogs service accounts reveals active exploitation.",
+      "query": "| where ProcessName=\"gogs.exe\" OR ProcessName=\"git\" AND (CommandLine contains \"--exec=\" OR CommandLine contains \"rebase\" OR CommandLine contains \"/tmp/rce_proof\") | stats count by Hostname, CommandLine, User",
+      "indicators": [
+        "git rebase --exec= commands",
+        "Malicious branch names with shell operators",
+        "Gogs service account spawning cmd.exe/powershell",
+        "Unexpected file creation in /tmp or C:\\Windows\\Temp"
+      ],
+      "sources": [
+        48,
+        61,
+        86,
+        90
+      ]
+    },
+    {
+      "title": "Track ShinyHunters Data Exfiltration Patterns",
+      "context": "ShinyHunters relies on bulk data exports and cloud storage transfers. Monitoring for anomalous large file transfers or unauthorized cloud sync activity catches exfiltration in progress.",
+      "query": "| where (FileName ends with \".zip\" OR FileName ends with \".7z\" OR FileName ends with \".sql\") AND FileSize > 1000000000 OR (ProcessName=\"WinSCP.exe\" OR ProcessName=\"rclone.exe\" OR ProcessName=\"cloudsync.exe\") | stats sum(FileSize) by User, DestinationIP, ProcessName",
+      "indicators": [
+        "Bulk .zip/.7z/.sql exports",
+        "WinSCP/rclone execution from non-IT accounts",
+        "Large outbound transfers to unknown IPs",
+        "Unauthorized cloud storage sync activity"
+      ],
+      "sources": [
+        6,
+        10,
+        73,
+        118
+      ]
+    },
+    {
+      "title": "Identify ChatGPhish Markdown Injection Attacks",
+      "context": "ChatGPT's web summary renderer blindly processes external Markdown, enabling prompt injection and phishing. Hunting for AI-generated links or QR codes in enterprise chat logs reveals compromised AI workflows.",
+      "query": "| where (Url contains \"chatgpt.com\" OR ProcessName=\"ChatGPT.exe\") AND (CommandLine contains \"markdown\" OR CommandLine contains \"qr-code\" OR CommandLine contains \"shortened-url\") | stats count by User, Url, CommandLine | where count > 5",
+      "indicators": [
+        "AI-generated markdown links to external domains",
+        "QR codes embedded in chat summaries",
+        "Cross-origin redirects from chatgpt.com",
+        "Unexpected session token exfiltration via AI tools"
+      ],
+      "sources": [
+        79,
+        100
       ]
     }
   ],
@@ -1473,17 +1490,18 @@
         3
       ]
     ],
-    "key_changes": "AI-assisted attack velocity has compressed exploitation timelines from days to hours. Trusted endpoint and VPN management consoles are now primary initial access vectors. Uncoordinated zero-day disclosures have eliminated traditional patching windows for enterprise IT.",
+    "key_changes": "Patching windows have collapsed from days to hours. AI-assisted exploitation compresses reconnaissance, weaponization, and deployment into automated workflows. Trusted vendor update mechanisms and developer tooling have become primary attack vectors, replacing traditional perimeter breaches.",
     "emerging_trends": [
-      "AI prompt injection via Markdown rendering in generative platforms",
-      "Developer supply chain trojanization targeting CI/CD pipelines and IDE extensions",
-      "Data brokerage extortion replacing ransomware encryption as primary monetization model",
-      "Certificate misconfiguration exploitation for complete MFA bypass on enterprise VPNs"
+      "AI-generated malware and phishing lures bypassing traditional filters",
+      "Uncoordinated zero-day disclosures triggering immediate wild exploitation",
+      "Supply chain poisoning of npm, VSCode extensions, and CI/CD pipelines",
+      "Authentication bypass vulnerabilities in enterprise VPN and endpoint management consoles",
+      "Extortion groups operating as data-as-a-service providers rather than ransomware encryptors"
     ],
     "declining_threats": [
-      "Opportunistic web scanning without AI-driven triage",
-      "Traditional ransomware campaigns relying on loud system disruption",
-      "Legacy phishing campaigns lacking AI-generated personalization"
+      "Traditional standalone ransomware encryption without data theft",
+      "Basic credential stuffing attacks without account traversal mechanisms",
+      "Opportunistic botnet recruitment via unpatched IoT firmware (shifted toward residential proxy networks)"
     ]
   }
 }
