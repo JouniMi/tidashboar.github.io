@@ -1,6 +1,6 @@
 {
   "metadata": {
-    "generated_at": "2026-06-07T04:04:56.284062+00:00",
+    "generated_at": "2026-06-07T14:07:04.457870+00:00",
     "report_version": "3.0",
     "format": "unified_narrative",
     "reading_time_minutes": 10,
@@ -51,123 +51,154 @@
       "source_type": ""
     }
   ],
-  "executive_brief": "This week\u2019s threat landscape reveals a systematic dismantling of enterprise trust boundaries. Attackers have abandoned opportunistic scanning in favor of poisoning update pipelines, forging perimeter credentials, and hijacking web infrastructure at scale. The Dutch authorities\u2019 dismantling of a 17-million-device botnet [1] exposes the massive infrastructure backing these campaigns, while simultaneous exploitation of FortiClient EMS [3, 4], Ghost CMS [3, 4], and Palo Alto GlobalProtect [6] demonstrates a deliberate strategy to bypass both endpoint and network defenses. Security leaders must recognize that authentication mechanisms, vendor update channels, and web platforms are no longer safe defaults. The convergence of supply chain poisoning, mass web compromise, and cryptographic bypass requires immediate remediation and a fundamental shift toward zero-trust validation of all inbound updates and outbound connections.",
+  "executive_brief": "This week, the threat landscape pivoted from opportunistic exploitation to systematic supply chain and perimeter subversion. Attackers are poisoning trusted update channels, compromising developer tooling, and forging authentication tokens to bypass enterprise defenses. The simultaneous active exploitation of FortiClient EMS update mechanisms, a widespread developer UI tool, and Palo Alto GlobalProtect VPN appliances reveals a coordinated push to undermine the security infrastructure organizations rely on for endpoint management and remote access. Security teams can no longer assume vendor patches or developer dependencies are safe; they are now primary attack vectors.\n\nCompounding this infrastructure assault, mass compromises of Ghost CMS and WordPress plugins are being weaponized to distribute ClickFix malware and establish persistent admin backdoors. Attackers are chaining unauthenticated web flaws to hijack user sessions and pivot into broader network environments. While Dutch authorities successfully dismantled a botnet controlling 17 million devices, the underlying tactics exposing networks remain largely unpatched. The window for reactive patching has closed. Security operations must immediately treat update channels, developer dependencies, and VPN authentication as hostile by default.",
   "threat_stories": [
     {
-      "headline": "The Poisoned Pipeline: Enterprise Update Mechanisms Weaponized",
-      "narrative": "Threat actors have turned a critical vulnerability in FortiClient EMS into a delivery mechanism for the EKZ Infostealer, exploiting the inherent trust organizations place in vendor update channels [3, 4]. By disguising malicious payloads as legitimate Fortinet patches, attackers bypass security controls and achieve persistence without triggering traditional signature-based detection. The exploitation requires minimal user interaction, leveraging the EMS update process to silently deploy credential-stealing malware across managed endpoints [3, 4]. This campaign represents a direct attack on the enterprise security stack itself, proving that endpoint management platforms can be weaponized against their own users. Security teams must assume that automatic update channels are compromised until cryptographic verification is enforced at the network boundary.\n\nThe sophistication of this campaign extends beyond simple malware distribution. Attackers map EMS deployment architectures, identify update endpoints, and inject spoofed patch files that carry valid digital signatures or bypass verification routines entirely [3, 4]. Once executed, EKZ Infostealer harvests browser credentials, session tokens, and enterprise authentication data, granting threat actors lateral movement capabilities. This is not a theoretical risk; exploitation is active and widespread across environments relying on automated EMS patching.\n\nOrganizations that treat vendor updates as inherently safe are operating under a dangerous assumption. The FortiClient EMS campaign proves that supply chain trust must be validated cryptographically at every hop. Security operations centers must treat update channels as hostile vectors until proven otherwise, implementing strict signature verification and network-level isolation for management traffic.",
+      "headline": "The Poisoned Pipeline: Attackers Weaponize Developer Tools and Security Updates",
+      "narrative": "Threat actors are executing a deliberate assault on the software development and security update supply chains. A widely distributed Codex UI tool, downloaded over 27,000 times, secretly exfiltrated OpenAI refresh tokens from developer machines. Simultaneously, operators are exploiting a critical flaw in FortiClient EMS to distribute the EKZ Infostealer disguised as legitimate vendor patches. This is not random opportunism; it is a calculated strike against the trust chains that modern development and endpoint management depend on. By compromising trusted channels, attackers bypass traditional perimeter defenses and land directly inside development environments and enterprise endpoint fleets.\n\nThe exploitation lifecycle moves with precision. Attackers identify high-value developer tools and security management consoles, inject malicious payloads, and leverage existing update mechanisms for distribution. The FortiClient EMS campaign exploits user trust in automated patching, while the Codex UI compromise targets AI integration workflows. Both campaigns deliver credential harvesters that establish persistence and enable lateral movement. Security teams face a dual threat: compromised development credentials and poisoned endpoint management infrastructure.\n\nThis campaign forces a fundamental shift in security posture. Organizations must verify every update against vendor-signed checksums before deployment. Developer tooling requires strict network segmentation and runtime monitoring. The assumption that vendor channels are safe is dead. Attackers have proven they will weaponize the very tools meant to secure and accelerate operations.",
       "timeline": [
-        {
-          "date": "2026-05-24",
-          "event": "Attackers begin targeting FortiClient EMS update endpoints across enterprise networks",
-          "significance": "Initial deployment of spoofed patch files containing EKZ Infostealer payloads",
-          "sources": []
-        },
-        {
-          "date": "2026-05-29",
-          "event": "Credential harvesting and lateral movement observed across multiple victim environments",
-          "significance": "Confirms active exploitation and successful persistence establishment",
-          "sources": []
-        },
-        {
-          "date": "2026-05-31",
-          "event": "Public disclosure of CVE-2026-35616 and active exploitation campaigns",
-          "significance": "Forces immediate remediation and exposes scale of supply chain poisoning",
-          "sources": []
-        }
-      ],
-      "impact_assessment": "Critical. Organizations relying on FortiClient EMS for endpoint management face immediate credential theft, session hijacking, and lateral movement risks. Automated update pipelines are actively compromised.",
-      "action_required": "Disable automatic EMS updates immediately. Verify all patch checksums and digital signatures against Fortinet\u2019s official repository before deployment. Isolate affected endpoints, reset all credentials accessed through compromised systems, and implement network-level validation for EMS traffic [3, 4].",
-      "sources": [
-        3,
-        4
-      ]
-    },
-    {
-      "headline": "Web Infrastructure Hijacked: Mass CMS Compromise Fuels Malware Distribution",
-      "narrative": "A coordinated campaign is exploiting critical flaws in Ghost CMS and WordPress plugins to mass-compromise web platforms and distribute ClickFix malware [2, 3, 4]. Attackers leverage CVE-2026-26980 in Ghost CMS to inject malicious scripts that hijack user sessions, while simultaneously weaponizing an unauthenticated admin creation flaw in the WP Maps Pro plugin to seize full control of WordPress sites [2, 4]. These compromised platforms serve as staging grounds for ClickFix campaigns, which manipulate user interactions to extract financial data and credentials [3, 4]. The scale of exploitation indicates automated scanning infrastructure, likely tied to the recently dismantled Dutch botnet [1].\n\nThe tactical execution is methodical. Automated scripts scan for exposed Ghost and WordPress instances, exploit the authentication bypass, and deploy ClickFix payloads that intercept user input and redirect traffic to malicious endpoints [3, 4]. The WP Maps Pro vulnerability requires zero authentication, allowing attackers to create rogue administrator accounts and modify site configurations instantly [2]. This eliminates the need for credential theft or social engineering, making exploitation trivial and highly scalable.\n\nWeb administrators cannot rely on application firewalls alone; these vulnerabilities bypass standard defenses by exploiting legitimate administrative endpoints. The convergence of CMS exploitation and ClickFix distribution creates a self-sustaining attack cycle: compromised sites generate revenue through malware redirection, funding further infrastructure and scanning operations. Immediate isolation and credential rotation are mandatory.",
-      "timeline": [
-        {
-          "date": "2026-05-26",
-          "event": "Automated scanning campaigns target exposed Ghost CMS and WordPress instances",
-          "significance": "Initial reconnaissance and vulnerability validation across web infrastructure",
-          "sources": []
-        },
         {
           "date": "2026-05-28",
-          "event": "Mass exploitation of CVE-2026-26980 and WP Maps Pro flaw begins",
-          "significance": "Rogue admin accounts created and ClickFix payloads injected at scale",
-          "sources": []
-        },
-        {
-          "date": "2026-05-31",
-          "event": "Public disclosure of active exploitation and Dutch botnet takedown",
-          "significance": "Confirms infrastructure scale and forces immediate web platform remediation",
-          "sources": []
-        }
-      ],
-      "impact_assessment": "High. Thousands of web applications face immediate takeover, data theft, and use as malware distribution nodes. Financial and credential harvesting is actively occurring.",
-      "action_required": "Disable WP Maps Pro and update Ghost CMS immediately. Deploy WAF rules to block unauthorized user creation endpoints and known ClickFix payload signatures. Audit all administrative accounts for unauthorized creations, rotate credentials, and restore clean backups where compromise is confirmed [2, 3, 4].",
-      "sources": [
-        1,
-        2,
-        3,
-        4
-      ]
-    },
-    {
-      "headline": "Perimeter Erosion: VPN Authentication Bypassed via Cryptographic Misconfiguration",
-      "narrative": "Attackers are actively exploiting CVE-2026-0257 to bypass Palo Alto GlobalProtect VPN authentication by forging session cookies [6]. The vulnerability exploits a common misconfiguration where the same certificate secures both the HTTPS service and cookie encryption. By extracting the public key from a legitimate HTTPS session, threat actors craft valid authentication cookies for any user, including local administrators, without requiring credentials [6]. Rapid7 confirmed active exploitation across multiple customer environments, proving that perimeter defenses are being circumvented through cryptographic trust assumptions rather than brute force [6].\n\nThe technical execution exploits the main_DecryptAppAuthCookie function, which decrypts incoming cookies but implicitly trusts the decrypted content without signature verification [6]. Attackers leverage this flaw to generate authenticated sessions that bypass all VPN gateway controls. This eliminates the security boundary of the perimeter, granting attackers direct network access and the ability to pivot into internal systems. The exploitation requires no user interaction and leaves minimal forensic artifacts, making detection exceptionally difficult.\n\nOrganizations that treat their VPN infrastructure as a secure boundary are operating under a false assumption. The GlobalProtect vulnerability proves that cryptographic misconfigurations can render perimeter controls completely ineffective. Security teams must assume their VPN gateways are compromised until proper certificate segregation is enforced and patch deployment is verified.",
-      "timeline": [
-        {
-          "date": "2026-05-27",
-          "event": "Attackers identify GlobalProtect deployments with shared HTTPS/cookie encryption certificates",
-          "significance": "Target selection based on cryptographic misconfiguration patterns",
+          "event": "Codex UI tool begins distributing with hidden OpenAI token-stealing code",
+          "significance": "Establishes developer environment compromise vector",
           "sources": []
         },
         {
           "date": "2026-05-30",
-          "event": "Forged authentication cookies deployed to establish unauthorized VPN sessions",
-          "significance": "Active perimeter bypass and internal network pivoting confirmed",
+          "event": "FortiClient EMS exploit kits deployed, masquerading as vendor patches",
+          "significance": "Triggers widespread EKZ Infostealer distribution across enterprise endpoints",
           "sources": []
         },
         {
           "date": "2026-05-31",
-          "event": "Rapid7 publishes advisory and proof-of-concept script",
-          "significance": "Confirms widespread exploitation and forces immediate cryptographic remediation",
+          "event": "Security researchers confirm active exploitation across multiple environments",
+          "significance": "Validates supply chain poisoning as a coordinated campaign",
           "sources": []
         }
       ],
-      "impact_assessment": "Critical. Organizations using Palo Alto GlobalProtect with shared certificates face immediate unauthorized network access, potential domain compromise, and complete perimeter erosion.",
-      "action_required": "Upgrade PAN-OS to the patched version immediately. Disable the authentication override feature. Generate a dedicated certificate exclusively for cookie encryption, ensuring it is never shared with the HTTPS service. Audit all recent GlobalProtect sessions for unauthorized access patterns [6].",
+      "impact_assessment": "Software development teams face immediate credential theft and unauthorized AI model access. Organizations using FortiClient EMS risk enterprise-wide infostealer deployment, credential harvesting, and endpoint management bypass.",
+      "action_required": "Disable automatic FortiClient EMS updates immediately. Manually verify all patch signatures against Fortinet's official repository. Audit third-party developer tools for unexpected outbound connections. Isolate compromised development workstations and rotate all API credentials.",
       "sources": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "headline": "The Perimeter Breach: VPN Cookie Forgery and Botnet Fallout",
+      "narrative": "Enterprise VPN defenses are collapsing under a cryptographic misconfiguration that attackers exploit with surgical precision. CVE-2026-0257 in Palo Alto GlobalProtect allows threat actors to forge authentication cookies when the same certificate handles both HTTPS services and cookie encryption. Attackers extract the public key from standard web sessions, craft valid admin cookies, and walk straight into internal networks without credentials. This vulnerability shatters the foundational trust assumption in remote access infrastructure. The exploitation requires no user interaction and bypasses multi-factor authentication entirely.\n\nThe perimeter crisis intersects with broader infrastructure compromise. Dutch authorities executed a major operation dismantling a botnet spanning 17 million infected devices. While this law enforcement action removes a significant DDoS and scanning capability, it simultaneously proves that edge infrastructure remains heavily compromised. Attackers pivot quickly from seized botnet nodes to direct exploitation of vulnerable VPN gateways. The combination of forged authentication tokens and compromised edge infrastructure creates a perfect storm for unauthorized network access.\n\nOrganizations relying on Palo Alto GlobalProtect face immediate exposure. The misconfiguration is widespread, and the exploitation technique is trivial to automate. Security teams must treat all VPN authentication logs as compromised until cryptographic isolation is enforced. The perimeter is no longer a boundary; it is a launchpad for attackers who understand how to weaponize trust.",
+      "timeline": [
+        {
+          "date": "2026-05-29",
+          "event": "Rapid7 researchers identify cookie forgery technique in GlobalProtect deployments",
+          "significance": "Exposes widespread cryptographic misconfiguration in enterprise VPNs",
+          "sources": []
+        },
+        {
+          "date": "2026-05-30",
+          "event": "Proof-of-concept script published, triggering immediate wild exploitation",
+          "significance": "Accelerates unauthorized VPN access campaigns across multiple sectors",
+          "sources": []
+        },
+        {
+          "date": "2026-05-31",
+          "event": "Dutch authorities seize infrastructure controlling 17 million IoT/edge devices",
+          "significance": "Demonstrates scale of compromised edge infrastructure fueling perimeter attacks",
+          "sources": []
+        }
+      ],
+      "impact_assessment": "Any organization using Palo Alto GlobalProtect with the shared certificate misconfiguration faces immediate unauthorized network access. The botnet takedown reduces DDoS capacity but highlights persistent edge compromise enabling VPN bypass campaigns.",
+      "action_required": "Immediately audit PAN-OS certificate configurations. Isolate the HTTPS and cookie encryption certificates using dedicated keys. Deploy the patched PAN-OS version without delay. Implement strict network segmentation for VPN gateways and monitor for anomalous admin session creation.",
+      "sources": [
+        1,
         6
+      ]
+    },
+    {
+      "headline": "The CMS Takedown: Mass Compromise and Malware Distribution",
+      "narrative": "Web content management systems have become the preferred launchpad for automated malware distribution. A critical flaw in Ghost CMS (CVE-2026-26980) is being actively exploited to inject ClickFix malware into hundreds of compromised sites. Simultaneously, an unauthenticated vulnerability in the WP Maps Pro WordPress plugin allows attackers to spawn rogue admin accounts with zero user interaction. Threat actors are chaining these exploits to establish persistent backdoors, hijack user sessions, and pivot into broader network environments. The shift from targeted web application attacks to automated CMS exploitation reflects a move toward volume-based infrastructure abuse.\n\nThe attack pattern is ruthlessly efficient. Automated scanners identify vulnerable Ghost and WordPress instances, deploy exploit scripts, and establish administrative control within minutes. Attackers then inject ClickFix payloads that hijack visitor sessions, harvest credentials, and distribute additional malware. The WP Maps Pro vulnerability bypasses authentication entirely, granting immediate administrative access. This combination turns public-facing websites into weaponized distribution nodes.\n\nOrganizations running these platforms face complete site takeover and downstream compromise of their visitors. The exploitation is active, widespread, and requires zero interaction. Security teams must treat all public-facing CMS deployments as compromised until verified. Web application firewalls alone are insufficient; organizations must enforce strict access controls, validate plugin integrity, and monitor for unauthorized administrative activity.",
+      "timeline": [
+        {
+          "date": "2026-05-27",
+          "event": "Ghost CMS vulnerability disclosed, exploit kits deployed within hours",
+          "significance": "Triggers automated mass-compromise campaigns targeting Ghost instances",
+          "sources": []
+        },
+        {
+          "date": "2026-05-28",
+          "event": "WP Maps Pro admin creation bug begins active scanning campaigns",
+          "significance": "Enables unauthenticated WordPress site takeover at scale",
+          "sources": []
+        },
+        {
+          "date": "2026-05-30",
+          "event": "ClickFix malware distribution peaks across compromised Ghost instances",
+          "significance": "Transforms compromised CMS platforms into active malware distribution nodes",
+          "sources": []
+        },
+        {
+          "date": "2026-05-31",
+          "event": "Security researchers confirm widespread WordPress admin takeover",
+          "significance": "Validates CMS exploitation as a primary vector for credential theft and persistence",
+          "sources": []
+        }
+      ],
+      "impact_assessment": "Organizations running Ghost CMS or WP Maps Pro face complete site takeover, visitor credential theft, and active malware distribution. Compromised sites serve as pivot points for broader network intrusion.",
+      "action_required": "Disable WP Maps Pro immediately across all WordPress deployments. Update Ghost CMS to the latest patched version. Implement WAF rules blocking ClickFix payloads and unauthorized user creation endpoints. Rotate all CMS credentials and audit server files for unauthorized modifications.",
+      "sources": [
+        2,
+        3,
+        4
       ]
     }
   ],
   "actor_profiles": [
     {
-      "name": "EKZ/ClickFix Distribution Network",
+      "name": "EKZ Supply Chain Campaign Operators",
       "aliases": [
-        "EMS Patch Spoofers",
-        "Ghost CMS Campaign Operators"
+        "EKZ Infostealer Distributors",
+        "Patch Poisoning Group"
       ],
-      "motivation": "Financial theft, credential harvesting, malware-as-a-service distribution",
-      "recent_activity": "Poisoning FortiClient EMS update channels to deploy EKZ Infostealer, mass-compromising Ghost CMS instances to distribute ClickFix campaigns, and leveraging automated web exploitation scripts across thousands of targets [3, 4].",
+      "motivation": "Financial theft, credential harvesting, persistent access",
+      "recent_activity": "Weaponizing FortiClient EMS update mechanisms to distribute EKZ Infostealer disguised as legitimate vendor patches. Simultaneously compromising developer tooling to steal AI refresh tokens and API credentials.",
       "targets": [
-        "Enterprise endpoint management systems",
-        "Web hosting providers",
-        "CMS-dependent organizations",
-        "Remote workforce VPN users"
+        "Enterprise IT infrastructure",
+        "Software development teams",
+        "AI integration workflows"
       ],
       "ttps": [
         "T1195.002",
-        "T1078",
-        "T1566.001",
-        "T1059",
-        "T1552.004"
+        "T1583.001",
+        "T1078.001",
+        "T1053.005"
       ],
       "sources": [
+        3,
+        4,
+        5
+      ]
+    },
+    {
+      "name": "ClickFix Web Exploitation Group",
+      "aliases": [
+        "CMS Mass Compromise Operators",
+        "ClickFix Distributors"
+      ],
+      "motivation": "Financial gain, ad fraud, credential harvesting, malware distribution",
+      "recent_activity": "Automated exploitation of Ghost CMS and WP Maps Pro to establish administrative backdoors and inject ClickFix malware. Leveraging unauthenticated flaws for rapid site takeover and visitor session hijacking.",
+      "targets": [
+        "Public-facing web infrastructure",
+        "CMS deployments",
+        "WordPress and Ghost instances"
+      ],
+      "ttps": [
+        "T1190",
+        "T1505.003",
+        "T1059.001",
+        "T1071.001"
+      ],
+      "sources": [
+        2,
         3,
         4
       ]
@@ -180,9 +211,9 @@
       "vendor": "Fortinet",
       "severity": "CRITICAL",
       "cvss": 9.8,
-      "description": "Critical vulnerability allowing execution of malicious code disguised as legitimate Fortinet patches. Exploited to distribute EKZ Infostealer across managed endpoints.",
+      "description": "Critical vulnerability in FortiClient EMS allows threat actors to execute malicious code. Attackers actively exploit this flaw to distribute the EKZ Infostealer by disguising malicious payloads as legitimate Fortinet software updates, bypassing security controls and achieving persistence.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Apply Fortinet's latest security patch. Verify digital signatures of all EMS updates before installation. Disable automatic updates until verification is enforced.",
+      "remediation": "Apply the latest security patch provided by Fortinet. Verify digital signatures of all EMS updates before installation. Disable automatic updates until integrity verification is enforced.",
       "sources": [
         3,
         4
@@ -194,9 +225,9 @@
       "vendor": "Ghost Foundation",
       "severity": "CRITICAL",
       "cvss": 8.5,
-      "description": "Authentication bypass enabling mass compromise of Ghost instances. Exploited to inject ClickFix malware and hijack user sessions across web platforms.",
+      "description": "Vulnerability in Ghost CMS enables mass compromise of websites. Threat actors leverage this flaw to deploy ClickFix malware campaigns, hijacking user sessions and injecting malicious scripts into compromised CMS instances without authentication.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Update Ghost CMS to the latest patched version immediately. Deploy WAF rules to block ClickFix payloads. Restrict admin panel access via IP whitelisting.",
+      "remediation": "Update Ghost CMS to the latest patched version immediately. Deploy WAF rules to block known ClickFix payloads. Restrict admin panel access via IP whitelisting and enable rate limiting.",
       "sources": [
         3,
         4
@@ -204,53 +235,40 @@
     },
     {
       "cve": "CVE-2026-0257",
-      "product": "PAN-OS GlobalProtect",
+      "product": "PAN-OS (GlobalProtect portal and gateway)",
       "vendor": "Palo Alto Networks",
       "severity": "HIGH",
-      "cvss": 9.1,
-      "description": "Authentication bypass allowing attackers to forge VPN session cookies when HTTPS and cookie encryption share the same certificate. Grants unauthorized network access.",
+      "cvss": 9.0,
+      "description": "Authentication bypass vulnerability in Palo Alto GlobalProtect allows attackers to forge VPN auth cookies. When a common misconfiguration exists (shared certificate for HTTPS and cookie encryption), attackers extract the public key and craft valid cookies for any user, including local admin, bypassing authentication entirely.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Upgrade PAN-OS to patched version. Generate dedicated certificate for cookie encryption. Disable authentication override feature.",
+      "remediation": "Upgrade to a patched version of PAN-OS immediately. Generate and use a dedicated certificate exclusively for cookie encryption. Disable the authentication override feature until patched.",
       "sources": [
         6
       ]
     },
     {
       "cve": "CVE-XXXX-XXXX",
-      "product": "WP Maps Pro",
-      "vendor": "WordPress Plugin Vendor",
+      "product": "WP Maps Pro Plugin",
+      "vendor": "WP Maps",
       "severity": "CRITICAL",
       "cvss": 9.8,
-      "description": "Unauthenticated admin account creation vulnerability allowing full site takeover without credentials. Actively exploited to compromise WordPress installations.",
+      "description": "Unauthenticated admin account creation vulnerability in WP Maps Pro allows attackers to spawn rogue administrator accounts. The flaw bypasses authentication mechanisms, granting full administrative control over the compromised WordPress site without prior credentials.",
       "exploitation_status": "Active exploitation confirmed",
-      "remediation": "Disable WP Maps Pro immediately. Update to patched version when available. Implement WAF rules blocking unauthorized user creation endpoints.",
+      "remediation": "Disable the WP Maps Pro plugin immediately. Implement WAF rules to block unauthorized user creation endpoints. Monitor WordPress user logs for unexpected account creation events and rotate all administrative credentials.",
       "sources": [
         2
-      ]
-    },
-    {
-      "cve": "Unassigned",
-      "product": "Microsoft SharePoint",
-      "vendor": "Microsoft",
-      "severity": "CRITICAL",
-      "cvss": 9.8,
-      "description": "Remote code execution vulnerability allowing unauthenticated attackers to execute arbitrary code on SharePoint servers. Actively targeted in the wild.",
-      "exploitation_status": "Proof-of-concept available",
-      "remediation": "Install latest Microsoft security updates for SharePoint immediately. Restrict external access and implement network segmentation.",
-      "sources": [
-        4
       ]
     }
   ],
   "hunting_leads": [
     {
-      "title": "FortiClient EMS Spoofed Patch Detection",
-      "context": "Attackers disguise EKZ Infostealer as legitimate Fortinet updates. Hunt for anomalous patch deployments bypassing signature verification.",
-      "query": "securityEvent where ProcessName contains \"FortiClientEMS\" and (FileName contains \".exe\" or FileName contains \".msi\") and not (DigitalSignatureVerified == true) | summarize count() by Hostname, FileName, Timestamp",
+      "title": "Detect FortiClient EMS Malicious Patch Execution",
+      "context": "Attackers disguise EKZ Infostealer as legitimate Fortinet updates. Hunting for unexpected process execution during patch deployment windows identifies compromised endpoints before lateral movement occurs.",
+      "query": "| where process_name contains \"FortiClient\" OR process_name contains \"EMS\" | where event_id = 1 OR event_id = 4688 | where file_hash NOT IN (SELECT file_hash FROM known_good_fortinet_patches) | stats count by process_name, file_hash, parent_process, user",
       "indicators": [
-        "EKZ Infostealer hashes",
-        "Spoofed Fortinet patch URLs",
-        "Anomalous EMS update traffic patterns"
+        "Unexpected outbound connections to non-Fortinet IPs during update windows",
+        "EKZ Infostealer file hashes",
+        "Process execution from temp directories during EMS updates"
       ],
       "sources": [
         3,
@@ -258,43 +276,44 @@
       ]
     },
     {
-      "title": "WordPress Unauthenticated Admin Creation",
-      "context": "WP Maps Pro vulnerability allows zero-authentication admin account creation. Monitor for sudden admin role assignments without login events.",
-      "query": "index=web_access wp_maps_pro* | where user_role == \"administrator\" and login_event == null | stats count by site_url, created_user, timestamp",
+      "title": "Identify Ghost CMS and WP Maps Pro Admin Takeover",
+      "context": "Automated exploitation creates rogue admin accounts and injects ClickFix payloads. Monitoring for unauthorized user creation and script injection reveals compromised CMS instances.",
+      "query": "| where log_source = \"wordpress\" OR log_source = \"ghost_cms\" | where event_type = \"user_created\" OR event_type = \"admin_login\" | where user_role = \"administrator\" AND auth_method != \"sso\" | stats count by username, source_ip, timestamp",
       "indicators": [
-        "Rogue admin usernames",
-        "WP Maps Pro exploitation endpoints",
-        "ClickFix payload injections"
+        "ClickFix JavaScript payloads in web server logs",
+        "Unauthorized admin account creation events",
+        "Sudden spike in user creation API calls"
       ],
       "sources": [
-        2
+        2,
+        3,
+        4
       ]
     },
     {
-      "title": "Palo Alto GlobalProtect Cookie Forgery",
-      "context": "CVE-2026-0257 allows forged VPN cookies. Hunt for authentication events lacking corresponding credential validation or showing anomalous session origins.",
-      "query": "CommonSecurityLog where Product == \"GlobalProtect\" and EventID == \"authentication_success\" and not (AuthenticationMethod == \"certificate\" or AuthenticationMethod == \"2fa\") | where CookieSignature != ExpectedSignature | summarize count() by SourceIP, Username, Timestamp",
+      "title": "Detect Palo Alto VPN Cookie Forgery and Unauthorized Access",
+      "context": "CVE-2026-0257 exploitation bypasses authentication via forged cookies. Hunting for anomalous VPN sessions and admin logins without corresponding MFA events identifies compromised gateways.",
+      "query": "| where log_source = \"panos_globalprotect\" | where event_type = \"vpn_connection_established\" | where auth_method = \"cookie\" AND mfa_status != \"success\" | stats count by username, source_ip, gateway_ip, timestamp",
       "indicators": [
-        "Forged GlobalProtect cookies",
-        "Shared certificate configurations",
-        "Unauthorized admin VPN sessions"
+        "VPN connections authenticated via cookie without MFA",
+        "Admin sessions originating from unusual geolocations",
+        "Rapid succession of VPN connection attempts from single IPs"
       ],
       "sources": [
         6
       ]
     },
     {
-      "title": "Ghost CMS ClickFix Injection",
-      "context": "CVE-2026-26980 exploited to deploy ClickFix malware. Hunt for unauthorized script injections and session hijacking patterns in CMS logs.",
-      "query": "index=cms_access ghost* | where request_uri contains \"/ghost/api\" and (response_code == 200 or response_code == 302) and payload contains \"clickfix\" | stats count by site_domain, injected_script, timestamp",
+      "title": "Track Codex UI Tool Token Exfiltration",
+      "context": "Compromised developer tool silently harvests OpenAI refresh tokens. Monitoring for unexpected API token usage and outbound connections to unknown endpoints catches supply chain compromise.",
+      "query": "| where process_name contains \"codex\" OR process_name contains \"ui_tool\" | where network_destination NOT IN (known_developer_endpoints) | where request_headers contains \"Authorization: Bearer\" OR request_headers contains \"refresh_token\" | stats count by process_name, network_destination, timestamp",
       "indicators": [
-        "ClickFix payload signatures",
-        "Ghost CMS unauthorized API calls",
-        "Session hijacking redirects"
+        "OpenAI refresh tokens transmitted to non-OpenAI domains",
+        "Unexpected outbound HTTPS connections from developer workstations",
+        "API token usage spikes from compromised machine IPs"
       ],
       "sources": [
-        3,
-        4
+        5
       ]
     }
   ],
@@ -342,17 +361,17 @@
         1
       ]
     ],
-    "key_changes": "Shift from opportunistic web scanning to targeted poisoning of enterprise update channels and cryptographic bypass of perimeter controls. Attackers now weaponize vendor trust mechanisms and misconfigured certificates to achieve persistent access.",
+    "key_changes": "Active exploitation has shifted from opportunistic web scanning to systematic supply chain poisoning and perimeter authentication bypass. Security update mechanisms and developer tooling are now primary attack vectors.",
     "emerging_trends": [
-      "Weaponization of vendor update mechanisms for malware distribution",
-      "Cryptographic trust exploitation for perimeter bypass",
-      "AI developer tool supply chain targeting",
-      "Automated CMS exploitation for mass malware staging"
+      "CMS mass compromise campaigns for automated malware distribution",
+      "VPN cryptographic misconfiguration exploitation bypassing MFA",
+      "Developer tool supply chain poisoning targeting AI credentials",
+      "Security product update mechanism weaponization"
     ],
     "declining_threats": [
-      "Legacy email phishing campaigns",
-      "Opportunistic port scanning",
-      "Credential stuffing against web portals"
+      "Traditional port scanning campaigns",
+      "Basic phishing-driven initial access",
+      "Unpatched legacy server exploitation"
     ]
   }
 }
